@@ -5,7 +5,6 @@
   "main": "lib/Run.js",
   "types": "lib/Rodule.d.ts",
   "type": "module",
-  "private": true,
   "scripts": {
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' Run.ts",
     "start:windows": "nodemon --watch 'src/**/*.ts' --exec \"npx ts-node\" Run.ts",
@@ -15,9 +14,17 @@
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "package": "ncc build --source-map --license licenses.txt"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/essif-lab/trrt"
+  },
   "keywords": [],
-  "author": "",
+  "author": "eSSIF-Lab",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/essif-lab/trrt/issues"
+  },
+  "homepage": "https://github.com/essif-lab/trrt#readme",
   "dependencies": {
     "chalk": "5.2.0",
     "classnames": "^2.2.6",
@@ -49,9 +56,6 @@
     "vinyl-source-stream": "^2.0.0",
     "watchify": "^4.0.0"
   },
-  "workspaces": [
-    "packages\\a"
-  ],
   "files": [
     "lib/**/*"
   ]
