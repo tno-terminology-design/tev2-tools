@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Resolver } from './Resolver.js';
+import { Resolver } from './Resolver';
 import { Logger } from 'tslog';
 import chalk from 'chalk';
 import clear from 'clear';
@@ -43,5 +43,7 @@ async function main(): Promise<void> {
       }
 
 }
+
+export const Test = (input: string) => `Returning ${input}`;
 
 main();

@@ -1,5 +1,5 @@
 import { Logger } from "tslog";
-import { Converter } from "./Converter.js";
+import { Converter } from "./Converter";
 
 export class MarkdownConverter implements Converter {
       private log = new Logger();
