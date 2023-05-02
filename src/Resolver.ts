@@ -223,13 +223,12 @@ export class Resolver {
       private createOutputDir(): boolean {
             if (!fs.existsSync(this.output)) {
                   this.log.info("Creating output directory: " + this.output + ".....");
-                  fs.mkdir(this.output, (err) => {
-                        if (err) {
-                              this.log.error(err);
-                              return false;
-                        }
-                  });
-                  return true;
+                  fs.mkdirSync(this.output, { recursive: true});
+                  if (!fs.existsSync(this.output)) {
+                        return true;
+                  } else {
+                        return false;
+                  };
             }
             return true;
       }
