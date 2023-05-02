@@ -17,7 +17,7 @@ export class Resolver {
       private output: string;
       // todo switch scope
       private scope: string;
-      private tmpLocalMrgFile: string  = "docs/glossaries/mrg-process-engine.yaml"; // temp
+      private tmpLocalMrgFile: string  = "src/test_files/terminology/manual-mrg.yaml"; // temp
       private mrgWritePath = "./mrg.yaml"
       private config?: string;
       private directory: string = ".";
