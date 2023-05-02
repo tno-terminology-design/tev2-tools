@@ -15,4 +15,4 @@ jobs:
           npm install
           npm run build
           npm install -g
-          trrt
+          trrt -o __tests__/output/ -s src/test_files/saf.yaml -d src/test_files/terminology

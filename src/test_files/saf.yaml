@@ -5,12 +5,12 @@
 # ways in which people can contribute, raise issues, see what's going on, discuss, etc.
 #
 scope:
-  scopetag: tev2 # identifier that curators have determined for this terminology
+  scopetag: default # identifier that curators have determined for this terminology
   scopedir: test_files  # URL of the scope-directory for meta data purposes
   curatedir: terminology # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
   glossarydir: terminology # directory where all glossary files and GDFs are located. Full URL is `scopedir`/`glossarydir`
   mrgfile: manual-mrg.yaml # file that contains the (default) machine readable glossary. Full URL is `scopedir`/`mrgfile`
-  # hrgfile: glossary-tev2 # file that contains the (default) human readable glossary. Full URL is `scopedir`/`hrgfile`
+  # hrgfile: glossary-default # file that contains the (default) human readable glossary. Full URL is `scopedir`/`hrgfile`
   # license: LICENSE.md # file that contains the (default) licensing conditions. Full URL is `scopedir`/`license`
   # statuses: [ proposed, approved, deprecated ] # list of status tags that are defined for terminological artifacts in this scope
   
@@ -32,4 +32,4 @@ versions:
 - vsntag: main # this version MUST only be used for testing the MRG generator
   mrgfile: manual-mrg.yaml # URL: <scopedir>/<glossarydir>/<mrgfile>
   termselcrit:
-  - "*@tev2" # import all TEv2 terms
+  - "*@default" # import all default terms
