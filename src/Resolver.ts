@@ -235,7 +235,7 @@ export class Resolver {
 
       private writeFile(file: string, data: string) {
             this.log.trace("Writing: " + file);
-            fs.writeFileSync(this.output + file, data);
+            fs.writeFileSync(path.join(this.output, file), data);
       }
 
       private interpretAndConvert(data: string, glossary: Map<string, string>): string {
