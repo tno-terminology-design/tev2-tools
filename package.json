@@ -13,7 +13,7 @@
     "start:windows": "nodemon --watch 'src/**/*.ts' --exec \"npx ts-node\" Run.ts",
     "create": "npm run build && npm run test",
     "build": "tsc -p .",
-    "local": "npm i -g && trrt",
+    "local": "sudo npm i -g && trrt",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "package": "ncc build --source-map --license licenses.txt"
   },
