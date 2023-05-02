@@ -1,5 +1,5 @@
 import { Logger } from "tslog";
-import { Converter } from "./Converter";
+import { Converter } from "./Converter.js";
 
 export class ESSIFConverter implements Converter {
       private log = new Logger();

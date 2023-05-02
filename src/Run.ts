@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Resolver } from './Resolver';
+import { Resolver } from './Resolver.js';
 import { Logger } from 'tslog';
 import chalk from 'chalk';
 import clear from 'clear';
@@ -17,6 +17,7 @@ console.log(
 );
 
 program
+      .name('trrt')
       .version('0.0.0')
       .description("A CLI for the Term Reference Resolution Toolkit")
       .option('-o, --output <path>', 'Path to output converted files to (required)')
@@ -27,6 +28,8 @@ program
       .option('-I, --interpreter <type>', 'Set interpreter to Standard or Alt syntax')
       .option('-C, --converter <type>', 'Set converter to Markdown HTTP or ESIFF output')
       .parse(process.argv);
+
+program.parse()
 
 async function main(): Promise<void> {
       const log = new Logger();
@@ -43,9 +46,5 @@ async function main(): Promise<void> {
       }
 
 }
-
-
-// strictly for testing
-export const Test = (input: string) => `Returning ${input}`;
 
 main();

@@ -1,5 +1,5 @@
 import { Logger } from "tslog";
-import { Interpreter } from "./Interpreter";
+import { Interpreter } from "./Interpreter.js";
 
 export class StandardInterpreter implements Interpreter {
       private log = new Logger();

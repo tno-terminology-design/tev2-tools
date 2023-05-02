@@ -1,10 +1,10 @@
-import { Interpreter } from './Interpreter';
-import { Converter } from './Converter';
-import { StandardInterpreter } from './StandardInterpreter';
-import { MarkdownConverter } from './MarkdownConverter';
-import { HTTPConverter } from './HTTPConverter';
-import { AltInterpreter } from './AltInterpreter';
-import { ESSIFConverter } from './ESIFFConverter'
+import { Interpreter } from './Interpreter.js';
+import { Converter } from './Converter.js';
+import { StandardInterpreter } from './StandardInterpreter.js';
+import { MarkdownConverter } from './MarkdownConverter.js';
+import { HTTPConverter } from './HTTPConverter.js';
+import { AltInterpreter } from './AltInterpreter.js';
+import { ESSIFConverter } from './ESIFFConverter.js'
 import { Logger } from 'tslog';
 
 import download = require('download');
