@@ -1,17 +1,19 @@
 {
   "name": "trrt",
   "version": "0.0.0",
-  "description": "",
+  "description": "Term Reference Resolution Tool (TRRT)",
   "main": "lib/Run.js",
-  "types": "lib/Rodule.d.ts",
+  "bin": {
+    "trrt": "./lib/Run.js"
+  },
   "type": "module",
   "scripts": {
     "test": "jest --config jest.config.json",
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' Run.ts",
     "start:windows": "nodemon --watch 'src/**/*.ts' --exec \"npx ts-node\" Run.ts",
     "create": "npm run build && npm run test",
-    "build": "tsc",
-    "local": "sudo npm i -g && trrt",
+    "build": "tsc -p .",
+    "local": "npm i -g && trrt",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "package": "ncc build --source-map --license licenses.txt"
   },
