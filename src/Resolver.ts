@@ -17,7 +17,6 @@ export class Resolver {
       private output: string;
       // todo switch scope
       private scope: string;
-      private tmpLocalMrgFile: string  = "src/test_files/terminology/manual-mrg.yaml"; // temp
       private mrgWritePath = "./mrg.yaml"
       private config?: string;
       private directory: string = ".";
@@ -150,15 +149,16 @@ export class Resolver {
       private async readGlossary(): Promise<Map<string, string>> {
             var glossary: Map<string, string> = new Map();
             var mrgURL: string = this.getMrgUrl();
-            if (this.tmpLocalMrgFile) {
-                  // this is for local testing
-                  const mrgDocument: any = yaml.load(fs.readFileSync(this.tmpLocalMrgFile, 'utf8'));
+            // local mrg file
+            // TODO differentiate between local and remote more precisely
+            if (!mrgURL.startsWith('http')) {
+                  const mrgDocument: any = yaml.load(fs.readFileSync(mrgURL, 'utf8'));
                   this.populateGlossary(mrgDocument, glossary);
                   this.log.info(`Populated glossary of ${this.scope}:${this.version}`);
                   console.log(glossary);
                   return glossary;
-            } else {
-                  // remote mrg file                  
+            // remote mrg file  
+            } else {              
                   if (mrgURL != "") {
                         // TODO make sure this is synchronous 
                         this.log.trace("Downloading MRG....");
@@ -166,7 +166,7 @@ export class Resolver {
                         const mrgDocument: any = yaml.load(fs.readFileSync(this.mrgWritePath, 'utf8'));
                         this.log.info(`MRG loaded: ${mrgDocument}`);
                         this.populateGlossary(mrgDocument, glossary);
-                        this.log.info(`Populated gloassary of ${this.scope}:${this.version}`);
+                        this.log.info(`Populated glossary of ${this.scope}:${this.version}`);
                         console.log(glossary);
                         return glossary;
                   } else {
