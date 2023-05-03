@@ -23,13 +23,13 @@ export class MarkdownConverter implements Converter {
                         }
                         this.log.info("The converted markdown term is: " + markdownOut)
                   } else {
-                        this.log.error("No access for this version yet");
+                        this.log.error("No access to version " + properties.get("vsntag") + " of " + properties.get("scopetag"));
                         return markdownOut;
                         // TODO go back and get the correct glossary   
                   }
 
             } else {
-                  this.log.error("No access for this scope yet");
+                  this.log.error("No access to scope " + properties.get("scopetag"));
                   return markdownOut;
                   // TODO go back and get the correct glossary
             }
