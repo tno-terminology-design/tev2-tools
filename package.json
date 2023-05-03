@@ -15,6 +15,7 @@
     "create": "npm run build && npm run test",
     "build": "tsc -p .",
     "local": "sudo npm i -g && trrt",
+    "rebuild": "npm uninstall trrt -g && rm lib -rf && npm run build && npm i -g",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "package": "ncc build --source-map --license licenses.txt"
   },
