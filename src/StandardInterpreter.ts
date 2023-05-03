@@ -3,8 +3,8 @@ import { Interpreter } from "./Interpreter.js";
 
 export class StandardInterpreter implements Interpreter {
       private log = new Logger();
-      private termRegexGlobal: RegExp = /(?<=^|[^`\\])\[(?<showtext>.+)\]\((?:(?<term>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)?(?::(?<vsntag>[a-z0-9_-]+))?\)/g;
-      private termRegexLocal: RegExp = /(?<=^|[^`\\])\[(?<showtext>.+)\]\((?:(?<term>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)?(?::(?<vsntag>[a-z0-9_-]+))?\)/;
+      private termRegexGlobal: RegExp = /(?<=^|[^`\\])\[(?<showtext>[^\n\]@]+)\]\((?:(?<term>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)/g;
+      private termRegexLocal: RegExp = /(?<=^|[^`\\])\[(?<showtext>[^\n\]@]+)\]\((?:(?<term>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)/;
       public constructor() { }
 
       getType(): string {
