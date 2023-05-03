@@ -20,13 +20,13 @@ export class HTTPConverter implements Converter {
                         }
                         this.log.info("The html term is: " + htmlOut);
                   } else {
-                        this.log.error("No access to version '" + properties.get("vsntag") + "' of '" + properties.get("scopetag") + "'");
+                        this.log.error(`No access to version '${properties.get("vsntag")}' of ' ${properties.get("scopetag")}'`);
                         return htmlOut;
                         // TODO go back and get the correct glossary   
                   }
 
             } else {
-                  this.log.error("No access to scope '" + properties.get("scopetag") + "'");
+                  this.log.error(`No access to scope '${properties.get("scopetag")}`);
                   return htmlOut;
                   // TODO go back and get the correct glossary
             }
