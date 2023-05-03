@@ -6,11 +6,11 @@
 #
 scope:
   scopetag: default # identifier that curators have determined for this terminology
-  scopedir: test_files  # URL of the scope-directory for meta data purposes
+  scopedir: ./src/test_files  # URL of the scope-directory
   curatedir: terminology # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
   glossarydir: terminology # directory where all glossary files and GDFs are located. Full URL is `scopedir`/`glossarydir`
-  mrgfile: manual-mrg.yaml # file that contains the (default) machine readable glossary. Full URL is `scopedir`/`mrgfile`
-  # hrgfile: glossary-default # file that contains the (default) human readable glossary. Full URL is `scopedir`/`hrgfile`
+  mrgfile: manual-mrg.yaml # file that contains the (default) machine readable glossary. Full URL is `glossarydir`/`mrgfile`
+  # hrgfile: glossary-default # file that contains the (default) human readable glossary. Full URL is `glossarydir`/`hrgfile`
   # license: LICENSE.md # file that contains the (default) licensing conditions. Full URL is `scopedir`/`license`
   # statuses: [ proposed, approved, deprecated ] # list of status tags that are defined for terminological artifacts in this scope
   
