@@ -3,8 +3,8 @@ import { Interpreter } from "./Interpreter.js";
 
 export class StandardInterpreter implements Interpreter {
       private log = new Logger();
-      private termRegexGlobal: RegExp = /(?<=[^`\\])\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>.+?)\]\((?<id>[a-z0-9_-]+?)(?:#(?<trait>[a-z0-9_-]+?))?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\)/g;
-      private termRegexLocal: RegExp = /(?<=[^`\\])\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>.+?)\]\((?<id>[a-z0-9_-]+?)(?:#(?<trait>[a-z0-9_-]+?))?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\)/;
+      private termRegexGlobal: RegExp = /(?<=^|[^`\\])\[(?<showtext>.+)\]\((?:(?<term>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)?(?::(?<vsntag>[a-z0-9_-]+))?\)/g;
+      private termRegexLocal: RegExp = /(?<=^|[^`\\])\[(?<showtext>.+)\]\((?:(?<term>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)?(?::(?<vsntag>[a-z0-9_-]+))?\)/;
       public constructor() { }
 
       getType(): string {
@@ -16,11 +16,9 @@ export class StandardInterpreter implements Interpreter {
             if (match.groups != undefined) {
                   if (match.groups.showtext != undefined && match.groups.showtext != "") {
                         termProperties.set("showtext", match.groups.showtext);
-                  } else {
-                        termProperties.set("showtext", "Missing Input");
                   }
-                  if (match.groups.id != undefined && match.groups.id != "") {
-                        termProperties.set("term", match.groups.id);
+                  if (match.groups.term != undefined && match.groups.term != "") {
+                        termProperties.set("term", match.groups.term);
                   } else {
                         // term is a text that identifies a knowledge artifact, and is specified in the curated text that documents that artifact (in a specific version of the terminology of a specific scope). It will be matched against the term fields of MRG entries in the MRG that documents said terminology. If omitted, it is generated as follows (assuming the MRG to be used has already been identified):
 
@@ -30,11 +28,9 @@ export class StandardInterpreter implements Interpreter {
                         // - if the resulting term matches an element in the list of texts in the formphrases field of an MRG entry, then replace term with 
                         //   the contents of the term-field of that same MRG entry.
                         var showtext = termProperties.get("showtext");
-                        if (showtext != "Missing Input" && showtext != undefined) {
+                        if (showtext != undefined) {
                               var term = showtext.toLowerCase().replace(/[^A-Za-z_-]+/g, "-");
                               termProperties.set("term", term);
-                        } else {
-                              termProperties.set("term", "Missing Input");
                         }
                   }
                   if (match.groups.trait != undefined && match.groups.trait != "") {
@@ -52,7 +48,7 @@ export class StandardInterpreter implements Interpreter {
                   } else {
                         termProperties.set("vsntag", "latest");
                   }
-                  this.log.trace(`Found term: ${match}`);
+                  this.log.trace(`Interpreted term: ${termProperties.get("term")}`);
             }
 
             return termProperties;
