@@ -254,7 +254,7 @@ export class Resolver {
       public async resolve(): Promise<boolean> {
             this.createOutputDir();
             var files = fs.readdirSync(this.directory);
-            this.log.info("Reading " + this.directory + ".....");
+            this.log.info("Reading " + this.directory + "...");
 
             files.forEach(async file => {
                   if (path.extname(file) == ".md" || path.extname(file) == ".html") {
@@ -263,7 +263,7 @@ export class Resolver {
                         data = this.interpretAndConvert(data, await this.readGlossary());
                         this.writeFile(file, data);
                   } else {
-                        this.log.error(file + " does not have a recognised file type (*.md, *.html)");
+                        this.log.error(this.directory + "/" + file + " was not resolved, as it does not have a recognised file type (*.md, *.html)");
                   }
             });
 
