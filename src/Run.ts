@@ -27,6 +27,7 @@ program
       .option('-V, --defaultversion <vsn>', 'Default version to use when no version is set in term')
       .option('-I, --interpreter <type>', 'Set interpreter to Standard or Alt syntax')
       .option('-C, --converter <type>', 'Set converter to Markdown HTTP or ESIFF output')
+      .option('-r, --recursive', 'Recursively read contents and output subdirectories of the input')
       .parse(process.argv);
 
 program.parse()
@@ -37,7 +38,7 @@ async function main(): Promise<void> {
       if (!options.output || !options.saf) {
             program.outputHelp();
       } else {
-            let resolver: Resolver = new Resolver({ outputPath: options.output, scopePath: options.saf, directoryPath: options.directory, vsn: options.defaultversion, configPath: options.config, interpreterType: options.interpreter, converterType: options.converter});
+            let resolver: Resolver = new Resolver({ outputPath: options.output, scopePath: options.saf, directoryPath: options.directory, vsn: options.defaultversion, configPath: options.config, interpreterType: options.interpreter, converterType: options.converter, recursive: options.recursive });
             if (await resolver.resolve()) {
                   log.info("Resolution complete...");
             } else {

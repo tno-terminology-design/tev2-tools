@@ -17,7 +17,7 @@ export class Resolver {
       private output: string;
       // todo switch scope
       private scope: string;
-      private mrgWritePath = "./mrg.yaml"
+      private mrgWritePath = "./mrg.yaml"    // on download from remote source
       private config?: string;
       private directory: string = ".";
       // todo switch scope based on version 
@@ -25,10 +25,12 @@ export class Resolver {
       private converter?: Converter;
       private interpreter?: Interpreter;
       private baseURL?: string;
+      private recursive?: boolean;
 
-      public constructor({ outputPath, scopePath, directoryPath, vsn, configPath, interpreterType, converterType }: { outputPath: string; scopePath: string; directoryPath?: string; vsn?: string; configPath?: string; interpreterType?: string; converterType?: string; }) {
+      public constructor({ outputPath, scopePath, directoryPath, vsn, configPath, interpreterType, converterType, recursive }: { outputPath: string; scopePath: string; directoryPath?: string; vsn?: string; configPath?: string; interpreterType?: string; converterType?: string; recursive?: boolean }) {
             this.output = outputPath;
             this.scope = scopePath;
+            this.recursive = recursive;
 
             // process optional parameters if not set in config 
             if (configPath) {
