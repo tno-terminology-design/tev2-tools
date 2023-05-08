@@ -144,31 +144,28 @@ export class Resolver {
 
 
       private async readGlossary(): Promise<Map<string, string>> {
-            var glossary: Map<string, string> = new Map();
-            var mrgURL: string = this.getMrgUrl();
-            // local mrg file
-            // TODO differentiate between local and remote more precisely
-            if (!mrgURL.startsWith('http')) {
-                  const mrgDocument: any = yaml.load(fs.readFileSync(mrgURL, 'utf8'));
-                  this.populateGlossary(mrgDocument, glossary);
-                  this.log.info(`Populated glossary of ${this.scope}:${this.version}`);
-                  return glossary;
-            // remote mrg file  
-            } else {              
-                  if (mrgURL != "") {
-                        // TODO make sure this is synchronous 
-                        this.log.trace("Downloading MRG....");
+            const glossary: Map<string, string> = new Map();
+            const mrgURL: string = this.getMrgUrl();
+            let mrgDocument: any;
+            
+            try {
+                  // Try reading MRG file using fs
+                  mrgDocument = yaml.load(fs.readFileSync(mrgURL, 'utf8'));
+            } catch (err) {
+                  try {
+                        // If file does not exist locally, download it
+                        this.log.trace("Trying to download MRG: " + mrgURL);
                         fs.writeFileSync(this.mrgWritePath, await download(mrgURL));
-                        const mrgDocument: any = yaml.load(fs.readFileSync(this.mrgWritePath, 'utf8'));
-                        this.log.info(`MRG loaded: ${mrgDocument}`);
-                        this.populateGlossary(mrgDocument, glossary);
-                        this.log.info(`Populated glossary of ${this.scope}:${this.version}`);
+                        mrgDocument = yaml.load(fs.readFileSync(this.mrgWritePath, 'utf8'));
+                  } catch (err) {
+                        this.log.error("Failed to download or read MRG, glossary empty")
                         return glossary;
-                  } else {
-                        this.log.error("No MRG to download, glossary empty");
-                        return glossary;
-                  }
+                  }      
             }
+
+            this.populateGlossary(mrgDocument, glossary);
+            this.log.info(`Populated glossary of ${this.scope}:${this.version}`)
+            return glossary
       }
 
 
