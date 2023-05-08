@@ -152,7 +152,6 @@ export class Resolver {
                   const mrgDocument: any = yaml.load(fs.readFileSync(mrgURL, 'utf8'));
                   this.populateGlossary(mrgDocument, glossary);
                   this.log.info(`Populated glossary of ${this.scope}:${this.version}`);
-                  console.log(glossary);
                   return glossary;
             // remote mrg file  
             } else {              
@@ -164,7 +163,6 @@ export class Resolver {
                         this.log.info(`MRG loaded: ${mrgDocument}`);
                         this.populateGlossary(mrgDocument, glossary);
                         this.log.info(`Populated glossary of ${this.scope}:${this.version}`);
-                        console.log(glossary);
                         return glossary;
                   } else {
                         this.log.error("No MRG to download, glossary empty");
@@ -246,7 +244,7 @@ export class Resolver {
                   if (dirent.isDirectory()) {
                         const nestedFiles = this.getFilesRecursively(fullPath);
                         files.push(...nestedFiles);
-                  } else if (dirent.isFile() && [".md", ".html"].includes(path.extname(dirent.name))) {
+                  } else if (dirent.isFile()) {
                         files.push(fullPath);
                   }
             }
@@ -254,30 +252,26 @@ export class Resolver {
       }
 
       public async resolve(): Promise<boolean> {
-            if (this.recursive) {
-                  var files = this.getFilesRecursively(this.directory);
-                  
-                  files.forEach(async filePath => {
-                        var data = fs.readFileSync(filePath, 'utf8');
-                        this.log.trace("Reading: " + filePath);
-                        data = this.interpretAndConvert(data, await this.readGlossary());
-                        this.writeFile(path.dirname(path.join(this.output, filePath)), path.basename(filePath), data);
-                  });
-            } else {
-                  var files = fs.readdirSync(this.directory);
-                  this.log.info("Reading " + this.directory + "...");
+            const files = this.recursive
+                  ? this.getFilesRecursively(this.directory)
+                  : fs.readdirSync(this.directory);
 
-                  files.forEach(async file => {
-                        if ([".md", ".html"].includes(path.extname(file))) {
-                              var data = fs.readFileSync(path.join(this.directory, file), 'utf8');
-                              this.log.trace("Reading: " + path.join(this.directory, file));
-                              data = this.interpretAndConvert(data, await this.readGlossary());
-                              this.writeFile(this.output, file, data);
-                        }
-                  });
+            this.log.info(`Reading ${files.length} ${this.recursive ? "files recursively" : "files"} in ${this.directory}`);
+
+            for (const file of files) {
+                  const filePath = this.recursive ? file : path.join(this.directory, file);
+
+                  if ([".md", ".html"].includes(path.extname(filePath))) {
+                        const data = fs.readFileSync(filePath, "utf8");
+                        this.log.trace("Reading: " + filePath);
+                        const convertedData = this.interpretAndConvert(data, await this.readGlossary());
+                        this.writeFile(path.dirname(path.join(this.output, filePath)), path.basename(filePath), convertedData);
+                  }
             }
+
             return true;
       }
+
 
 
 }
