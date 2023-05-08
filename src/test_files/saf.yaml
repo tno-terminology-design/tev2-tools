@@ -5,6 +5,7 @@
 # ways in which people can contribute, raise issues, see what's going on, discuss, etc.
 #
 scope:
+  website: placeholder.com/docs # home page of the terminology
   scopetag: default # identifier that curators have determined for this terminology
   scopedir: ./src/test_files  # URL of the scope-directory
   curatedir: terminology # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
