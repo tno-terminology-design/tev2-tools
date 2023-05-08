@@ -42,7 +42,7 @@ async function main(): Promise<void> {
             if (await resolver.resolve()) {
                   log.info("Resolution complete...");
             } else {
-                  log.error("Failed to resolve terms, see logs....");
+                  log.error("Failed to resolve terms, see logs...");
             }
       }
 
