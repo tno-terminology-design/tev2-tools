@@ -1,6 +1,6 @@
 {
   "name": "trrt",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Term Reference Resolution Tool (TRRT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
