@@ -30,7 +30,7 @@ export class Resolver {
       public constructor({ outputPath, scopePath, directoryPath, vsn, configPath, interpreterType, converterType, recursive }: { outputPath: string; scopePath: string; directoryPath?: string; vsn?: string; configPath?: string; interpreterType?: string; converterType?: string; recursive?: boolean }) {
             this.output = outputPath;
             this.scope = scopePath;
-            this.recursive = recursive;
+            this.recursive = recursive;   // either true or undefined
 
             // process optional parameters if not set in config 
             if (configPath) {
@@ -109,44 +109,46 @@ export class Resolver {
             return "";
       }
 
-      private getMrgUrl(): string {
-            this.log.trace("Locating MRG from SAF at: " + this.scope);
+      private getScopeMap(): Map<string, string> {
             const safDocument: Map<string, string> = new Map(Object.entries(yaml.load(fs.readFileSync(this.scope, 'utf8')!)!));
             // JSON.stringify() used to force object to string casting as javascript does not support typing otherwise
-            const scopeMap: Map<string, string> = new Map(Object.entries(yaml.load(JSON.stringify(safDocument.get("scope"))!)!));
-            var mrgURL: string = "";
+            return new Map(Object.entries(yaml.load(JSON.stringify(safDocument.get("scope"))!)!));
+      }
 
-            // move to separate functions
-            if (scopeMap.get("website") != "" && scopeMap.get("website")) {
-                  this.baseURL = scopeMap.get("website");
-            } else {
+      private getMrgUrl(): string {
+            this.log.trace("Locating MRG from SAF at: " + this.scope);
+
+            const scopeMap = this.getScopeMap();
+
+            const website = scopeMap.get("website");
+            if (!website) {
                   this.log.error("No website defined in SAF");
             }
+            this.baseURL = website;
 
-            if (scopeMap.get("scopedir") != "" && scopeMap.get("scopedir")) {
-                  mrgURL = mrgURL + scopeMap.get("scopedir");
-            } else {
+            const scopedir = scopeMap.get("scopedir");
+            if (!scopedir) {
                   this.log.error("No scopedir defined in SAF");
-                  return "";
+                  return ""
             }
 
-            if (scopeMap.get("glossarydir") != "" && scopeMap.get("glossarydir")) {
-                  mrgURL = mrgURL + "/" + scopeMap.get("glossarydir");
-            } else {
+            const glossarydir = scopeMap.get("glossarydir");
+            if (!glossarydir) {
                   this.log.error("No glossarydir defined in SAF");
-                  return "";
+                  return ""
             }
 
-            if (scopeMap.get("mrgfile") != "" && scopeMap.get("mrgfile")) {
-                  mrgURL = mrgURL + "/" + scopeMap.get("mrgfile");
-            } else {
+            const mrgfile = scopeMap.get("mrgfile");
+            if (!mrgfile) {
                   this.log.error("No mrgfile defined in SAF");
-                  return "";
+                  return ""
             }
 
+            const mrgURL = `${scopedir}/${glossarydir}/${mrgfile}`;
             this.log.trace(`MRG URL is: ${mrgURL}`);
             return mrgURL;
       }
+
 
       private async readGlossary(): Promise<Map<string, string>> {
             var glossary: Map<string, string> = new Map();
