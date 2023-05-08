@@ -95,18 +95,11 @@ export class Resolver {
       }
 
       public getInterpreterType(): string {
-            if (this.interpreter) {
-                  return this.interpreter.getType();
-            }
-            return "";
-
-      }
+            return this.interpreter ? this.interpreter.getType() : "";
+          }          
 
       public getConverterType(): string {
-            if (this.converter) {
-                  return this.converter.getType();
-            }
-            return "";
+            return this.converter ? this.converter.getType() : "";
       }
 
       private getScopeMap(): Map<string, string> {
@@ -224,22 +217,12 @@ export class Resolver {
             return glossary;
       }
 
-      private createOutputDir(): boolean {
-            if (!fs.existsSync(this.output)) {
-                  this.log.info("Creating output directory: " + this.output + ".....");
-                  fs.mkdirSync(this.output, { recursive: true});
-                  if (!fs.existsSync(this.output)) {
-                        return true;
-                  } else {
-                        return false;
-                  };
-            }
-            return true;
-      }
-
-      private writeFile(file: string, data: string) {
-            this.log.trace("Writing: " + file);
-            fs.writeFileSync(path.join(this.output, file), data);
+      private writeFile(dirPath: string, file: string, data: string) {
+            if (!fs.existsSync(dirPath)) {
+                  fs.mkdirSync(dirPath, { recursive: true });
+            };
+            this.log.trace("Writing: " + path.join(dirPath, file));
+            fs.writeFileSync(path.join(dirPath, file), data);
       }
 
       private interpretAndConvert(data: string, glossary: Map<string, string>): string {
@@ -255,22 +238,44 @@ export class Resolver {
             return data;
       }
 
-      public async resolve(): Promise<boolean> {
-            this.createOutputDir();
-            var files = fs.readdirSync(this.directory);
-            this.log.info("Reading " + this.directory + "...");
-
-            files.forEach(async file => {
-                  if (path.extname(file) == ".md" || path.extname(file) == ".html") {
-                        var data = fs.readFileSync(this.directory + "/" + file, 'utf8')
-                        this.log.trace("Reading: " + file);
-                        data = this.interpretAndConvert(data, await this.readGlossary());
-                        this.writeFile(file, data);
-                  } else {
-                        this.log.error(this.directory + "/" + file + " was not resolved, as it does not have a recognised file type (*.md, *.html)");
+      public getFilesRecursively(dirPath: string): string[] {
+            const files: string[] = [];
+            const dirents = fs.readdirSync(dirPath, { withFileTypes: true });
+            for (const dirent of dirents) {
+                        const fullPath = path.join(dirPath, dirent.name);
+                  if (dirent.isDirectory()) {
+                        const nestedFiles = this.getFilesRecursively(fullPath);
+                        files.push(...nestedFiles);
+                  } else if (dirent.isFile() && [".md", ".html"].includes(path.extname(dirent.name))) {
+                        files.push(fullPath);
                   }
-            });
+            }
+            return files;
+      }
 
+      public async resolve(): Promise<boolean> {
+            if (this.recursive) {
+                  var files = this.getFilesRecursively(this.directory);
+                  
+                  files.forEach(async filePath => {
+                        var data = fs.readFileSync(filePath, 'utf8');
+                        this.log.trace("Reading: " + filePath);
+                        data = this.interpretAndConvert(data, await this.readGlossary());
+                        this.writeFile(path.dirname(path.join(this.output, filePath)), path.basename(filePath), data);
+                  });
+            } else {
+                  var files = fs.readdirSync(this.directory);
+                  this.log.info("Reading " + this.directory + "...");
+
+                  files.forEach(async file => {
+                        if ([".md", ".html"].includes(path.extname(file))) {
+                              var data = fs.readFileSync(path.join(this.directory, file), 'utf8');
+                              this.log.trace("Reading: " + path.join(this.directory, file));
+                              data = this.interpretAndConvert(data, await this.readGlossary());
+                              this.writeFile(this.output, file, data);
+                        }
+                  });
+            }
             return true;
       }
 
