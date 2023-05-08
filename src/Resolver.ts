@@ -178,7 +178,8 @@ export class Resolver {
                   if (innerValues.get("formPhrases")) {
                         alternatives = innerValues.get("formPhrases")!.split(",");
                         alternatives.forEach(t => t.trim());
-                        // todo double check the white spaces in this glossary 
+                        // todo double check the white spaces in this glossary
+                        // (?<text>\w+){(?<formPhrase>ss|yies|ying)}
                         for (var alternative of alternatives) {
                               if (alternative.includes("{")) {
                                     if (alternative.includes("{ss}")) {
