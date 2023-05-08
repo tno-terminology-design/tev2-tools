@@ -26,7 +26,7 @@ export class HTTPConverter implements Converter {
                   }
 
             } else {
-                  this.log.error(`No access to scope '${properties.get("scopetag")}`);
+                  this.log.error(`No access to scope '${properties.get("scopetag")}'`);
                   return htmlOut;
                   // TODO go back and get the correct glossary
             }

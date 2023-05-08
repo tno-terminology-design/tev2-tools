@@ -29,7 +29,7 @@ export class MarkdownConverter implements Converter {
                   }
 
             } else {
-                  this.log.error(`No access to scope '${properties.get("scopetag")}`);
+                  this.log.error(`No access to scope '${properties.get("scopetag")}'`);
                   return markdownOut;
                   // TODO go back and get the correct glossary
             }

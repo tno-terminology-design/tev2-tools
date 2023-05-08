@@ -22,7 +22,7 @@ export class ESSIFConverter implements Converter {
                         // TODO go back and get the correct glossary   
                   }
             } else {
-                  this.log.error(`No access to scope '${properties.get("scopetag")}`);
+                  this.log.error(`No access to scope '${properties.get("scopetag")}'`);
                   return esiffOut;
                   // TODO go back and get the correct glossary
             }
