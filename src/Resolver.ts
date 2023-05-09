@@ -6,6 +6,7 @@ import { HTTPConverter } from './HTTPConverter.js';
 import { AltInterpreter } from './AltInterpreter.js';
 import { ESSIFConverter } from './ESIFFConverter.js'
 import { Logger } from 'tslog';
+import { tmpdir } from 'os';
 
 import download = require('download');
 import fs = require("fs");
@@ -108,36 +109,26 @@ export class Resolver {
             return new Map(Object.entries(yaml.load(JSON.stringify(safDocument.get("scope"))!)!));
       }
 
+      private getSafKey(key: string): string {
+            const scopeMap = this.getScopeMap();
+            const value = scopeMap.get(key);
+            if (!value) {
+              this.log.error(`No ${key} defined in SAF`);
+              return "";
+            }
+            return value;
+          }
+
       private getMrgUrl(): string {
             this.log.trace("Locating MRG from SAF at: " + this.scope);
 
             const scopeMap = this.getScopeMap();
+            this.baseURL = this.getSafKey("website");
+            const scopedir = this.getSafKey("scopedir");
+            const glossarydir = this.getSafKey("glossarydir");
+            const mrgfile = this.getSafKey("mrgfile")
 
-            const website = scopeMap.get("website");
-            if (!website) {
-                  this.log.error("No website defined in SAF");
-            }
-            this.baseURL = website;
-
-            const scopedir = scopeMap.get("scopedir");
-            if (!scopedir) {
-                  this.log.error("No scopedir defined in SAF");
-                  return ""
-            }
-
-            const glossarydir = scopeMap.get("glossarydir");
-            if (!glossarydir) {
-                  this.log.error("No glossarydir defined in SAF");
-                  return ""
-            }
-
-            const mrgfile = scopeMap.get("mrgfile");
-            if (!mrgfile) {
-                  this.log.error("No mrgfile defined in SAF");
-                  return ""
-            }
-
-            const mrgURL = `${scopedir}/${glossarydir}/${mrgfile}`;
+            const mrgURL = path.join(scopedir, glossarydir, mrgfile);
             this.log.trace(`MRG URL is: ${mrgURL}`);
             return mrgURL;
       }
@@ -153,14 +144,19 @@ export class Resolver {
                   mrgDocument = yaml.load(fs.readFileSync(mrgURL, 'utf8'));
             } catch (err) {
                   try {
-                        // If file does not exist locally, download it
+                        // If file does not exist locally, download it to tmpdir
+                        const filePath = path.join(tmpdir(), mrgURL)
+                        const writeStream = fs.createWriteStream(filePath);
+
                         this.log.trace("Trying to download MRG: " + mrgURL);
-                        fs.writeFileSync(this.mrgWritePath, await download(mrgURL));
-                        mrgDocument = yaml.load(fs.readFileSync(this.mrgWritePath, 'utf8'));
+                        writeStream.write(await download(mrgURL))
+                        writeStream.close();
+
+                        mrgDocument = yaml.load(fs.readFileSync(filePath, 'utf8'));
                   } catch (err) {
                         this.log.error("Failed to download or read MRG, glossary empty")
                         return glossary;
-                  }      
+                  }
             }
 
             this.populateGlossary(mrgDocument, glossary);
