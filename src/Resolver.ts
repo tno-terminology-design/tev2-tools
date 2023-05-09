@@ -254,7 +254,7 @@ export class Resolver {
                   ? this.getFilesRecursively(this.directory)
                   : fs.readdirSync(this.directory);
 
-            this.log.info(`Reading ${files.length} ${this.recursive ? "files recursively" : "files"} in ${this.directory}`);
+            this.log.info(`Reading ${this.recursive ? "files recursively" : "files"} in ${this.directory}`);
 
             for (const file of files) {
                   const filePath = this.recursive ? file : path.join(this.directory, file);
