@@ -41,3 +41,32 @@ entries:
   #  - "criteria"
   #  - "notes"
   #  - "footnotes"
+-
+  term: "specification"
+  scopetag: "TEv2"
+  locator: "specification.md" # not sure yet if and how this is used by TRRT
+  isa: null
+  termType: "concept"
+  formPhrases: "specification{ss}"
+  status: null
+  synonyms: null
+  grouptags: null
+  glossaryText: "todo here the definition of the term specification"
+  created: "2023-05-01"
+  updated: "2023-05-01"
+  vsntag: "main"
+  commit: null
+  contributors: null
+  attribution: null
+  originalLicense: null
+  navurl: "somewhere/inside/tev2/specification.md"
+  headingids:
+  #  - "tev2-curated-text-header"
+  #  - "curation-status"
+  #  - "origins-acknowledgements"
+  #  - "concept"
+  #  - "summary"
+  #  - "purpose"
+  #  - "criteria"
+  #  - "notes"
+  #  - "footnotes"

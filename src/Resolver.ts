@@ -18,7 +18,6 @@ export class Resolver {
       private output: string;
       // todo switch scope
       private scope: string;
-      private mrgWritePath = "./mrg.yaml"    // on download from remote source
       private config?: string;
       private directory: string = ".";
       // todo switch scope based on version 
@@ -113,11 +112,11 @@ export class Resolver {
             const scopeMap = this.getScopeMap();
             const value = scopeMap.get(key);
             if (!value) {
-              this.log.error(`No ${key} defined in SAF`);
-              return "";
+                  this.log.error(`No ${key} defined in SAF`);
+                  return "";
             }
             return value;
-          }
+      }
 
       private getMrgUrl(): string {
             this.log.trace("Locating MRG from SAF at: " + this.scope);
@@ -143,20 +142,22 @@ export class Resolver {
                   // Try reading MRG file using fs
                   mrgDocument = yaml.load(fs.readFileSync(mrgURL, 'utf8'));
             } catch (err) {
-                  try {
-                        // If file does not exist locally, download it to tmpdir
-                        const filePath = path.join(tmpdir(), mrgURL)
-                        const writeStream = fs.createWriteStream(filePath);
+                  this.log.error("Failed to find MRG " + mrgURL);
+                  return glossary
+                  // try {
+                  //       // If file does not exist locally, download it to tmpdir
+                  //       const filePath = path.join(tmpdir(), mrgURL);
+                  //       const writeStream = fs.createWriteStream(filePath);
 
-                        this.log.trace("Trying to download MRG: " + mrgURL);
-                        writeStream.write(await download(mrgURL))
-                        writeStream.close();
+                  //       this.log.trace("Trying to download MRG: " + mrgURL);
+                  //       writeStream.write(await download(mrgURL));
+                  //       writeStream.close();
 
-                        mrgDocument = yaml.load(fs.readFileSync(filePath, 'utf8'));
-                  } catch (err) {
-                        this.log.error("Failed to download or read MRG, glossary empty")
-                        return glossary;
-                  }
+                  //       mrgDocument = yaml.load(fs.readFileSync(filePath, 'utf8'));
+                  // } catch (err) {
+                  //       this.log.error("Failed to download MRG, glossary empty")
+                  //       return glossary;
+                  // }
             }
 
             this.populateGlossary(mrgDocument, glossary);
@@ -221,6 +222,7 @@ export class Resolver {
             const matches: IterableIterator<RegExpMatchArray> = data.matchAll(this.interpreter!.getGlobalTermRegex());
             for (const match of Array.from(matches)) {
                   var termProperties: Map<string, string> = this.interpreter!.interpret(match);
+                  this.log.trace(glossary, termProperties);
                   var replacement = this.converter!.convert(glossary, termProperties);
                   if (replacement != "") {
                         data = data.replace(this.interpreter!.getLocalTermRegex(), replacement);
