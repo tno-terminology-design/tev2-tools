@@ -121,7 +121,6 @@ export class Resolver {
       private getMrgUrl(): string {
             this.log.trace("Locating MRG from SAF at: " + this.scope);
 
-            const scopeMap = this.getScopeMap();
             this.baseURL = this.getSafKey("website");
             const scopedir = this.getSafKey("scopedir");
             const glossarydir = this.getSafKey("glossarydir");
@@ -169,8 +168,11 @@ export class Resolver {
       private populateGlossary(mrgDocument: Object, glossary: Map<string, string>): Map<string, string> {
             const mrg: Map<string, string> = new Map(Object.entries(mrgDocument));
             for (const [key, value] of Object.entries(mrg.get("entries")!)) {
+
                   var alternatives: string[];
                   const innerValues: Map<string, string> = new Map(Object.entries(yaml.load(JSON.stringify(value)!)!));
+
+                  this.log.trace(innerValues)
 
                   if (innerValues.get("formPhrases")) {
                         alternatives = innerValues.get("formPhrases")!.split(",");
@@ -200,9 +202,9 @@ export class Resolver {
                         }
 
 
-                        glossary.set(innerValues.get("term")!, `${this.baseURL}/${innerValues.get("navurl")}`);
+                        glossary.set(`${innerValues.get("term")!}@${innerValues.get("scopetag")}`, `${this.baseURL}/${innerValues.get("navurl")}`);
                         for (var alternative of alternatives.filter(s => !s.includes("{"))) {
-                              glossary.set(alternative, `${this.baseURL}/${innerValues.get("navurl")}`);
+                              glossary.set(`${alternative!}@${innerValues.get("scopetag")}`, `${this.baseURL}/${innerValues.get("navurl")}`);
                         }
 
                   }
@@ -261,7 +263,7 @@ export class Resolver {
                         const data = fs.readFileSync(filePath, "utf8");
                         this.log.trace("Reading: " + filePath);
                         const convertedData = this.interpretAndConvert(data, await this.readGlossary());
-                        this.writeFile(path.dirname(path.join(this.output, filePath)), path.basename(filePath), convertedData);
+                        this.writeFile(path.dirname(path.join(this.output, path.basename(filePath))), path.basename(filePath), convertedData);
                   }
             }
 

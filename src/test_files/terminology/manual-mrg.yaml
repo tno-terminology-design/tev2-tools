@@ -43,7 +43,7 @@ entries:
   #  - "footnotes"
 -
   term: "specification"
-  scopetag: "TEv2"
+  scopetag: "tev2"
   locator: "specification.md" # not sure yet if and how this is used by TRRT
   isa: null
   termType: "concept"

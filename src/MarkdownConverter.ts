@@ -13,6 +13,11 @@ export class MarkdownConverter implements Converter {
             // trait (optional)
             // trait identifies a particular kind of descriptive text that is associated with the knowledge artifact. If specified, it must be one of the elements in the list of headingid's as specified in the headingids field of the MRG entry. If omitted, the preceding #-character should also be omitted
             var markdownOut: string = "";
+            this.log.info(glossary, properties)
+
+            const match = `${properties.get("term")}#${properties.get("trait")}@${properties.get("scopetag")}:${properties.get("vsntag")}`
+            this.log.trace(match)
+
             if (properties.get("scopetag") == "default") {
                   if (properties.get("vsntag") == "latest") {
                         var term: string = glossary.get(properties.get("term")!)!;
