@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Resolver } from './Resolver.js';
+import { Resolver } from './Resolver.js'
 import { Logger } from 'tslog';
 import chalk from 'chalk';
 import clear from 'clear';
@@ -38,14 +38,26 @@ async function main(): Promise<void> {
       if (!options.output || !options.saf) {
             program.outputHelp();
       } else {
-            let resolver: Resolver = new Resolver({ outputPath: options.output, scopePath: options.saf, directoryPath: options.directory, vsn: options.defaultversion, configPath: options.config, interpreterType: options.interpreter, converterType: options.converter, recursive: options.recursive });
+            // a term is found with a scopetag that has not yet been resolved.
+            // 
+            //       look up the scopedir from the scopes section of the main saf
+            //       from the resulting scopedir, read the saf 
+
+            // get the MRG associated with the vsntag of the term ref.
+            //       search the versions section that matches vsntag or altvsntags and obtain the mrgfile.
+            
+            // add the entire newly found MRG to the working glossary term@scopetag:vsntag.
+            //       match term to term
+            //       match possible termtype to termtype
+            //       
+
+            let resolver: Resolver = new Resolver({ outputPath: options.output, safPath: options.saf, configPath: options.config, inputPath: options.directory, defaultVersion: options.defaultversion, interpreterType: options.interpreter, converterType: options.converter, recursive: options.recursive });
             if (await resolver.resolve()) {
                   log.info("Resolution complete...");
             } else {
                   log.error("Failed to resolve terms, see logs...");
             }
       }
-
 }
 
 main();

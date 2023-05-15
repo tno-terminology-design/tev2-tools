@@ -15,14 +15,14 @@ scope:
   # license: LICENSE.md # file that contains the (default) licensing conditions. Full URL is `scopedir`/`license`
   # statuses: [ proposed, approved, deprecated ] # list of status tags that are defined for terminological artifacts in this scope
   
+#
 # The second section contains a mapping between scopetags that are used within the scope, and the associated scopedirs.
 # This enables tools to find the [SAF](@) of these [scopes](@), and from there all other directories, files etc.
 # that live within them, e.g. to use/import their data.
 #
 scopes:
-# - scopetags: # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
-#   - other-scope-tag
-#   scopedir: path-to-other-scope-dir # URL of the scope-directory
+- scopetags: [ essiflab, essif-lab ] # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
+  scopedir: https://github.com/essif-lab/framework/tree/master/docs/tev2 # URL of the scope-directory
 
 #
 # The third section specifies the versions that are actively maintained by the curators.
@@ -33,4 +33,10 @@ versions:
 - vsntag: main # this version MUST only be used for testing the MRG generator
   mrgfile: manual-mrg.yaml # URL: <scopedir>/<glossarydir>/<mrgfile>
   termselcrit:
+  - "*@essif-lab"
+  - "*@default" # import all default terms
+- vsntag: lain # this version MUST only be used for testing the MRG generator
+  mrgfile: manual-mrg.yaml # URL: <scopedir>/<glossarydir>/<mrgfile>
+  termselcrit:
+  - "*@essif-lab"
   - "*@default" # import all default terms
