@@ -1,15 +1,13 @@
 import { Interpreter } from './Interpreter.js';
 import { Converter } from './Converter.js';
-import { Glossary } from './saf.js';
+import { Glossary } from './Glossary.js';
 import { StandardInterpreter } from './StandardInterpreter.js';
 import { MarkdownConverter } from './MarkdownConverter.js';
 import { HTTPConverter } from './HTTPConverter.js';
 import { AltInterpreter } from './AltInterpreter.js';
 import { ESSIFConverter } from './ESIFFConverter.js'
 import { Logger } from 'tslog';
-import { tmpdir } from 'os';
 
-import download = require('download');
 import fs = require("fs");
 import path = require('path');
 import yaml = require('js-yaml');
@@ -20,7 +18,7 @@ export class Resolver {
       private safPath: string;
       private configPath?: string;
       private inputPath: string;
-      private defaultVersion: string = "latest";
+      private defaultVersion?: string;
       private interpreter: Interpreter;
       private converter: Converter;
       private recursive: boolean;
@@ -32,7 +30,7 @@ export class Resolver {
             this.safPath = safPath;
             this.recursive = recursive ?? false;
 
-            this.glossary = new Glossary({ safURL: this.safPath, glossary: new Map(), vsntag: this.defaultVersion })
+            this.glossary = new Glossary({ safURL: this.safPath, vsntag: this.defaultVersion })
 
             this.interpreter = interpreterType === "Alt" ? new AltInterpreter() : new StandardInterpreter();
             this.converter = converterType === "HTTP" ? new HTTPConverter() :
@@ -49,20 +47,39 @@ export class Resolver {
 
       private async interpretAndConvert(data: string): Promise<string> {
             const matches: IterableIterator<RegExpMatchArray> = data.matchAll(this.interpreter!.getGlobalTermRegex());
+            await this.glossary.main();
 
             for (const match of Array.from(matches)) {
                   var termProperties: Map<string, string> = this.interpreter!.interpret(match);
-                  this.log.trace(this.glossary, termProperties);
+                  var entries = this.glossary.glossary.entries;
+                  this.log.trace(this.glossary.glossary, termProperties);
 
-                  // if scope doesn't exist yet, add it
-                  await this.glossary.main();
-
+                  if (termProperties.get("scopetag") == "") {
+                        if (this.defaultVersion) {
+                              termProperties.set("scopetag", this.defaultVersion)
+                        } else {
+                              termProperties.set("scopetag", "default")
+                        }
+                  }
+                  // test if termProperties scopetag exists in entries already
+                  const scopetag = termProperties.get("scopetag");
+                  if (!entries.some(entry => entry.scopetag === scopetag)) {
+                        // if not: check if required saf is inside remote scopes of current saf
+                        if (scopetag) {
+                              let remoteSAF = (await this.glossary.saf).scopes.find(scopes => scopes.scopetags.includes(scopetag))?.scopedir;
+                              if (remoteSAF) {
+                                    let remoteGlossary = new Glossary({ safURL: remoteSAF })
+                                    await remoteGlossary.main();
+                                    // add remoteGlossary output to glossary
+                                    this.glossary.glossary.entries.push(...remoteGlossary.glossary.entries);
+                              }     
+                        }
+                  }             
                   var replacement = this.converter!.convert(this.glossary.glossary, termProperties);
                   if (replacement != "") {
                         data = data.replace(this.interpreter!.getLocalTermRegex(), replacement);
-                  }
+                  }                       
             }
-
             return data;
       }
 
