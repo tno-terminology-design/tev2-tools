@@ -52,7 +52,6 @@ export class Resolver {
             for (const match of Array.from(matches)) {
                   var termProperties: Map<string, string> = this.interpreter!.interpret(match);
                   var entries = this.glossary.glossary.entries;
-                  this.log.trace(this.glossary.glossary, termProperties);
 
                   if (termProperties.get("scopetag") == "") {
                         if (this.defaultVersion) {
@@ -63,6 +62,7 @@ export class Resolver {
                   }
                   // test if termProperties scopetag exists in entries already
                   const scopetag = termProperties.get("scopetag");
+                  this.log.debug(scopetag)
                   if (!entries.some(entry => entry.scopetag === scopetag)) {
                         // if not: check if required saf is inside remote scopes of current saf
                         if (scopetag) {
@@ -72,13 +72,17 @@ export class Resolver {
                                     await remoteGlossary.main();
                                     // add remoteGlossary output to glossary
                                     this.glossary.glossary.entries.push(...remoteGlossary.glossary.entries);
-                              }     
+                              }
                         }
                   }             
                   var replacement = this.converter!.convert(this.glossary.glossary, termProperties);
                   if (replacement != "") {
                         data = data.replace(this.interpreter!.getLocalTermRegex(), replacement);
-                  }                       
+                  } else {
+                        // term refs that can not be interpreted should be converted to something that is not recognized as a term ref
+                        replacement = `${termProperties.get("showtext")}[broken-termref]`
+                        data = data.replace(this.interpreter!.getLocalTermRegex(), replacement);;
+                  }
             }
             return data;
       }

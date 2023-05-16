@@ -2,6 +2,8 @@ import { Logger } from "tslog";
 import { Converter } from "./Converter.js";
 import { Output } from "./Glossary.js";
 
+import path = require('path');
+
 export class MarkdownConverter implements Converter {
       private log = new Logger();
       public constructor() { }
@@ -12,7 +14,17 @@ export class MarkdownConverter implements Converter {
 
       public convert(glossary: Output, properties: Map<string, string>): string {
             var markdownOut: string = "";
-            this.log.info(glossary.entries.find(entry => entry.term === properties.get("term")), properties)
+            let match = glossary.entries.find(entry =>
+                  entry.term === properties.get("term") &&
+                  entry.scopetag === properties.get("scopetag")
+                );
+
+            this.log.debug(match, properties)
+
+            if (match?.website && match?.navurl) {
+                  markdownOut = `[${properties.get("showtext")}](${path.join(match.website, match.navurl)}#${properties.get("trait")})`
+            }
+
 
             // if (properties.get("scopetag") == "default") {
             //       if (properties.get("vsntag") == "latest") {
@@ -32,8 +44,11 @@ export class MarkdownConverter implements Converter {
             //       this.log.error(`No access to scope '${properties.get("scopetag")}'`);
             //       return markdownOut;
             // }
-            return ``;
+
+            this.log.debug(markdownOut)
+            // if (markdownOut == "") {
+            //       return `[${properties.get("showtext")}](${properties.get("term")})`
+            // }
+            return markdownOut;
       }
-
-
 }
