@@ -47,9 +47,11 @@ export class Resolver {
 
       private async interpretAndConvert(data: string): Promise<string> {
             const matches: IterableIterator<RegExpMatchArray> = data.matchAll(this.interpreter!.getGlobalTermRegex());
+            let lastIndex = 0;
             await this.glossary.main();
 
             for (const match of Array.from(matches)) {
+                  
                   var termProperties: Map<string, string> = this.interpreter!.interpret(match);
                   var entries = this.glossary.glossary.entries;
 
@@ -80,7 +82,8 @@ export class Resolver {
                         data = data.replace(this.interpreter!.getLocalTermRegex(), replacement);
                   } else {
                         // term refs that can not be interpreted should be converted to something that is not recognized as a term ref
-                        replacement = `${termProperties.get("showtext")}[broken-termref]`
+                        // this, due to a shortcoming in the way regex is used to replace the first termref it finds
+                        replacement = `${termProperties.get("showtext")}[unresolved-termref]`
                         data = data.replace(this.interpreter!.getLocalTermRegex(), replacement);;
                   }
             }
