@@ -145,51 +145,38 @@ export class Glossary {
 
       private async populateGlossary(): Promise<Output> {
             for (const entry of (await this.mrg).entries) {
-
-                  var alternatives: string[];
-
                   if (entry.formPhrases) {
-                        alternatives = entry.formPhrases!.split(",");
-                        alternatives.forEach(t => t.trim());
-                        // (?<Text>\w+){(?<Macro>ss|yies|ying)}
-                        this.log.debug(alternatives)
-                        for (var alternative of alternatives) {
-                              this.log.debug(alternative)
-                              if (alternative.includes("{")) {
-                                    if (alternative.includes("{ss}")) {
-                                          alternatives.push(alternative.replace("{ss}", "s"));
-                                          alternatives.push(alternative.replace("{ss}", "'s"));
-                                          alternatives.push(alternative.replace("{ss}", "(s)"));
-                                          if (alternative.replace("{ss}", "")! in alternatives) {
-                                                alternatives.push(alternative.replace("{ss}", ""));
-                                          }
-                                    } else if (alternative.includes("{yies}")) {
-                                          alternatives.push(alternative.replace("{yies}", "y's"));
-                                          alternatives.push(alternative.replace("{yies}", "ies"));
-                                          if (alternative.replace("{yies}", "y")! in alternatives) {
-                                                alternatives.push(alternative.replace("{yies}", "y"));
-                                          }
-                                    } else if (alternative.includes("{ying}")) {
-                                          alternatives.push(alternative.replace("{ying}", "ier"));
-                                          alternatives.push(alternative.replace("{ying}", "ying"));
-                                          alternatives.push(alternative.replace("{ying}", "ies"));
-                                          alternatives.push(alternative.replace("{ying}", "ied"));
-                                          if (alternative.replace("{ying}", "y")! in alternatives) {
-                                                alternatives.push(alternative.replace("{ying}", "y"));
+                        const alternatives = entry.formPhrases.split(",").map(t => t.trim());
+                        const regexMap: { [key: string]: string[] } = {
+                              "{ss}": ["s", "'s", "(s)"],
+                              "{yies}": ["y's", "ies"],
+                              "{ying}": ["ier", "ying", "ies", "ied"],
+                        };
+
+
+                        for (const alternative of alternatives) {
+                              const match = alternative.match(/\{(ss|yies|ying)}/);
+                              if (match) {
+                                    const macro = match[0];
+                                    const replacements = regexMap[macro];
+                                    if (replacements) {
+                                          for (const replacement of replacements) {
+                                                alternatives.push(alternative.replace(match[0], replacement));
                                           }
                                     }
-
                               }
                         }
+
                         entry.website = (await this.saf).scope.website;
                         this.glossary.entries.push(entry);
 
-                        for (var alternative of alternatives.filter(s => !s.includes("{"))) {
+                        for (const alternative of alternatives.filter(s => !s.includes("{"))) {
                               const altEntry: Entry = { ...entry, term: alternative };
-                              this.glossary.entries.push(altEntry)
+                              this.glossary.entries.push(altEntry);
                         }
                   }
             }
+
             this.log.debug(this.glossary);
             return this.glossary;
       }
