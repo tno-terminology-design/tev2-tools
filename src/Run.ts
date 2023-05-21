@@ -18,7 +18,7 @@ console.log(
 
 program
       .name('trrt')
-      .version('0.0.2')
+      .version('0.0.3')
       .description("A CLI for the Term Reference Resolution Toolkit")
       .option('-o, --output <path>', 'Path to output converted files to (required)')
       .option('-s, --saf <path>', 'Path to read SAF file from (required)')
