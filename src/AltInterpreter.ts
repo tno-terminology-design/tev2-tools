@@ -2,9 +2,7 @@ import { Converter } from "./Converter.js";
 import { Interpreter } from "./Interpreter.js"
 
 export class AltInterpreter implements Interpreter {
-      private termRegexGlobal = /(?<=[^`\\])\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)(?<showtext>.+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\](?<ref>\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?/g;
-
-      private termRegexLocal = /(?<=[^`\\])\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)(?<showtext>.+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\](?<ref>\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?/;
+      private termRegex = /(?<=[^`\\])\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)(?<showtext>.+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\](?<ref>\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?/g;
 
       constructor() {}
 
@@ -18,12 +16,8 @@ export class AltInterpreter implements Interpreter {
             return termProperties;
       }
 
-      getGlobalTermRegex(): RegExp {
-            return this.termRegexGlobal;
-      }
-
-      getLocalTermRegex(): RegExp {
-            return this.termRegexLocal;
+      getTermRegex(): RegExp {
+            return this.termRegex;
       }
 
 

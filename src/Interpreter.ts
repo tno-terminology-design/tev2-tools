@@ -1,6 +1,5 @@
 export interface Interpreter {
       interpret(match: RegExpMatchArray): Map<string,string>;
-      getGlobalTermRegex() : RegExp;
-      getLocalTermRegex() : RegExp;
+      getTermRegex() : RegExp;
       getType() :  string;
 }

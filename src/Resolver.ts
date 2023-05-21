@@ -16,7 +16,7 @@ export class Resolver {
       private log = new Logger();
       private outputPath: string;
       private safPath: string;
-      private configPath?: string;
+      // private configPath?: string;
       private inputPath: string;
       private defaultVersion?: string;
       private interpreter: Interpreter;
@@ -30,7 +30,7 @@ export class Resolver {
             this.safPath = safPath;
             this.recursive = recursive ?? false;
 
-            this.glossary = new Glossary({ safURL: this.safPath, vsntag: this.defaultVersion })
+            this.glossary = new Glossary({ safURL: safPath, vsntag: defaultVersion })
 
             this.interpreter = interpreterType === "Alt" ? new AltInterpreter() : new StandardInterpreter();
             this.converter = converterType === "HTTP" ? new HTTPConverter() :
@@ -46,49 +46,60 @@ export class Resolver {
       }
 
       private async interpretAndConvert(data: string): Promise<string> {
-            const matches: IterableIterator<RegExpMatchArray> = data.matchAll(this.interpreter!.getGlobalTermRegex());
+            const matches: IterableIterator<RegExpMatchArray> = data.matchAll(
+                  this.interpreter!.getTermRegex()
+            );
             let lastIndex = 0;
             await this.glossary.main();
-
+      
             for (const match of Array.from(matches)) {
-                  
-                  var termProperties: Map<string, string> = this.interpreter!.interpret(match);
-                  var entries = this.glossary.glossary.entries;
-
-                  if (termProperties.get("scopetag") == "") {
+                  const termProperties: Map<string, string> = this.interpreter!.interpret(match);
+                  const entries = this.glossary.glossary.entries;
+      
+                  if (termProperties.get("scopetag") === "") {
                         if (this.defaultVersion) {
-                              termProperties.set("scopetag", this.defaultVersion)
+                              termProperties.set("scopetag", this.defaultVersion);
                         } else {
-                              termProperties.set("scopetag", "default")
+                              termProperties.set("scopetag", "default");
                         }
                   }
-                  // test if termProperties scopetag exists in entries already
+
                   const scopetag = termProperties.get("scopetag");
-                  this.log.debug(scopetag)
+                  this.log.debug(scopetag);
+      
                   if (!entries.some(entry => entry.scopetag === scopetag)) {
-                        // if not: check if required saf is inside remote scopes of current saf
                         if (scopetag) {
-                              let remoteSAF = (await this.glossary.saf).scopes.find(scopes => scopes.scopetags.includes(scopetag))?.scopedir;
+                              const remoteSAF = (
+                                    await this.glossary.saf
+                              ).scopes.find(scopes => scopes.scopetags.includes(scopetag))?.scopedir;
+      
                               if (remoteSAF) {
-                                    let remoteGlossary = new Glossary({ safURL: remoteSAF })
+                                    const remoteGlossary = new Glossary({ safURL: remoteSAF });
                                     await remoteGlossary.main();
-                                    // add remoteGlossary output to glossary
-                                    this.glossary.glossary.entries.push(...remoteGlossary.glossary.entries);
+                                    entries.push(...remoteGlossary.glossary.entries);
                               }
                         }
-                  }             
-                  var replacement = this.converter!.convert(this.glossary.glossary, termProperties);
-                  if (replacement != "") {
-                        data = data.replace(this.interpreter!.getLocalTermRegex(), replacement);
-                  } else {
-                        // term refs that can not be interpreted should be converted to something that is not recognized as a term ref
-                        // this, due to a shortcoming in the way regex is used to replace the first termref it finds
-                        replacement = `${termProperties.get("showtext")}[unresolved-termref]`
-                        data = data.replace(this.interpreter!.getLocalTermRegex(), replacement);;
+                  }
+
+                  let replacement = this.converter!.convert(this.glossary.glossary, termProperties);
+
+                  if(match.index !== undefined) {
+                        if (replacement == "") {
+                              replacement = `[${termProperties.get("showtext")}](unresolved-termref)`;
+                        }
+                        const startIndex = match.index + lastIndex;
+                        const matchLength = match[0].length;
+                        const textBeforeMatch = data.substring(0, startIndex);
+                        const textAfterMatch = data.substring(startIndex + matchLength);
+                        
+                        data = `${textBeforeMatch}${replacement}${textAfterMatch}`;
+                        lastIndex += replacement.length - matchLength;
                   }
             }
+
             return data;
       }
+      
 
       private getFilesRecursively(dirPath: string): string[] {
             const files: string[] = [];

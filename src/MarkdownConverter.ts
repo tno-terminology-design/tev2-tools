@@ -14,18 +14,21 @@ export class MarkdownConverter implements Converter {
 
       public convert(glossary: Output, properties: Map<string, string>): string {
             var markdownOut: string = "";
+            this.log.debug(properties)
+
             let match = glossary.entries.find(entry =>
                   entry.term === properties.get("term") &&
                   entry.scopetag === properties.get("scopetag")
-                );
-
-            this.log.debug(match, properties)
+            );
 
             if (match?.website && match?.navurl) {
-                  markdownOut = `[${properties.get("showtext")}](${path.join(match.website, match.navurl)}#${properties.get("trait")})`
+                  if (properties.get("trait")) {
+                        markdownOut = `[${properties.get("showtext")}](${path.join(match.website, match.navurl)}#${properties.get("trait")})`
+                  } else {
+                        markdownOut = `[${properties.get("showtext")}](${path.join(match.website, match.navurl)})`
+                  }
             }
 
-            this.log.debug(markdownOut)
             return markdownOut;
       }
 }

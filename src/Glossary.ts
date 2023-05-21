@@ -148,47 +148,39 @@ export class Glossary {
 
                   var alternatives: string[];
 
-                  // if (entry.formPhrases) {
-                  //       alternatives = entry.formPhrases!.split(",");
-                  //       alternatives.forEach(t => t.trim());
-                  //       // todo double check the white spaces in this glossary
-                  //       // (?<text>\w+){(?<formPhrase>ss|yies|ying)}
-                  //       for (var alternative of alternatives) {
-                  //             if (alternative.includes("{")) {
-                  //                   if (alternative.includes("{ss}")) {
-                  //                         alternatives.push(alternative.replace("{ss}", "s"));
-                  //                         if (alternative.replace("{ss}", "")! in alternatives) {
-                  //                               alternatives.push(alternative.replace("{ss}", ""));
-                  //                         }
-                  //                   } else if (alternative.includes("{yies}")) {
-                  //                         alternatives.push(alternative.replace("{yies}", "ies"));
-                  //                         if (alternative.replace("{yies}", "y")! in alternatives) {
-                  //                               alternatives.push(alternative.replace("{yies}", "y"));
-                  //                         }
-                  //                   } else if (alternative.includes("{ying}")) {
-                  //                         alternatives.push(alternative.replace("{ying}", "ing"));
-                  //                         if (alternative.replace("{ying}", "y")! in alternatives) {
-                  //                               alternatives.push(alternative.replace("{ying}", "y"));
-                  //                         }
-                  //                   }
+                  if (entry.formPhrases) {
+                        alternatives = entry.formPhrases!.split(",");
+                        alternatives.forEach(t => t.trim());
+                        // todo double check the white spaces in this glossary
+                        // (?<text>\w+){(?<formPhrase>ss|yies|ying)}
+                        for (var alternative of alternatives) {
+                              if (alternative.includes("{")) {
+                                    if (alternative.includes("{ss}")) {
+                                          alternatives.push(alternative.replace("{ss}", "s"));
+                                          if (alternative.replace("{ss}", "")! in alternatives) {
+                                                alternatives.push(alternative.replace("{ss}", ""));
+                                          }
+                                    } else if (alternative.includes("{yies}")) {
+                                          alternatives.push(alternative.replace("{yies}", "ies"));
+                                          if (alternative.replace("{yies}", "y")! in alternatives) {
+                                                alternatives.push(alternative.replace("{yies}", "y"));
+                                          }
+                                    } else if (alternative.includes("{ying}")) {
+                                          alternatives.push(alternative.replace("{ying}", "ing"));
+                                          if (alternative.replace("{ying}", "y")! in alternatives) {
+                                                alternatives.push(alternative.replace("{ying}", "y"));
+                                          }
+                                    }
 
-                  //             }
-                  //       }
-
-                  //       if (this.vsntag) {
-                  //             glossary.set(`${entry.term}@${entry.scopetag}:${this.vsntag}`, path.join((await this.saf).scope.website, entry.navurl));
-                  //             for (var alternative of alternatives.filter(s => !s.includes("{"))) {
-                  //                   glossary.set(`${alternative!}@${entry.scopetag}:${this.vsntag}`, path.join((await this.saf).scope.website, entry.navurl));
-                  //             }
-                  //       } else {
-                  //             glossary.set(`${entry.term}@${entry.scopetag}`, path.join((await this.saf).scope.website, entry.navurl));
-                  //             for (var alternative of alternatives.filter(s => !s.includes("{"))) {
-                  //                   glossary.set(`${alternative!}@${entry.scopetag}`, path.join((await this.saf).scope.website, entry.navurl));
-                  //             }
-                  //       }
-                        
-
-                  // }
+                              }
+                        }                        
+                        for (var alternative of alternatives.filter(s => !s.includes("{"))) {
+                              // code now only pushes /s term in the case of the example
+                              let alt = entry;
+                              alt.term = alternative;
+                              this.glossary.entries.push(alt)
+                        }
+                  }
                   entry.website = (await this.saf).scope.website;
                         
                   this.glossary.entries.push(entry)
