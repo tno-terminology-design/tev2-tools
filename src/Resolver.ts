@@ -83,7 +83,7 @@ export class Resolver {
 
                   let replacement = this.converter!.convert(this.glossary.glossary, termProperties);
 
-                  if(match.index !== undefined) {
+                  if (match.index !== undefined) {
                         if (replacement == "") {
                               replacement = `[${termProperties.get("showtext")}](unresolved-termref)`;
                         }

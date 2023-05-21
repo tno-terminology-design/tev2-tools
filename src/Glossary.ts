@@ -151,40 +151,46 @@ export class Glossary {
                   if (entry.formPhrases) {
                         alternatives = entry.formPhrases!.split(",");
                         alternatives.forEach(t => t.trim());
-                        // todo double check the white spaces in this glossary
-                        // (?<text>\w+){(?<formPhrase>ss|yies|ying)}
+                        // (?<Text>\w+){(?<Macro>ss|yies|ying)}
+                        this.log.debug(alternatives)
                         for (var alternative of alternatives) {
+                              this.log.debug(alternative)
                               if (alternative.includes("{")) {
                                     if (alternative.includes("{ss}")) {
                                           alternatives.push(alternative.replace("{ss}", "s"));
+                                          alternatives.push(alternative.replace("{ss}", "'s"));
+                                          alternatives.push(alternative.replace("{ss}", "(s)"));
                                           if (alternative.replace("{ss}", "")! in alternatives) {
                                                 alternatives.push(alternative.replace("{ss}", ""));
                                           }
                                     } else if (alternative.includes("{yies}")) {
+                                          alternatives.push(alternative.replace("{yies}", "y's"));
                                           alternatives.push(alternative.replace("{yies}", "ies"));
                                           if (alternative.replace("{yies}", "y")! in alternatives) {
                                                 alternatives.push(alternative.replace("{yies}", "y"));
                                           }
                                     } else if (alternative.includes("{ying}")) {
-                                          alternatives.push(alternative.replace("{ying}", "ing"));
+                                          alternatives.push(alternative.replace("{ying}", "ier"));
+                                          alternatives.push(alternative.replace("{ying}", "ying"));
+                                          alternatives.push(alternative.replace("{ying}", "ies"));
+                                          alternatives.push(alternative.replace("{ying}", "ied"));
                                           if (alternative.replace("{ying}", "y")! in alternatives) {
                                                 alternatives.push(alternative.replace("{ying}", "y"));
                                           }
                                     }
 
                               }
-                        }                        
+                        }
+                        entry.website = (await this.saf).scope.website;
+                        this.glossary.entries.push(entry);
+
                         for (var alternative of alternatives.filter(s => !s.includes("{"))) {
-                              // code now only pushes /s term in the case of the example
-                              let alt = entry;
-                              alt.term = alternative;
-                              this.glossary.entries.push(alt)
+                              const altEntry: Entry = { ...entry, term: alternative };
+                              this.glossary.entries.push(altEntry)
                         }
                   }
-                  entry.website = (await this.saf).scope.website;
-                        
-                  this.glossary.entries.push(entry)
             }
+            this.log.debug(this.glossary);
             return this.glossary;
       }
 }
