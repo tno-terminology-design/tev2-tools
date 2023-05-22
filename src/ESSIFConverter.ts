@@ -3,11 +3,11 @@ import { Output } from "./Glossary.js";
 
 import path = require('path');
 
-export class HTTPConverter implements Converter {
+export class ESSIFConverter implements Converter {
       public constructor() {}
       
       getType(): string {
-            return "HTTP";
+            return "ESSIF";
       }
 
       public convert(glossary: Output, properties: Map<string, string>): string {
@@ -19,7 +19,7 @@ export class HTTPConverter implements Converter {
             );
 
             if (match?.website && match?.navurl) {
-                  esiffOut = `<a href="${path.join(match.website, match.navurl)}">${properties.get("showtext")}</a>`
+                  esiffOut = `<a href="${path.join(match.website, match.navurl)}" title="${match.glossaryText}">${properties.get("showtext")}</a>`
             }
 
             return esiffOut;

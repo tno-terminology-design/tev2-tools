@@ -13,12 +13,12 @@ scopes:
 
 entries:
 -
-  term: "identify"
+  term: "specification"
   scopetag: "default"
   locator: "specification.md" # not sure yet if and how this is used by TRRT
   isa: null
   termType: "concept"
-  formPhrases: "identif{ying}"
+  formPhrases: "specification{ss}"
   status: null
   synonyms: null
   grouptags: null

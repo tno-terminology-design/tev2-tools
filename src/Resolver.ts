@@ -5,7 +5,7 @@ import { StandardInterpreter } from './StandardInterpreter.js';
 import { MarkdownConverter } from './MarkdownConverter.js';
 import { HTTPConverter } from './HTTPConverter.js';
 import { AltInterpreter } from './AltInterpreter.js';
-import { ESSIFConverter } from './ESIFFConverter.js'
+import { ESSIFConverter } from './ESSIFConverter.js'
 import { Logger } from 'tslog';
 
 import fs = require("fs");
@@ -32,9 +32,20 @@ export class Resolver {
 
             this.glossary = new Glossary({ safURL: safPath, vsntag: defaultVersion })
 
-            this.interpreter = interpreterType === "Alt" ? new AltInterpreter() : new StandardInterpreter();
-            this.converter = converterType === "HTTP" ? new HTTPConverter() :
-                  converterType === "ESIFF" ? new ESSIFConverter() : new MarkdownConverter();
+            const interpreterMap: { [key: string]: Interpreter } = {
+                  ALT: new AltInterpreter(),
+                  default: new StandardInterpreter(),
+            };
+
+            const converterMap: { [key: string]: Converter } = {
+                  HTTP: new HTTPConverter(),
+                  ESSIF: new ESSIFConverter(),
+                  default: new MarkdownConverter(),
+            };
+
+            this.interpreter = interpreterMap[interpreterType || 'default'];
+            this.converter = converterMap[converterType || 'default'];
+                
       }
 
       private writeFile(dirPath: string, file: string, data: string) {
@@ -65,7 +76,6 @@ export class Resolver {
                   }
 
                   const scopetag = termProperties.get("scopetag");
-                  this.log.debug(scopetag);
       
                   if (!entries.some(entry => entry.scopetag === scopetag)) {
                         if (scopetag) {

@@ -93,7 +93,7 @@ export class Glossary {
                   try {
                         // If file does not exist locally, download it to tmpdir
                         const filePath = path.join(tmpdir(), `saf.yaml`);
-                        this.log.debug('Trying to download ' + this.safURL)
+                        this.log.info('Trying to download ' + this.safURL)
 
                         fs.writeFileSync(filePath, await download(this.safURL));
                         this.log.info(`SAF loaded: ${filePath}`);
@@ -177,7 +177,6 @@ export class Glossary {
                   }
             }
 
-            this.log.debug(this.glossary);
             return this.glossary;
       }
 }

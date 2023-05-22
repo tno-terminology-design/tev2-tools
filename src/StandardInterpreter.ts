@@ -7,7 +7,7 @@ export class StandardInterpreter implements Interpreter {
       public constructor() { }
 
       getType(): string {
-            return "Standard";
+            return "STANDARD";
       }
 
       interpret(match: RegExpMatchArray): Map<string, string> {
@@ -18,7 +18,7 @@ export class StandardInterpreter implements Interpreter {
                   termProperties.set("trait", match.groups.trait);
                   termProperties.set("scopetag", match.groups.scopetag);
                   termProperties.set("vsntag", match.groups.vsntag);
-                  this.log.trace(`Interpreted term: ${termProperties.get("term")}`);
+                  this.log.trace(`Interpreted term: ${termProperties.get("term")} ${termProperties.get("scopetag")}`);
             }
 
             return termProperties;

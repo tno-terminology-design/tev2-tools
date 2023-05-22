@@ -1,11 +1,9 @@
-import { Logger } from "tslog";
 import { Converter } from "./Converter.js";
 import { Output } from "./Glossary.js";
 
 import path = require('path');
 
 export class MarkdownConverter implements Converter {
-      private log = new Logger();
       public constructor() { }
 
       getType(): string {
@@ -14,7 +12,6 @@ export class MarkdownConverter implements Converter {
 
       public convert(glossary: Output, properties: Map<string, string>): string {
             var markdownOut: string = "";
-            this.log.debug(properties)
 
             let match = glossary.entries.find(entry =>
                   entry.term === properties.get("term") &&
