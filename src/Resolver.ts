@@ -190,7 +190,10 @@ export class Resolver {
             this.log.info(`Reading ${this.recursive ? "files recursively" : "files"} in '${this.inputPath}'`);
 
             // Process each file
-            for (const filePath of files) {
+            for (let filePath of files) {
+                  if (!this.recursive) {
+                        filePath = path.join(this.inputPath, filePath);
+                  }
                   // Check if the file has a valid extension (.md or .html)
                   if ([".md", ".html"].includes(path.extname(filePath))) {
                         // Read the file content
