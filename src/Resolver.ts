@@ -43,8 +43,8 @@ export class Resolver {
                   default: new MarkdownConverter(),
             };
 
-            this.interpreter = interpreterMap[interpreterType || 'default'];
-            this.converter = converterMap[converterType || 'default'];
+            this.interpreter = interpreterMap[interpreterType ?? 'default'];
+            this.converter = converterMap[converterType ?? 'default'];
                 
       }
 
