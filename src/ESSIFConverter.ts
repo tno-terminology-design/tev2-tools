@@ -13,13 +13,21 @@ export class ESSIFConverter implements Converter {
       public convert(glossary: Output, properties: Map<string, string>): string {
             var esiffOut: string = "";
 
+            // Find the matching entry in the glossary based on the term and scopetag
             let match = glossary.entries.find(entry =>
                   entry.term === properties.get("term") &&
                   entry.scopetag === properties.get("scopetag")
             );
-
+            
+            // Generate the ESSIF HTML representation based on the matching entry
             if (match?.website && match?.navurl) {
-                  esiffOut = `<a href="${path.join(match.website, match.navurl)}" title="${match.glossaryText}">${properties.get("showtext")}</a>`
+                  if (properties.get("trait")) {
+                        // Add the trait as an anchor link if available
+                        esiffOut = `<a href="${path.join(match.website, match.navurl)}#${properties.get("trait")}" title="${match.glossaryText}">${properties.get("showtext")}</a>`
+                  } else {
+                        esiffOut = `<a href="${path.join(match.website, match.navurl)}" title="${match.glossaryText}">${properties.get("showtext")}</a>`
+                  }
+
             }
 
             return esiffOut;

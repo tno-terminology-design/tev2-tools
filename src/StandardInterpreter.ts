@@ -7,18 +7,20 @@ export class StandardInterpreter implements Interpreter {
       public constructor() { }
 
       getType(): string {
-            return "STANDARD";
+            return "Standard";
       }
 
       interpret(match: RegExpMatchArray): Map<string, string> {
             var termProperties: Map<string, string> = new Map();
+
             if (match.groups != undefined) {
                   termProperties.set("showtext", match.groups.showtext);
                   termProperties.set("term", match.groups.term || match.groups.showtext.toLowerCase().replace(/[^A-Za-z_-]+/, "-"));
                   termProperties.set("trait", match.groups.trait);
                   termProperties.set("scopetag", match.groups.scopetag);
                   termProperties.set("vsntag", match.groups.vsntag);
-                  this.log.trace(`Interpreted term: ${termProperties.get("term")} ${termProperties.get("scopetag")}`);
+
+                  this.log.trace(`Interpreted term ref: ${termProperties.get("term")} ${termProperties.get("scopetag")}`);
             }
 
             return termProperties;

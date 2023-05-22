@@ -34,24 +34,27 @@ program.parse()
 
 async function main(): Promise<void> {
       const log = new Logger();
+
+      // Parse command line options
       const options = program.opts();
+
+      // Check if required options are provided
       if (!options.output || !options.saf) {
             program.outputHelp();
       } else {
-            // a term is found with a scopetag that has not yet been resolved.
-            // 
-            //       look up the scopedir from the scopes section of the main saf
-            //       from the resulting scopedir, read the saf 
-
-            // get the MRG associated with the vsntag of the term ref.
-            //       search the versions section that matches vsntag or altvsntags and obtain the mrgfile.
+            // Create a resolver with the provided options
+            let resolver: Resolver = new Resolver({
+                  outputPath: options.output,
+                  safPath: options.saf,
+                  configPath: options.config,
+                  inputPath: options.directory,
+                  defaultVersion: options.defaultversion,
+                  interpreterType: options.interpreter,
+                  converterType: options.converter,
+                  recursive: options.recursive
+            });
             
-            // add the entire newly found MRG to the working glossary term@scopetag:vsntag.
-            //       match term to term
-            //       match possible termtype to termtype
-            //       
-
-            let resolver: Resolver = new Resolver({ outputPath: options.output, safPath: options.saf, configPath: options.config, inputPath: options.directory, defaultVersion: options.defaultversion, interpreterType: options.interpreter, converterType: options.converter, recursive: options.recursive });
+            // Resolve terms
             if (await resolver.resolve()) {
                   log.info("Resolution complete...");
             } else {
