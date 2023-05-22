@@ -131,7 +131,9 @@ export class Resolver {
 
                   if (match.index !== undefined) {
                         // If the replacement is empty, use the original matched text as the replacement
-                        replacement = replacement ?? match[0];
+                        if (replacement === "") {
+                              replacement = match[0];
+                        }
 
                         const startIndex = match.index + lastIndex;
                         const matchLength = match[0].length;
