@@ -7,64 +7,56 @@ import { HTTPConverter } from './HTTPConverter.js';
 import { AltInterpreter } from './AltInterpreter.js';
 import { ESSIFConverter } from './ESSIFConverter.js'
 import { Logger } from 'tslog';
+import { glob } from 'glob';
 
 import fs = require("fs");
 import path = require('path');
-import yaml = require('js-yaml');
 
 export class Resolver {
       private log = new Logger();
       private outputPath: string;
-      private safPath: string;
-      // private configPath?: string;
-      private inputPath: string;
-      private defaultVersion?: string;
+      private globPattern: string;
+      private version: string;
       private interpreter: Interpreter;
       private converter: Converter;
-      private recursive: boolean;
       public glossary: Glossary;
 
       public constructor({
             outputPath,
-            safPath,
-            configPath,
-            inputPath,
-            defaultVersion,
+            scopedir,
+            globPattern,
+            version,
             interpreterType,
             converterType,
-            recursive
       }: {
             outputPath: string;
-            safPath: string;
-            configPath?: string;
-            inputPath?: string;
-            defaultVersion?: string;
-            interpreterType?: string;
-            converterType?: string;
-            recursive?: boolean;
+            scopedir: string;
+            globPattern: string;
+            version: string;
+            interpreterType: string;
+            converterType: string;
       }) {
             this.outputPath = outputPath;
-            this.inputPath = inputPath ?? "./";
-            this.safPath = safPath;
-            this.recursive = recursive ?? false;
+            this.globPattern = globPattern;
+            this.version = version;
 
-            this.glossary = new Glossary({ safURL: safPath, vsntag: defaultVersion })
+            this.glossary = new Glossary({ safURL: path.join(scopedir, "saf.yaml"), vsntag: version })
 
             // Define the interpreter and converter maps with supported types and corresponding instances
             const interpreterMap: { [key: string]: Interpreter } = {
-                  ALT: new AltInterpreter(),
+                  alt: new AltInterpreter(),
                   default: new StandardInterpreter(),
             };
 
             const converterMap: { [key: string]: Converter } = {
-                  HTTP: new HTTPConverter(),
-                  ESSIF: new ESSIFConverter(),
+                  http: new HTTPConverter(),
+                  essif: new ESSIFConverter(),
                   default: new MarkdownConverter(),
             };
 
             // Assign the interpreter and converter instance based on the provided interpreter type (or use the default)
-            this.interpreter = interpreterMap[interpreterType?.toUpperCase() || 'default'];
-            this.converter = converterMap[converterType?.toUpperCase() || 'default'];
+            this.interpreter = interpreterMap[interpreterType.toLowerCase()];
+            this.converter = converterMap[converterType.toLowerCase()];
                 
       }
       /**
@@ -100,18 +92,14 @@ export class Resolver {
                   const termProperties: Map<string, string> = this.interpreter!.interpret(match);
                   const entries = this.glossary.glossary.entries;
                   
-                  // If the term has an empty scopetag, set it to the defaultVersion or 'default' if defaultVersion is not specified
+                  // If the term has an empty scopetag, set it to the default version
                   if (termProperties.get("scopetag") === "") {
-                        if (this.defaultVersion) {
-                              termProperties.set("scopetag", this.defaultVersion);
-                        } else {
-                              termProperties.set("scopetag", "default");
-                        }
+                        termProperties.set("scopetag", this.version);
                   }
 
                   const scopetag = termProperties.get("scopetag");
       
-                  // If the glossary does not contain any entries with the same scopetag, check for a remote SAF and fetch glossary entries from it
+                  // If the glossary does not contain any entries with the same scopetag, check for a remote SAF and fetch glossary entries from its MRG
                   if (!entries.some(entry => entry.scopetag === scopetag)) {
                         if (scopetag) {
                               const remoteSAF = (
@@ -150,50 +138,20 @@ export class Resolver {
 
             return data;
       }
-      
-      /**
-       * Recursively retrieves all files in the specified directory path.
-       * @param dirPath The directory path to retrieve files from.
-       * @returns An array of file paths.
-       */
-      private getFilesRecursively(dirPath: string): string[] {
-            const files: string[] = [];
-
-            // Get the directory entries (files and subdirectories) of the specified directory
-            const dirents = fs.readdirSync(dirPath, { withFileTypes: true });
-            for (const dirent of dirents) {
-                        const fullPath = path.join(dirPath, dirent.name);
-                  
-                  // If the entry is a directory, recursively retrieve files from it and add them to the 'files' array
-                  if (dirent.isDirectory()) {
-                        const nestedFiles = this.getFilesRecursively(fullPath);
-                        files.push(...nestedFiles);
-                  // If the entry is a file, add its full path to the 'files' array
-                  } else if (dirent.isFile()) {
-                        files.push(fullPath);
-                  }
-            }
-            return files;
-      }
 
       /**
        * Resolves and converts files in the specified input path.
        */
       public async resolve(): Promise<boolean> {
-            // Get the list of files in the input path, either recursively or non-recursively based on the 'recursive' flag
-            const files = this.recursive
-                  ? this.getFilesRecursively(this.inputPath)
-                  : fs.readdirSync(this.inputPath);
-
             // Log information about the interpreter, converter and the files being read
             this.log.info(`Using interpreter '${this.interpreter.getType()}' and converter '${this.converter.getType()}'`)
-            this.log.info(`Reading ${this.recursive ? "files recursively" : "files"} in '${this.inputPath}'`);
+            this.log.info(`Reading files using pattern '${this.globPattern}'`);
+
+            // Get the list of files based on the glob pattern
+            const files = await glob(this.globPattern);
 
             // Process each file
             for (let filePath of files) {
-                  if (!this.recursive) {
-                        filePath = path.join(this.inputPath, filePath);
-                  }
                   // Check if the file has a valid extension (.md or .html)
                   if ([".md", ".html"].includes(path.extname(filePath))) {
                         // Read the file content
@@ -204,7 +162,7 @@ export class Resolver {
                         const convertedData = this.interpretAndConvert(data);
 
                         // Write the converted data to the output file
-                        this.writeFile(path.dirname(path.join(this.outputPath, path.basename(filePath))), path.basename(filePath), await convertedData);
+                        this.writeFile(path.join(this.outputPath, path.dirname(filePath)), path.basename(filePath), await convertedData);
                   }
             }
 
