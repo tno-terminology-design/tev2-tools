@@ -42,7 +42,7 @@ async function main(): Promise<void> {
 
       // Parse command line parameters
       var options = program.opts();
-      options.glob = program.args[0]
+      options.glob = program.args[0] ?? '*'
 
       if (options.config) {
             try {
