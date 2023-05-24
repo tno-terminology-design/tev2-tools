@@ -30,7 +30,7 @@ program
       .option('-c, --config <path>', 'Path (including the filename) of the tool\'s (YAML) configuration file')
       .option('-o, --output <dir>', 'Root directory for output files to be written')
       .option('-s, --scopedir <path>', 'Path of the scope directory from which the tool is called')
-      .option('-v, --version <versiontag>', 'Version of the terminology that is to be used to resolve term refs for which neither a scope nor a version part has been specified', 'default')
+      .option('-v, --vsntag <vsntag>', 'Version of the terminology that is to be used to resolve term refs for which neither a scope nor a version part has been specified')
       .option('-int, --interpreter <type>', 'Set interpreter to Standard or Alt syntax', 'default')
       .option('-con, --converter <type>', 'Set converter to Markdown HTTP or ESIFF output', 'default')
       .parse(process.argv);
@@ -68,7 +68,7 @@ async function main(): Promise<void> {
             let resolver: Resolver = new Resolver({
                   outputPath: resolve(options.output),
                   scopedir: resolve(options.scopedir),
-                  version: options.version,
+                  vsntag: options.vsntag,
                   interpreterType: options.interpreter,
                   converterType: options.converter,
                   globPattern: options.glob

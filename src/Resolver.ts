@@ -16,7 +16,7 @@ export class Resolver {
       private log = new Logger();
       private outputPath: string;
       private globPattern: string;
-      private version: string;
+      private vsntag: string;
       private interpreter: Interpreter;
       private converter: Converter;
       public glossary: Glossary;
@@ -25,22 +25,22 @@ export class Resolver {
             outputPath,
             scopedir,
             globPattern,
-            version,
+            vsntag,
             interpreterType,
             converterType,
       }: {
             outputPath: string;
             scopedir: string;
             globPattern: string;
-            version: string;
+            vsntag: string;
             interpreterType: string;
             converterType: string;
       }) {
             this.outputPath = outputPath;
             this.globPattern = globPattern;
-            this.version = version;
+            this.vsntag = vsntag;
 
-            this.glossary = new Glossary({ safURL: path.join(scopedir, "saf.yaml"), vsntag: version })
+            this.glossary = new Glossary({ safURL: path.join(scopedir, "saf.yaml"), vsntag: vsntag })
 
             // Define the interpreter and converter maps with supported types and corresponding instances
             const interpreterMap: { [key: string]: Interpreter } = {
@@ -92,9 +92,9 @@ export class Resolver {
                   const termProperties: Map<string, string> = this.interpreter!.interpret(match);
                   const entries = this.glossary.glossary.entries;
                   
-                  // If the term has an empty scopetag, set it to the default version
+                  // If the term has an empty scopetag, set it to the scopetag of the SAF
                   if (termProperties.get("scopetag") === "") {
-                        termProperties.set("scopetag", this.version);
+                        termProperties.set("scopetag", (await this.glossary.saf).scope.scopetag);
                   }
 
                   const scopetag = termProperties.get("scopetag");
