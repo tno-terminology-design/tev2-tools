@@ -106,8 +106,7 @@ export class Glossary {
                         this.getSafMap();
                   } catch (err) {
                         // Log the error if the SAF download fails
-                        this.log.error(err)
-                        this.log.error("Failed to download SAF");
+                        this.log.error("Failed to download SAF:", err);
                   }
             }
 
@@ -151,7 +150,7 @@ export class Glossary {
                               this.getMrgMap();
                         } catch (err) {
                               // Log the error if the MRG download fails and return an empty MRG map
-                              this.log.error("Failed to download MRG");
+                              this.log.error("Failed to download MRG: ", err);
                               return this.mrg
                         }
                   }

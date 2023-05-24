@@ -101,16 +101,18 @@ export class Resolver {
       
                   // If the glossary does not contain any entries with the same scopetag, check for a remote SAF and fetch glossary entries from its MRG
                   if (!entries.some(entry => entry.scopetag === scopetag)) {
-                        if (scopetag) {
+                        try {
                               const remoteSAF = (
                                     await this.glossary.saf
-                              ).scopes.find(scopes => scopes.scopetags.includes(scopetag))?.scopedir;
+                              ).scopes.find(scopes => scopes.scopetags.includes(scopetag!))?.scopedir;
       
                               if (remoteSAF) {
                                     const remoteGlossary = new Glossary({ safURL: remoteSAF });
                                     await remoteGlossary.main();
                                     entries.push(...remoteGlossary.glossary.entries);
                               }
+                        } catch (err) {
+                              this.log.error('Failed to fetch remote glossary entries:', err);
                         }
                   }
 
