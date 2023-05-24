@@ -1,6 +1,6 @@
 {
   "name": "@essif-lab/trrt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Term Reference Resolution Tool (TRRT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
