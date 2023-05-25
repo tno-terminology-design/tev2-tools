@@ -32,7 +32,7 @@ program
       .option('-s, --scopedir <path>', 'Path of the scope directory where the SAF is located')
       .option('-v, --vsntag <vsntag>', 'Default version to use when no version is set in term ref')
       .option('-int, --interpreter <type>', 'Set interpreter to Alt syntax', 'default')
-      .option('-con, --converter <type>', 'Set converter to Markdown HTTP or ESIFF output', 'default')
+      .option('-con, --converter <type>', 'Set converter to Markdown, HTTP or ESIFF output', 'default')
       .parse(process.argv);
 
 program.parse()
