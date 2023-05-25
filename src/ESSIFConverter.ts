@@ -1,5 +1,5 @@
 import { Converter } from "./Converter.js";
-import { Output } from "./Glossary.js";
+import { Entry } from "./Glossary.js";
 
 import path = require('path');
 
@@ -10,24 +10,19 @@ export class ESSIFConverter implements Converter {
             return "ESSIF";
       }
 
-      public convert(glossary: Output, properties: Map<string, string>): string {
+      public convert(entry: Entry, term: Map<string, string>): string {
             var esiffOut: string = "";
 
-            // Find the matching entry in the glossary based on the term and scopetag
-            let match = glossary.entries.find(entry =>
-                  entry.term === properties.get("term") &&
-                  entry.scopetag === properties.get("scopetag")
-            );
-            
-            // Generate the ESSIF HTML representation based on the matching entry
-            if (match?.website && match?.navurl) {
-                  if (properties.get("trait")) {
-                        // Add the trait as an anchor link if available
-                        esiffOut = `<a href="${path.join(match.website, match.navurl)}#${properties.get("trait")}" title="${match.glossaryText}">${properties.get("showtext")}</a>`
+            // Generate the HTTP representation based on the matching entry
+            if (entry.website && entry.navurl) {
+                  if (term.get("trait") && entry.headingids) {
+                        // Add the trait as an anchor link if available in entry heading id's
+                        if (term.get("trait")! in entry.headingids) {
+                              esiffOut = `<a href="${path.join(entry.website, entry.navurl)}#${term.get("trait")}">${term.get("showtext")}</a>`
+                        }
                   } else {
-                        esiffOut = `<a href="${path.join(match.website, match.navurl)}" title="${match.glossaryText}">${properties.get("showtext")}</a>`
+                        esiffOut = `<a href="${path.join(entry.website, entry.navurl)}">${term.get("showtext")}</a>`
                   }
-
             }
 
             return esiffOut;

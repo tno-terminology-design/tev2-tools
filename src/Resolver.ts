@@ -116,16 +116,17 @@ export class Resolver {
                         }
                   }
 
-                  // Convert the term using the configured converter
-                  let replacement = this.converter!.convert(this.glossary.glossary, termProperties);
+                  // Find the matching entry in the glossary based on the term and scopetag
+                  let entry = this.glossary.glossary.entries.find(entry =>
+                        entry.term === termProperties.get("term") &&
+                        entry.scopetag === termProperties.get("scopetag")
+                  );
 
-                  if (match.index !== undefined) {
-                        // If the replacement is empty, use the original matched text as the replacement
-                        if (replacement === "") {
-                              replacement = match[0];
-                        }
+                  if (entry) {
+                        // Convert the term using the configured converter
+                        let replacement = this.converter!.convert(entry, termProperties);
 
-                        const startIndex = match.index + lastIndex;
+                        const startIndex = match.index! + lastIndex;
                         const matchLength = match[0].length;
                         const textBeforeMatch = data.substring(0, startIndex);
                         const textAfterMatch = data.substring(startIndex + matchLength);
@@ -135,6 +136,8 @@ export class Resolver {
 
                         // Update the lastIndex to account for the length difference between the match and replacement
                         lastIndex += replacement.length - matchLength;
+                  } else {
+                        this.log.warn(`Glossary item ${termProperties.get("term")} could not be located`)
                   }
             }
 

@@ -1,4 +1,4 @@
 export interface Converter {
-      convert(glossary: any, properties: Map<string, string>): string;
+      convert(entry: any, term: Map<string, string>): string;
       getType() : string;
 }
