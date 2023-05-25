@@ -4,11 +4,11 @@
 
 The **Term Ref(erence) Resolution Tool (TRRT)** takes files that contain so-called term refs (e.g. `[terms communities](terms-community@ctwg)`) and outputs a version of these files in which term refs are converted to so-called renderable refs, i.e. texts that can be further processed by tools such as GitHub pages, Docusaurus, etc., the result of which is that the rendered document contains markups that help readers to quickly find more explanations of the concept or other knowledge artifact that is being referenced. More information at: [eSSIF-Lab](https://essif-lab.github.io/framework/docs/tev2/spec-tools/trrt).
 
-### Who will use the TRRT
+### Who will use the TRRT?
 
 The TRRT will be used by terminology creators and curators to generate renderable refs. It can also be used in a CI/CD pipeline, allowing for resolution as a pre-processing step before building a static site or performing other deployment activities.
 
-### What inputs does the TRRT need
+### What inputs does the TRRT need?
 
 For resolution to work, the following artifacts need to be present:
 
