@@ -122,7 +122,7 @@ export class Glossary {
             let version = (await this.saf).versions.find(version => version.vsntag === this.vsntag);
             
             if (!version && this.vsntag) {
-                  // Look inside 'altvsntag' if no MRG has been found
+                  // Look inside 'altvsntags' if no MRG has been found
                   version = (await this.saf).versions.find(version => version.altvsntags.includes(this.vsntag!));
             }
 
