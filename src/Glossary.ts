@@ -1,5 +1,5 @@
 import { Logger } from 'tslog';
-import { tmpdir, version } from 'os';
+import { tmpdir } from 'os';
 
 import download = require('download');
 import fs = require("fs");
@@ -46,7 +46,7 @@ interface Terminology {
       altvsntags: string;
 }
 
-interface Entry {
+export interface Entry {
       term: string;
       vsntag: string;
       scopetag: string;
@@ -119,7 +119,12 @@ export class Glossary {
        */
       private async getMrgMap(): Promise<MRG> {
             // Find the MRG inside the versions section of the SAF that matches the specified `vsntag`
-            const version = (await this.saf).versions.find(version => version.vsntag === this.vsntag);
+            let version = (await this.saf).versions.find(version => version.vsntag === this.vsntag);
+            
+            if (!version && this.vsntag) {
+                  // Look inside 'altvsntag' if no MRG has been found
+                  version = (await this.saf).versions.find(version => version.altvsntags.includes(this.vsntag!));
+            }
 
             let mrgfile: string;
             if (version) {

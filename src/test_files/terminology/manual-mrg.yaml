@@ -7,7 +7,7 @@ terminology:
   curatedir: "terminology"
   vsntag: "main"
   license: "LICENSE.md"
-  altvsntags: null
+  altvsntags: "latest"
 scopes:
   # empty
 

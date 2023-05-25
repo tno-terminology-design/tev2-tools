@@ -32,6 +32,8 @@ scopes:
 versions:
 - vsntag: main # this version MUST only be used for testing the MRG generator
   mrgfile: manual-mrg.yaml # URL: <scopedir>/<glossarydir>/<mrgfile>
+  altvsntags: # alternative verstiontags
+    - latest
   termselcrit:
   - "*@essif-lab"
   - "*@default" # import all default terms
