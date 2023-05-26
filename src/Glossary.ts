@@ -202,7 +202,7 @@ export class Glossary {
                         // Add the original entry to the glossary
                         this.glossary.entries.push(entry);
 
-                        // Add entries for the alternative forms to the glossary
+                        // Add entries of the alternative forms to the glossary
                         for (const alternative of alternatives.filter(s => !s.includes("{"))) {
                               const altEntry: Entry = { ...entry, term: alternative };
                               this.glossary.entries.push(altEntry);
