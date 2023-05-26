@@ -11,12 +11,14 @@ import { glob } from 'glob';
 
 import fs = require("fs");
 import path = require('path');
+import { version } from 'os';
 
 export class Resolver {
       private log = new Logger();
       private outputPath: string;
       private globPattern: string;
       private vsntag: string;
+      private scopedir: string;
       private interpreter: Interpreter;
       private converter: Converter;
       public glossary: Glossary;
@@ -39,6 +41,7 @@ export class Resolver {
             this.outputPath = outputPath;
             this.globPattern = globPattern;
             this.vsntag = vsntag;
+            this.scopedir = scopedir;
 
             this.glossary = new Glossary({ safURL: path.join(scopedir, "saf.yaml"), vsntag: vsntag })
 
@@ -93,13 +96,26 @@ export class Resolver {
                   const entries = this.glossary.glossary.entries;
                   
                   // If the term has an empty scopetag, set it to the scopetag of the SAF
-                  if (termProperties.get("scopetag") === "") {
+                  if (!termProperties.get("scopetag")) {
                         termProperties.set("scopetag", (await this.glossary.saf).scope.scopetag);
                   }
 
+                  // If the term has an empty vsntag, set it to the default vsntag
+                  if (!termProperties.get("vsntag")) {
+                        termProperties.set("vsntag", this.vsntag);
+                  }
+
                   const scopetag = termProperties.get("scopetag");
-      
-                  // If the glossary does not contain any entries with the same scopetag, check for a remote SAF and fetch glossary entries from its MRG
+                  const vsntag = termProperties.get("vsntag");
+
+                  // If the glossary does not contain any entries with the same vsntag, check for other MRG's in the scopedir SAF
+                  if (!entries.some(entry => entry.vsntag === vsntag)) {
+                        const altvsn = new Glossary({ safURL: path.join(this.scopedir, "saf.yaml"), vsntag: vsntag });
+                        await altvsn.main();
+                        entries.push(...altvsn.glossary.entries);
+                  }
+
+                  // If the glossary does not contain any entries with the same scopetag, check for a remote scopedir and fetch its SAF and MRG
                   if (!entries.some(entry => entry.scopetag === scopetag)) {
                         try {
                               const remoteSAF = (
@@ -107,7 +123,7 @@ export class Resolver {
                               ).scopes.find(scopes => scopes.scopetags.includes(scopetag!))?.scopedir;
       
                               if (remoteSAF) {
-                                    const remoteGlossary = new Glossary({ safURL: remoteSAF });
+                                    const remoteGlossary = new Glossary({ safURL: remoteSAF, vsntag: vsntag });
                                     await remoteGlossary.main();
                                     entries.push(...remoteGlossary.glossary.entries);
                               }
@@ -116,10 +132,11 @@ export class Resolver {
                         }
                   }
 
-                  // Find the matching entry in the glossary based on the term and scopetag
+                  // Find the matching entry in the glossary based on the term, vsntag and scopetag
                   let entry = this.glossary.glossary.entries.find(entry =>
                         entry.term === termProperties.get("term") &&
-                        entry.scopetag === termProperties.get("scopetag")
+                        entry.scopetag === termProperties.get("scopetag") &&
+                        entry.vsntag === termProperties.get("vsntag")
                   );
 
                   if (entry) {
