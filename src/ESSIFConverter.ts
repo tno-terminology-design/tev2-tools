@@ -13,15 +13,15 @@ export class ESSIFConverter implements Converter {
       public convert(entry: Entry, term: Map<string, string>): string {
             var esiffOut: string = "";
 
-            // Generate the HTTP representation based on the matching entry
+            // Generate the 'converted' representation based on the matching entry
             if (entry.website && entry.navurl) {
-                  if (term.get("trait") && entry.headingids) {
+                  esiffOut = `<a href="${path.join(entry.website, entry.navurl)}">${term.get("showtext")}</a>`
+
+                  if (term.get("trait") !== undefined) {
                         // Add the trait as an anchor link if available in entry heading id's
-                        if (term.get("trait")! in entry.headingids) {
+                        if (entry.headingids?.includes(term.get("trait")!)) {
                               esiffOut = `<a href="${path.join(entry.website, entry.navurl)}#${term.get("trait")}">${term.get("showtext")}</a>`
                         }
-                  } else {
-                        esiffOut = `<a href="${path.join(entry.website, entry.navurl)}">${term.get("showtext")}</a>`
                   }
             }
 
