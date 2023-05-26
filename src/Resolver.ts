@@ -126,16 +126,21 @@ export class Resolver {
                         // Convert the term using the configured converter
                         let replacement = this.converter!.convert(entry, termProperties);
 
-                        const startIndex = match.index! + lastIndex;
-                        const matchLength = match[0].length;
-                        const textBeforeMatch = data.substring(0, startIndex);
-                        const textAfterMatch = data.substring(startIndex + matchLength);
-                        
-                        // Replace the matched term with the generated replacement in the data string
-                        data = `${textBeforeMatch}${replacement}${textAfterMatch}`;
-
-                        // Update the lastIndex to account for the length difference between the match and replacement
-                        lastIndex += replacement.length - matchLength;
+                        // Only execute the replacement steps if the 'replacement' string is not empty
+                        if (replacement.length > 0) {
+                              const startIndex = match.index! + lastIndex;
+                              const matchLength = match[0].length;
+                              const textBeforeMatch = data.substring(0, startIndex);
+                              const textAfterMatch = data.substring(startIndex + matchLength);
+                              
+                              // Replace the matched term with the generated replacement in the data string
+                              data = `${textBeforeMatch}${replacement}${textAfterMatch}`;
+      
+                              // Update the lastIndex to account for the length difference between the match and replacement
+                              lastIndex += replacement.length - matchLength;
+                        } else {
+                              this.log.warn(`Glossary item ${termProperties.get("term")} was converted to an empty string`)
+                        }
                   } else {
                         this.log.warn(`Glossary item ${termProperties.get("term")} could not be located`)
                   }
