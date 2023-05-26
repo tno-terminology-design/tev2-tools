@@ -32,15 +32,10 @@ entries:
   originalLicense: null
   navurl: "terminology/specification.md"
   headingids:
-  #  - "tev2-curated-text-header"
-  #  - "curation-status"
-  #  - "origins-acknowledgements"
-  #  - "concept"
-  #  - "summary"
-  #  - "purpose"
-  #  - "criteria"
-  #  - "notes"
-  #  - "footnotes"
+   - "concept"
+   - "summary"
+   - "purpose"
+   - "criteria"
 -
   term: "specification"
   scopetag: "tev2"
@@ -61,12 +56,7 @@ entries:
   originalLicense: null
   navurl: "somewhere/inside/tev2/specification.md"
   headingids:
-  #  - "tev2-curated-text-header"
-  #  - "curation-status"
-  #  - "origins-acknowledgements"
-  #  - "concept"
-  #  - "summary"
-  #  - "purpose"
-  #  - "criteria"
-  #  - "notes"
-  #  - "footnotes"
+   - "concept"
+   - "summary"
+   - "purpose"
+   - "criteria"
