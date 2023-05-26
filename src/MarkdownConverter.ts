@@ -16,7 +16,7 @@ export class MarkdownConverter implements Converter {
             // Generate the 'converted' representation based on the matching entry
             if (entry.website && entry.navurl) {
                   markdownOut = `[${term.get("showtext")}](${path.join(entry.website, entry.navurl)})`
-
+                  
                   if (term.get("trait") !== undefined) {
                         // Add the trait as an anchor link if available in entry heading id's
                         if (entry.headingids?.includes(term.get("trait")!)) {
