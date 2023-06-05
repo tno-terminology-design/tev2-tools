@@ -196,6 +196,13 @@ export class Glossary {
                               }
                         }
 
+                        // Set the vsntag property of the entry to the (alternative) vsntag
+                        // NOTE: This does mean an entire MRG may be copied if an altvsntag is used.
+                        //       Can be fixed by making vsntag a list inside the runtime glossary.
+                        if (this.vsntag) {
+                              entry.vsntag = this.vsntag;
+                        }
+                        
                         // Set the website property of the entry to the SAF scope website
                         entry.website = (await this.saf).scope.website;
 

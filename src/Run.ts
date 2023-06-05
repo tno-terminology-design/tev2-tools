@@ -30,7 +30,7 @@ program
       .option('-c, --config <path>', 'Path (including the filename) of the tool\'s (YAML) configuration file')
       .option('-o, --output <dir>', '(Root) directory for output files to be written')
       .option('-s, --scopedir <path>', 'Path of the scope directory where the SAF is located')
-      .option('-v, --vsntag <vsntag>', 'Default version to use when no version is set in term ref')
+      .option('-v, --vsntag <vsntag>', 'Default version to use when no version is set in term ref', 'latest')
       .option('-int, --interpreter <type>', 'Set interpreter to Alt syntax', 'default')
       .option('-con, --converter <type>', 'Set converter to Markdown, HTTP or ESIFF output', 'default')
       .parse(process.argv);
