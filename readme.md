@@ -2,7 +2,9 @@
 
 ## Overview
 
-The **Term Ref(erence) Resolution Tool (TRRT)** takes files that contain so-called term refs (e.g. `[terms communities](terms-community@ctwg)`) and outputs a version of these files in which term refs are converted to so-called renderable refs, i.e. texts that can be further processed by tools such as GitHub pages, Docusaurus, etc., the result of which is that the rendered document contains markups that help readers to quickly find more explanations of the concept or other knowledge artifact that is being referenced. More information at: [eSSIF-Lab](https://essif-lab.github.io/framework/docs/tev2/spec-tools/trrt).
+The **Term Ref(erence) Resolution Tool (TRRT)** takes files that contain so-called [term refs](https://essif-lab.github.io/framework/docs/tev2/terms/term-ref) and outputs a copy of these files in which these term refs are converted into so-called [renderable refs](https://essif-lab.github.io/framework/docs/tev2/terms/renderable-ref), i.e. texts that can be further processed by tools such as GitHub pages, Docusaurus, etc. The result of this is that the rendered document contains markups that help readers to quickly find more explanations of the concept or other knowledge artifact that is being referenced. There is more information about 
+- the [TRRT specifications](https://essif-lab.github.io/framework/docs/tev2/spec-tools/trrt)
+- [overview of the TEv2 tools](https://essif-lab.github.io/framework/docs/tev2/tev2-overview) of which the TRRT is a part.
 
 ### Who will use the TRRT?
 
@@ -10,11 +12,11 @@ The TRRT will be used by terminology creators and curators to generate renderabl
 
 ### What inputs does the TRRT need?
 
-For resolution to work, the following artifacts need to be present:
+For resolution to work, the following artifacts need to be present (see the [TEv2 architecture](https://essif-lab.github.io/framework/docs/tev2/overview/tev2-architecture) for an overview):
 
-* The Scope Administration File (SAF);
-* Access to (already existing) [MRGs](https://essif-lab.github.io/framework/docs/tev2/spec-tools/mrgt) insofar as they contain terms that are to be referenced;
-* The curated texts that document the terms (or other artifacts) that are to be resolved by the TRRT.
+* The [Scope Administration File (SAF)](https://essif-lab.github.io/framework/docs/tev2/spec-files/saf);
+* Access to (already existing) [MRGs](https://essif-lab.github.io/framework/docs/tev2/spec-files/mrg) (created with the [MRGTool](https://essif-lab.github.io/framework/docs/tev2/spec-tools/mrgt)) insofar as they contain terms that are to be referenced;
+* The [curated texts](https://essif-lab.github.io/framework/docs/tev2/terms/curated-text) as [specified here](https://essif-lab.github.io/framework/docs/tev2/spec-files/ctext) that document the terms (or other artifacts) that are to be resolved by the TRRT.
 
 ## Installation
 
