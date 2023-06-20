@@ -15,7 +15,7 @@ export class AltInterpreter implements Interpreter {
 
             if (match.groups != undefined) {
                   termProperties.set("showtext", match.groups.showtext);
-                  termProperties.set("term", match.groups.id || match.groups.showtext.toLowerCase().replace(/[^A-Za-z_-]+/, "-"));
+                  termProperties.set("term", match.groups.id || match.groups.showtext.toLowerCase().replace(/[^a-z_-]+/g, "-"));
                   termProperties.set("trait", match.groups.trait);
                   termProperties.set("scopetag", match.groups.scopetag);
                   termProperties.set("vsntag", match.groups.vsntag);
