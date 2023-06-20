@@ -159,7 +159,7 @@ export class Resolver {
                               this.log.warn(`Glossary item ${termProperties.get("term")} was converted to an empty string`)
                         }
                   } else {
-                        this.log.warn(`Glossary item ${termProperties.get("term")} could not be located`)
+                        this.log.warn(`Glossary item '${termProperties.get("term")}' could not be located`)
                   }
             }
 
