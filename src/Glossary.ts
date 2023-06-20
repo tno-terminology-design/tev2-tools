@@ -169,54 +169,54 @@ export class Glossary {
        * @returns A promise that resolves to the populated glossary.
        */
       private async populateGlossary(): Promise<Output> {
-            for (const entry of (await this.mrg).entries) {
-                  if (entry.formPhrases) {
-                        // Split the formPhrases string into the forms and trim each form
-                        const alternatives = entry.formPhrases.split(",").map(t => t.trim());
+            const mrgEntries = (await this.mrg).entries;
+            const safWebsite = (await this.saf).scope.website;
 
-                        // Mapping of macro placeholders to their corresponding replacements
-                        const regexMap: { [key: string]: string[] } = {
-                              "{ss}": ["s", "'s", "(s)"],
-                              "{yies}": ["y's", "ies"],
-                              "{ying}": ["ier", "ying", "ies", "ied"],
-                        };
+            for (const entry of mrgEntries) {
+                  // Split the formPhrases string into the forms and trim each form, or set it as an empty list
+                  const alternatives = entry.formPhrases ? entry.formPhrases.split(",").map(t => t.trim()) : [];
 
+                  // Mapping of macro placeholders to their corresponding replacements
+                  const regexMap: { [key: string]: string[] } = {
+                        "{ss}": ["s", "'s", "(s)"],
+                        "{yies}": ["y's", "ies"],
+                        "{ying}": ["ier", "ying", "ies", "ied"],
+                  };
 
-                        for (const alternative of alternatives) {
-                              const match = alternative.match(/\{(ss|yies|ying)}/);
-                              if (match) {
-                                    const macro = match[0];
-                                    const replacements = regexMap[macro];
-                                    if (replacements) {
-                                          // Replace the macro with each possible replacement and add the new alternative to the alternatives array
-                                          for (const replacement of replacements) {
-                                                alternatives.push(alternative.replace(match[0], replacement));
-                                          }
+                  for (const alternative of alternatives) {
+                        const match = alternative.match(/\{(ss|yies|ying)}/);
+                        if (match) {
+                              const macro = match[0];
+                              const replacements = regexMap[macro];
+                              if (replacements) {
+                                    // Replace the macro with each possible replacement and add the new alternative to the alternatives array
+                                    for (const replacement of replacements) {
+                                          alternatives.push(alternative.replace(match[0], replacement));
                                     }
                               }
                         }
+                  }
 
-                        // Set the vsntag property of the entry to the (alternative) vsntag
-                        // NOTE: This does mean an entire MRG may be copied if an altvsntag is used.
-                        //       Can be fixed by making vsntag a list inside the runtime glossary.
-                        if (this.vsntag) {
-                              entry.vsntag = this.vsntag;
-                        }
-                        
-                        // Set the website property of the entry to the SAF scope website
-                        entry.website = (await this.saf).scope.website;
+                  // Create the original Entry with the (alternative) vsntag and SAF scope website
+                  // NOTE: This does mean an entire MRG may be copied if an altvsntag is used.
+                  //       Can be fixed by making vsntag a list inside the runtime glossary.
+                  const glossaryEntry: Entry = {
+                        ...entry,
+                        vsntag: this.vsntag || entry.vsntag,
+                        website: safWebsite,
+                  };
 
-                        // Add the original entry to the glossary
-                        this.glossary.entries.push(entry);
+                  // Add the original entry to the glossary
+                  this.glossary.entries.push(glossaryEntry);
 
-                        // Add entries of the alternative forms to the glossary
-                        for (const alternative of alternatives.filter(s => !s.includes("{"))) {
-                              const altEntry: Entry = { ...entry, term: alternative };
-                              this.glossary.entries.push(altEntry);
-                        }
+                  // Add entries of the alternative forms to the glossary
+                  for (const alternative of alternatives.filter(s => !s.includes("{"))) {
+                        const altEntry: Entry = { ...glossaryEntry, term: alternative };
+                        this.glossary.entries.push(altEntry);
                   }
             }
 
             return this.glossary;
       }
+
 }
