@@ -22,7 +22,7 @@ console.log(
 
 program
       .name('trrt')
-      .version('0.2.1')
+      .version('0.2.2')
       .usage('[ <paramlist> ] [ <globpattern> ]\n' +
       '- <paramlist> (optional) is a list of key-value pairs\n' +
       '- <globpattern> (optional) specifies a set of (input) files that are to be processed')
