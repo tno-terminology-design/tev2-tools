@@ -21,7 +21,7 @@ For resolution to work, the following artifacts need to be present (see the [TEv
 ## Installation
 
 Install from the command line and make globally available
-`npm install @essif-lab/trrt -g`
+`npm install tno-terminology-design/trrt -g`
 
 ## Calling the Tool
 
