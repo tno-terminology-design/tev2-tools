@@ -1,8 +1,4 @@
-name: Test deployment
-defaults:
-    run:
-      shell: bash
-      working-directory: docs
+name: 'Test docusaurus deployment'
 on:
   pull_request:
     branches:
@@ -12,6 +8,10 @@ on:
 
 jobs:
   test-deploy:
+    defaults:
+      run:
+        shell: bash
+        working-directory: docs
     name: Test deployment
     runs-on: ubuntu-latest
     steps:
