@@ -8,10 +8,10 @@ on:
 
 jobs:
   test-deploy:
-    defaults:
-      run:
-        shell: bash
-        working-directory: docs
+    # defaults:
+    #   run:
+    #     shell: bash
+    #     working-directory: docs
     name: Test deployment
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 18
           cache: yarn
-
+          cache-dependency-path: docs
       - name: Install dependencies
         run: yarn install --frozen-lockfile
         working-directory: ./docs
