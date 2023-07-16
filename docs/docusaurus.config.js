@@ -87,32 +87,33 @@ const config = {
             title: 'Toolbox Repositories',
             items: [
               { label: 'TRRT',  href: 'https://github.com/tno-terminology-design/trrt' },
-              { label: 'MRGT',  href: 'https://github.com/trustoverip/ctwg-toolkit-mrg' },
+              { label: 'MRGT',  href: 'https://github.com/tno-terminology-design/mrgt' },
+              { label: 'MRG importer',  href: 'https://github.com/tno-terminology-design/mrg-import' },
             ],
           },
           {
             title: 'Terminology Design',
             items: [
-              { label: 'Introduction',  to: 'docs/terminology-design/overview' },
-              { label: 'Methods',       to: 'docs/terminology-design/methods' },
+              { label: 'Introduction',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/terminology-design/overview' },
+              { label: 'Methods',       href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/terminology-design/methods' },
               { label: 'Github', href: 'https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs/terms' },
             ],
           },
           {
             title: 'TEv2 User Manuals',
             items: [
-              { label: 'Curators',      to: 'docs/tev2/manuals/curator' },
-              { label: 'Contributors',  to: 'docs/tev2/manuals/contributor' },
-              { label: 'Authors',       to: 'docs/tev2/manuals/author' },
+              { label: 'Curators',      href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/manuals/curator' },
+              { label: 'Contributors',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/manuals/contributor' },
+              { label: 'Authors',       href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/manuals/author' },
               // { label: 'Github', href: 'https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs/terms' },
             ],
           },
           {
             title: 'TEv2 Specifications',
             items: [
-              { label: 'Files',     to: 'docs/tev2/tev2-spec-files' },
-              { label: 'Syntaxes',  to: 'docs/tev2/tev2-syntax' },
-              { label: 'Toolbox',   to: 'docs/tev2/tev2-toolbox' },
+              { label: 'Files',     href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-spec-files' },
+              { label: 'Syntaxes',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-syntax' },
+              { label: 'Toolbox',   href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-toolbox' },
               { label: 'Github', href: 'https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs/terms' },
             ],
           },
