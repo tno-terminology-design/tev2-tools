@@ -16,6 +16,8 @@ jobs:
       run:
         shell: bash
         working-directory: docs
+      env:
+        ACTIONS_STEP_DEBUG: true
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
