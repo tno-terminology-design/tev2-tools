@@ -3,7 +3,7 @@ id: overview
 sidebar_label: Term Ref Resolution
 displayed_sidebar: tev2SideBar
 scopetag: tev2
-date: 20220731
+date: 20230725
 ---
 
 # Term Reference Resolution Tool
@@ -25,14 +25,14 @@ As TEv2 is not (yet) available, the texts that specify the tool are still 'raw',
 :::
 
 :::info Editor's note
-Term ref resolution is the same process as we use for ingestion, and other conversions, as (will be) explained in the [profiles template section](/docs/tev2/spec-files/profile-templates). When that 'conversion pattern' is stable and properly documented, we need to revise this section to align with those descriptions.
+Term ref resolution is the same process as we use for ingestion, and other conversions, as (will be) explained in the [profiles template section](profile-templates). When that 'conversion pattern' is stable and properly documented, we need to revise this section to align with those descriptions.
 :::
 
 The **Term Ref(erence) Resolution Tool ([TRRT](@))** takes files that contain so-called [term refs](@) and outputs a copy of these files in which these [term refs](@) are converted into so-called [renderable refs](@), i.e. texts that can be further processed by tools such as GitHub pages, Docusaurus, etc. The result of this is that the rendered document contains markups that help [readers](@) to quickly find more explanations of the [concept](@) or other [knowledge artifact](@) that is being referenced.
 
 There is currently one implementation of the tool:
-- the repo in which the tool is being developed is [here](https://github.com/essif-lab/trrt).
-- the documentation is [<mark>tbd</mark>].
+- the repo in which the tool is being developed is [here](https://github.com/tno-terminology-design/trrt/).
+- the documentation is [here](https://tno-terminology-design.github.io/tev2-specifiations).
 
 <details>
   <summary>Examples</summary>
@@ -83,12 +83,12 @@ Note that this text is not readily renderable in a browser. `<Term ...>` and `</
 </details>
 
 Conceptually, [term ref](@) conversion is a simple two-step process:
-1. The [term ref](@) is interpreted, the result of which is a set of variables (or if regexes are used: [named capturing groups](https://riptutorial.com/regex/example/2479/named-capture-groups)) whose contents [identify](@) an [MRG entry](@) from a specific [MRG](@).
-2. Then, using the contents of the [identified](@) [MRG entry](@), the [term ref](@) is replaced by a converter with a [renderable ref](@), of the kind as specified by the [TRRT's](@) command line arguments or configuration file. Through the use of converters, the [renderable ref](@) may include all sorts of code that is processed further by other, third party rendering tools.
+1. The [term ref](@) is [interpreted](interpreter@), the result of which is a set of variables (or in the case of regexes, [named capturing groups](https://riptutorial.com/regex/example/2479/named-capture-groups)) whose contents [identify](@) an [MRG entry](@) from a specific [MRG](@).
+2. Then, using the contents of the [identified](@) [MRG entry](@), the [term ref](@) is replaced by a [converter](@) with a [renderable ref](@), of the kind as specified by the [TRRT's](@) command line arguments or configuration file. Through the use of converters, the [renderable ref](@) may include all sorts of code that is processed further by other, third-party rendering tools.
 
 By cleanly separating [term ref](@) interpretation from the part where it is overwritten with a [renderable ref](@), it becomes easy to extend the capabilities of the [TRRT](@) to include ways for rendering [term refs](@), e.g. for LaTeX, PDF, docx, odt and other formats, as well as for formats that we currently do not even know we would like to have.
 
-In order to convert [term refs](@) into [renderable refs](@), [TRRT](@) expects the [SAF](@) and the [MRG](@) of the [scope](@) from within which it is being called, to be available. The [MRG](@) is used to resolve all links to [terms](@) that are part of the [terminology](@) of this [scope](@). The [SAF](@) is used to locate the [MRGs](@) of any (other) [scope](@) whose [scopetag](@) is used as part of a [term ref](@) that needs to be resolved.
+In order to convert [term refs](@) into [renderable refs](@), the [TRRT](@) expects the [SAF](@) and the [MRG](@) of the [scope](@) from within which it is being called, to be available. The [MRG](@) is used to resolve all references to [terms](@) that are part of the [terminology](@) of this [scope](@). The [SAF](@) is used to locate the [MRGs](@) of any (other) [scope](@) whose [scopetag](@) is used as part of a [term ref](@) that needs to be resolved.
 
 ## Calling the Tool
 
@@ -132,11 +132,11 @@ The [term ref](@) resolution process has three steps:
 
 ### Interpretation of the Term Ref
 
-The following kinds of [term ref](@) syntaxes are (to be) supported:
+The following kinds of [term ref](@) syntaxes are supported by default:
 - the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax), i.e. \[`show text`\](`term`#`trait`@`scopetag`:`vsntag`);
 - the [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax), e.g. \[`show text`@\], which basically moves the `@`-character from the basic syntax within the square brackets, which in many (if not most) cases is more convenient for [authors](@), but has the drawback that the rendering of the plain markdown text would be rendered as [show text@], which may be inconvenient.
 
-Interpretation of a [term ref](@) leads to the population of the following variables (or, in case regexes are used, named capturing groups):
+Interpretation of a [term ref](@) leads to the population of the following variables:
 
 <details>
 <summary>Using regexes to find the values for the variables</summary>
@@ -205,29 +205,15 @@ Perhaps the [TRRT](@) may use this tool as a means for generating the `term` fie
 
 ### Locating the identified MRG Entry
 
-As soon as the variables have been provided with a value, the [MRG](@) can be found by following a sequence of steps:
+As soon as the variables have been provided with a value, the [MRG entry](@) can be found by following a sequence of steps:
 
-1. **get the [scopedir](@) and [SAF](@) associated with the `scope` variable of the [term ref](@)**. If the value of the `scopetag` variable is the [scopetag](@) of the current [scope](@) (as specified when the [tool was called](#calling-the-tool)), then use the current [scopedir](@). Otherwise, look up the [scopedir](@) from the [`scopes` section](/docs/tev2/spec-files/saf#scopes) of the current [SAF](@). From the resulting [scopedir](@), read the [SAF](@) (i.e. the `saf.yaml` file in the root of the [scopedir](@)).
+1. **read the [SAF](@) inside the supplied [scopedir](@)**. Thanks to the [MRG Import Tool](@) we can assume that all [MRGs](@) that may need to be consulted are located in the [glossarydir](@) and can be populated inside the runtime glossary of the [TRRT](@).
 
-2. **get the [MRG](@) associated with the `vsntag` of the [term ref](@)**. Search the element in the [versions section](docs/tev2/spec-files/mrg#versions) of the [SAF](@) where the `vsntag` variable is either the value of the `vsntag` field, or appears as one of the elements in the `altvsntags` field. Then, obtain the filename of the [MRG](@) from the `mrgfile` field of that element.
-
-3. **identify the [MRG entry](@) associated with the `id` field of the [term ref](@)**. Get the [MRG](@) from the location specified by the URL `<scopedir>`/`<glossarydir>`/`<mrgfile>` (which are all in the context of [scope](@) as identified by the `scopetag` variable). The [MRG entry](@) will be [identified](@) by a process that starts with the set of all [entries](mrg-entry@) that exist in the selected [MRG](@), and then weeding out any non-matching [entries](mrg-entry@) by applying the following steps:
-    - since `term` must be present, all [entries](mrg-entry@) are removed whose `term` field differs from the `term` variable;
-    - then, if the variable `termtype` is present, all [entries](mrg-entry@) whose `termtype` field has a different value from what that variable holds, are removed from the set;
-    - If the resulting set contains exactly one [MRG entry](@), this is the one that is selected; otherwise, a warning is raised.
+2. **find the matching [MRG entry](@) in the runtime glossary**. Based on the `term`, `scopetag` and `vsntag` variables of the [term ref](@), an entry in the glossary can be matched. `Altvsntags` may also be used in the runtime glossary for matching during this step. If the resulting set contains exactly one [MRG entry](@), this is the one that is selected; otherwise, a warning is raised.
 
 ### Rewriting the Term Ref with a Renderable Ref
 
-<img
-  alt="From this point onward, texts are under construction"
-  src={useBaseUrl('images/wip/wip-under-construction-from-here-onward.png')}
-/><br/><br/>
-
 The [term ref](@) will by default dereference to a human readable, rendered version of the [curated text](@) associated with the [identified](@) [MRG entry](@), which can be obtained through the URL located in the `navurl` field of the [MRG entry](@), which the text `#<trait>` is appended if a `trait` was specified.
-
-:::info Editor's note
-We should think about how to document [renderable refs](@) in such a way that they can easily be found and used for different roles ([authors](@), curators, developers) and purposes (writing a trrt-config file, adding a new type of [renderable ref](@), etc.).
-:::
 
 The text with which the [term ref](@) is to be replaced can have various formats. This enables the [TRRT](@) to be used in different contexts, and its results to be further processed by a variety of third-party rendering tools.
 
@@ -286,7 +272,7 @@ At this point, all data is available for constructing the replacement text. As w
 
 The [TRRT](@) starts by reading its command-line and configuration file. If the command-line has a key that is also found in the configuration file, the command-line key-value pair takes precedence. The resulting set of key-value pairs is tested for proper syntax and validity. Every improper syntax and every invalidity found will be logged. Improper syntax may be e.g. an invalid [globpattern](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax). Invalidities include non-existing directories or files, lack of write-permissions where needed, etc.
 
-Then, the [TRRT](@) reads the specified input files (in arbitrary order), and for each of them, produces an output file that is the same as the input file except for the fact that all [term refs](@) have been replaced with regular [markdown links](https://www.markdownguide.org/basic-syntax/#links), and (optionally) with additional texts that are to be used by third-party rendering tools for enhanced rendering of such links. An example of this would be text that can be used to enhance a link with a popup that contains the definition, or a description of the [term](@) that is being referenced.
+Then, the [TRRT](@) reads the specified input files (in arbitrary order), and for each of them, produces an output file that is the same as the input file except for the fact that all [term refs](@) have been replaced with texts that are to be used by third-party rendering tools for enhanced rendering of such links. An example of this would be text that can be used to enhance a link with a popup that contains the definition, or a description of the [term](@) that is being referenced.
 
 The [TRRT](@) logs every error- and/or warning condition that it comes across while processing its configuration file, commandline parameters, and input files, in a way that helps tool-operators and document [authors](@) to identify and fix such conditions.
 
