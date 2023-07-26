@@ -115,13 +115,12 @@ The columns in the following table are defined as follows:
 
 | Key        | Value         | Req'd | Description |
 | :--------- | :------------ | :---: | :---------- |
-| `config`   | `<path>`        | n | Path (including the filename) of the tool's (YAML) configuration file. This file contains the default key-value pairs to be used. Allowed keys (and the associated values) are documented in this table. Command-line arguments override key-value pairs specified in the configuration file. This parameter MUST NOT appear in the configuration file itself. |
-| `input`    | `<globpattern>` | n | [Globpattern](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) that specifies the set of (input) files that are to be processed. |
+| `config`   | `<path>`        | n | Path (including the filename) of the tool's (YAML) configuration file. This file contains the key-value pairs to be used. Allowed keys (and the associated values) are documented in this table. Command-line arguments override key-value pairs specified in the configuration file. This parameter MUST NOT appear in the configuration file itself. |
+| `input`    | `<globpattern>` | n | [Globpattern](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) string that specifies the set of (input) files that are to be processed. |
 | `output`   | `<dir>`         | Y | Directory where output files are to be written. This directory is specified as an absolute or relative path. |
 | `scopedir` | `<path>`        | Y | Path of the [scope directory](@) from which the tool is called. It MUST contain the [SAF](@) for that [scope](@), which we will refer to as the 'current scope' for the [TRRT](@). |
-| `version`  | `<versiontag>`  | n | Version of the [terminology](@) that is to be used to resolve [term refs](@) for which neither a `scope` nor a `version` part has been specified (which is the most common case). It MUST match either the `vsntag` field, or an element of the `altvsntags` field of a [terminology](@)-version as specified in the [`versions` section](/docs/tev2/spec-files/saf#versions) of the [SAF](@). When not specified, its value is taken from the `vsntag` field in the [terminology section](/docs/tev2/spec-files/mrg#mrg-terminology) of the default [MRG](@) (which is [identified](@) by the contents of the `mrgfile` field (in the [`scope` section](/docs/tev2/spec-files/saf#terminology) of the [SAF](@)). |
-| `interpreter` | `<type>`   | n | Allows for the switching between interpreter types. By default the `AltInterpreter` and `StandardInterpreter` are available. When this parameter is omitted, the basic [term ref](@) syntax is used. |
-| `converter` | `<type>`   | n | The type of converter which creates the [renderable refs](@). When this parameter is omitted, the Markdown converter is used. |
+| `interpreter` | `<type>` or `<regex>`   | n | Allows for the switching between existing and custom interpreter types. By default `alt` and `default` are available, but a custom regex pattern may be provided. When this parameter is omitted, the basic [term ref](@) syntax is interpreted. |
+| `converter` | `<type>` or `<mustache>`   | n | The type of converter which creates the [renderable refs](@). Allows for the switching between existing and custom converter types. By default `http` and `markdown` are available, but a custom [Mustache template](@) may be provided. When this parameter is omitted, the Markdown converter is used. |
 
 ## Term Ref Resolution
 
@@ -132,9 +131,10 @@ The [term ref](@) resolution process has three steps:
 
 ### Interpretation of the Term Ref
 
-The following kinds of [term ref](@) syntaxes are supported by default:
+The following kinds of [term ref](@) syntaxes are supported:
 - the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax), i.e. \[`show text`\](`term`#`trait`@`scopetag`:`vsntag`);
 - the [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax), e.g. \[`show text`@\], which basically moves the `@`-character from the basic syntax within the square brackets, which in many (if not most) cases is more convenient for [authors](@), but has the drawback that the rendering of the plain markdown text would be rendered as [show text@], which may be inconvenient.
+- custom syntaxes interpreted by the `interpreter` parameter of the [TRRT](@) through the use of regular expressions.
 
 Interpretation of a [term ref](@) leads to the population of the following variables:
 
@@ -211,62 +211,47 @@ As soon as the variables have been provided with a value, the [MRG entry](@) can
 
 2. **find the matching [MRG entry](@) in the runtime glossary**. Based on the `term`, `scopetag` and `vsntag` variables of the [term ref](@), an entry in the glossary can be matched. `Altvsntags` may also be used in the runtime glossary for matching during this step. If the resulting set contains exactly one [MRG entry](@), this is the one that is selected; otherwise, a warning is raised.
 
-### Rewriting the Term Ref with a Renderable Ref
+### Converting the Term Ref to a Renderable Ref
 
-The [term ref](@) will by default dereference to a human readable, rendered version of the [curated text](@) associated with the [identified](@) [MRG entry](@), which can be obtained through the URL located in the `navurl` field of the [MRG entry](@), which the text `#<trait>` is appended if a `trait` was specified.
+The text with which the [term ref](@) is to be replaced can have various formats. This behavior can be customized by supplying a Mustache template to the `converter` parameter. This enables the [TRRT](@) to be used in different contexts, and its results to be further processed by a variety of third-party rendering tools.
 
-The text with which the [term ref](@) is to be replaced can have various formats. This enables the [TRRT](@) to be used in different contexts, and its results to be further processed by a variety of third-party rendering tools.
-
+Any values from the standard interpreters and all properties supplied in the matching [MRG Entry](@) can be used as [Mustache expressions](https://handlebarsjs.com/guide/expressions).
+ 
 <details>
-  <summary>Examples of term-ref replacements</summary>
+  <summary>Examples of term-ref converters</summary>
 
 <Tabs
   defaultValue="simple"
   values={[
-    {label: 'ToIP Style', value: 'simple'},
-    {label: 'eSSIF-Lab Style', value: 'complex'},
+    {label: 'Markdown Style', value: 'markdown'},
+    {label: 'HTML Style', value: 'html'},
   ]}>
 
-<TabItem value="simple">
+<TabItem value="markdown">
 
-The simplest example is where a [term ref](@) is replaced with a regular [markdown link](https://www.markdownguide.org/basic-syntax/#links)
+The simplest example is where a [term ref](@) is replaced with a regular [markdown link](https://www.markdownguide.org/basic-syntax/#links) according to the template below.
 
-In this case, the [term ref](@) `[Actions](@)` is replaced with ``[Actions](/<hrgfile>#action)``
-where:
+[`[{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})`](https://handlebarsjs.com/playground.html#format=1&currentExample=%7B%22template%22%3A%22%5B%7B%7Bshowtext%7D%7D%5D(%7B%7Bnavurl%7D%7D%7B%7B%23trait%7D%7D%23%7B%7B%2Ftrait%7D%7D%7B%7Btrait%7D%7D)%5Cn%22%2C%22partials%22%3A%5B%5D%2C%22input%22%3A%22%7B%5Cn%20%20showtext%3A%20%5C%22show%20text%5C%22%2C%5Cn%20%20navurl%3A%20%5C%22https%3A%2F%2Fexample.com%2Fdocs%2Fterminology%2Fspecification.md%5C%22%2C%5Cn%20%20trait%3A%20%5C%22summary%5C%22%2C%5Cn%7D%5Cn%22%2C%22output%22%3A%22%5Bshow%20text%5D(https%3A%2F%2Fexample.com%2Fdocs%2Fterminology%2Fspecification.md%23summary)%5Cn%22%2C%22preparationScript%22%3A%22%22%2C%22handlebarsVersion%22%3A%224.7.7%22%7D)
 
-- `hrgfile` is the contents of the field [SAF](@).`scope.hrgfile`.
-
-Note that if the [term ref](@) refers to a [scope](@) that differs from the current [scope](@), then the URL should be preceeded by the text specified in the `website` field of the [SAF](@) of that [scope](@), because it would not be a relative (local) hyperlink.
+In this case, the [term ref](@) `[Actions](@)` is replaced with ``[Actions](/<navurl>#action)``,
+where `navurl` is gathered from the matching [MRG entry](@). The trait leading with a `#` is attached if a trait happens to be set.
 
 </TabItem>
-<TabItem value="complex">
+<TabItem value="html">
 
-A more complex example is what is done within eSSIF-Lab, where the [curators](@) not only want [terms](@) to be linked to their (rendered) [curated texts](@), but also want them to be provided with a tooltip that states their [definitions](@).
+A more complex example is what is done within eSSIF-Lab, where the [curators](@) not only want [terms](@) to be linked to their (rendered) [curated texts](@), but also want them to be provided with a tooltip that states their [definitions](@). This can be achieved by using the template below.
 
-In this [scope](@), the [term ref](@) `[Actions](@)` is replaced with `<Term reference="action" popup="<popuptext>">Actions</Term>`
-where:
+`<Term reference="{{term}}" popup="{{popuptext}}">{{showtext}}</Term>`
 
-- `<popuptext>` is the text provided in the `hoverText` field of the [MRG entry](@) whose `term` field is `action`, and
+In this [scope](@), the [term ref](@) `[Actions](@)` is replaced with `<Term reference="action" popup="<popuptext>">Actions</Term>` where:
+
+- `<popuptext>` is the text provided in the properties of the [MRG entry](@) whose `term` field is `action`, and
 - `<Term ...>` and `</Term>` represent a React component that supports linking and tooltip functionality, so that users hovering over the link will see a popup/tooltip with the text `<popuptext>`, and will navigate to the location of the (human readable, i.e. rendered) file that contains details and further explanations, as specified in the `navurl` field of the [MRG entry](@).
-
-:::info Editor's note
-The implementation of the `<Term ...>` ... `</Term>` construct will differ from that which is used by eSSIF-Lab, because a [term](@) that is defined in this, or another [scope](@), lives in the [curated file](@) at `scopedir`/`curatedir`/`locator`, where
-- `scopedir` is the URL that locates the [scope directory](@) of that [scope](@);
-- `curatedir` is the directory in that `scopedir` where [knowledge artifacts](@) (c.q. [curated texts](@)) live; its value is found both in the [SAF](@) and in the [MRG](@) of the [scope](@);
-- `locator` is the path (including filename), relative to `scopedir`/`curatedir`/, of the [curated file](@) that describes the [knowledge artifact](@) that is being referred to.
-:::
 
 </TabItem>
 </Tabs>
 
 </details>
-
-The essentials of the rewriting start with the [scopedir](@) of the [scope](@) from which the [TRRT](@) is called, and proceed as follows:
-- access the [SAF](@), and in case the `scopetag` is not of this [scope](@), look up the [scopedir](@) associated with that `scopetag` and obtain its [SAF](@);
-- using the `vsntag`, locate the [MRG](@) (or if `vsntag` isn't specified, use the [scope's](@) default [MRG](@)-file as specified in the [scope's](@) [SAF](@));
-- Find the [MRG entry](@) that has a `term`-field that is the same as `term`;
-
-At this point, all data is available for constructing the replacement text. As we have seen, it depends on the situation that need to be supported how the actual construction needs to be done.
 
 ## Processing, Errors and Warnings
 
@@ -285,7 +270,7 @@ The [TRRT](@) comes with documentation that enables developers to ascertain its 
 This section contains some notes of a discussion between Daniel and Rieks on these matters of some time ago.
 
 - A ToIP [glossary](@) will be put by default at `http://trustoverip.github.io/<terms-community>/glossary`, where `<terms-community>` is the name of the [terms-community](@). This allows every  [terms-community](@) to have its own [glossary](@). However, the above specifications allow [terms-communities](terms-community@) to [curate](@) multiple [scopes](scope@).
-- Storing [glossaries](glossary@) elsewhere was seen to break the (basic workings of the postprocessing tool, but the above specifications would fix that.
+- Storing [glossaries](glossary@) elsewhere was seen to break the (basic workings of the postprocessing tool, but the above specifications would fix that).
 - Entries, e.g. 'foo' can be referenced as `http://trustoverip.github.io/<community>/[glossary](@)#foo` (in case of a standalone glossary), and `http://trustoverip.github.io/<community>/document-that-includes-glossary-fragment#foo` (in case of a fragmented glossary).
 - There will be a new convention for content [authors](@) who want to reference [terms](term@) (let's call it the 'short form'). This topic is fully addressed above, and extended to be a bit more generic.
 - do we expect [glossaries](glossary@) that are generated by a [terms-community](@) to live at a fixed place (how do people find it, refer to its contents)? This topic is addressed
@@ -294,5 +279,5 @@ This section contains some notes of a discussion between Daniel and Rieks on the
   - github pages (e.g. https://github.com/trustoverip/ctwg-terms). Check (it's a github repo).
   - github wiki pages (e.g. https://github.com/trustoverip/ctwg-terms/wiki). Check (it's a github repo).
   - github wiki home pages (e.g. https://github.com/trustoverip/ctwg-terms/wiki/Home). Check (it's a github repo).
-  - github-pages pages (e.g. https://github.com/trustoverip/ctwg-terms/docs
+  - github-pages pages (e.g. https://github.com/trustoverip/ctwg-terms/docs)
 - We could also see GGT and TRRT to be extended, e.g. to work in conjunction with LaTeX or word-processor documents. This needs some looking into, but [pandoc](https://pandoc.org/) may be useful here.
