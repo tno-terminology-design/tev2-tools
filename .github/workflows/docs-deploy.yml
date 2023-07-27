@@ -25,6 +25,12 @@ jobs:
           node-version: 18
           cache: yarn
           cache-dependency-path: docs
+      # Terminology reference resolution
+      - name: Install TRRT
+        run: npm install -g @tno-terminology-design/trrt@1.x
+      - name: Run TRRT
+        run: trrt --output . --scopedir __tests__/content '**/**.md'
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build website
