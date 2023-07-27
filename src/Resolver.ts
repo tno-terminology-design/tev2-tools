@@ -1,67 +1,26 @@
-import { Interpreter } from './Interpreter.js';
-import { Converter } from './Converter.js';
-import { Glossary } from './Glossary.js';
-import { StandardInterpreter } from './StandardInterpreter.js';
-import { MarkdownConverter } from './MarkdownConverter.js';
-import { HTTPConverter } from './HTTPConverter.js';
-import { AltInterpreter } from './AltInterpreter.js';
-import { ESSIFConverter } from './ESSIFConverter.js'
-import { Logger } from 'tslog';
+import { interpreter, converter, glossary } from './Run.js'
+import { report, log } from './Report.js';
 import { glob } from 'glob';
 
+import stringSimilarity = require("string-similarity");
 import fs = require("fs");
 import path = require('path');
-import { version } from 'os';
 
 export class Resolver {
-      private log = new Logger();
       private outputPath: string;
       private globPattern: string;
-      private vsntag: string;
-      private scopedir: string;
-      private interpreter: Interpreter;
-      private converter: Converter;
-      public glossary: Glossary;
 
       public constructor({
             outputPath,
-            scopedir,
             globPattern,
-            vsntag,
-            interpreterType,
-            converterType,
       }: {
             outputPath: string;
-            scopedir: string;
             globPattern: string;
-            vsntag: string;
-            interpreterType: string;
-            converterType: string;
       }) {
             this.outputPath = outputPath;
             this.globPattern = globPattern;
-            this.vsntag = vsntag;
-            this.scopedir = scopedir;
-
-            this.glossary = new Glossary({ safURL: path.join(scopedir, "saf.yaml"), vsntag: vsntag })
-
-            // Define the interpreter and converter maps with supported types and corresponding instances
-            const interpreterMap: { [key: string]: Interpreter } = {
-                  alt: new AltInterpreter(),
-                  default: new StandardInterpreter(),
-            };
-
-            const converterMap: { [key: string]: Converter } = {
-                  http: new HTTPConverter(),
-                  essif: new ESSIFConverter(),
-                  default: new MarkdownConverter(),
-            };
-
-            // Assign the interpreter and converter instance based on the provided interpreter type (or use the default)
-            this.interpreter = interpreterMap[interpreterType.toLowerCase()];
-            this.converter = converterMap[converterType.toLowerCase()];
-                
       }
+      
       /**
        * Creates directory tree and writes data to a file.
        * @param dirPath - The directory path.
@@ -72,76 +31,60 @@ export class Resolver {
             // Check if the directory path doesn't exist
             if (!fs.existsSync(dirPath)) {
                   // Create the directory and any necessary parent directories recursively
-                  fs.mkdirSync(dirPath, { recursive: true });
+                  try {
+                        fs.mkdirSync(dirPath, { recursive: true });
+                  } catch (err) {
+                        log.error("Error creating directory " + dirPath + ": " + err);
+                  }
             };
-            this.log.trace("Writing: " + path.join(dirPath, file));
-            fs.writeFileSync(path.join(dirPath, file), data);
+            try {
+                  log.trace("Writing: " + path.join(dirPath, file));
+                  fs.writeFileSync(path.join(dirPath, file), data);
+            } catch (err) {
+                  log.error("Error writing file " + path.join(dirPath, file) + ": " + err);
+            }
       }
 
       /**
        * Interprets and converts terms in the given data string based on the interpreter and converter.
+       * @param file The file path of the file being processed.
        * @param data The input data string to interpret and convert.
-       * @returns A Promise that resolves to the processed data string.
+       * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
        */
-      private async interpretAndConvert(data: string): Promise<string> {
-            const matches: IterableIterator<RegExpMatchArray> = data.matchAll(
-                  this.interpreter!.getTermRegex()
-            );
+      private async interpretAndConvert(file: string, data: string): Promise<string | undefined> {
+            let matches: RegExpMatchArray[] = Array.from(data.matchAll(interpreter!.getRegex()));
+            if (matches.length < 1) {
+                  return undefined;
+            }
+
             let lastIndex = 0;
-            await this.glossary.main();
       
             // Iterate over each match found in the data string
-            for (const match of Array.from(matches)) {
-                  const termProperties: Map<string, string> = this.interpreter!.interpret(match);
-                  const entries = this.glossary.glossary.entries;
+            for (const match of matches) {
+                  const termProperties: Map<string, string> = interpreter!.interpret(match);
                   
                   // If the term has an empty scopetag, set it to the scopetag of the SAF
                   if (!termProperties.get("scopetag")) {
-                        termProperties.set("scopetag", (await this.glossary.saf).scope.scopetag);
+                        termProperties.set("scopetag", (glossary.saf).scope.scopetag);
                   }
 
-                  // If the term has an empty vsntag, set it to the default vsntag
+                  // If the term has an empty vsntag, set it to the defaultvsn of the SAF
                   if (!termProperties.get("vsntag")) {
-                        termProperties.set("vsntag", this.vsntag);
+                        termProperties.set("vsntag", (glossary.saf).scope.defaultvsn);
                   }
 
-                  const scopetag = termProperties.get("scopetag");
-                  const vsntag = termProperties.get("vsntag");
-
-                  // If the glossary does not contain any entries with the same vsntag, check for other MRG's in the scopedir SAF
-                  if (!entries.some(entry => entry.vsntag === vsntag)) {
-                        const altvsn = new Glossary({ safURL: path.join(this.scopedir, "saf.yaml"), vsntag: vsntag });
-                        await altvsn.main();
-                        entries.push(...altvsn.glossary.entries);
-                  }
-
-                  // If the glossary does not contain any entries with the same scopetag, check for a remote scopedir and fetch its SAF and MRG
-                  if (!entries.some(entry => entry.scopetag === scopetag)) {
-                        try {
-                              const remoteSAF = (
-                                    await this.glossary.saf
-                              ).scopes.find(scopes => scopes.scopetags.includes(scopetag!))?.scopedir;
-      
-                              if (remoteSAF) {
-                                    const remoteGlossary = new Glossary({ safURL: remoteSAF, vsntag: vsntag });
-                                    await remoteGlossary.main();
-                                    entries.push(...remoteGlossary.glossary.entries);
-                              }
-                        } catch (err) {
-                              this.log.error('Failed to fetch remote glossary entries:', err);
-                        }
-                  }
-
-                  // Find the matching entry in the glossary based on the term, vsntag and scopetag
-                  let entry = this.glossary.glossary.entries.find(entry =>
-                        entry.term === termProperties.get("term") &&
-                        entry.scopetag === termProperties.get("scopetag") &&
-                        entry.vsntag === termProperties.get("vsntag")
+                  // Find the matching entry in the glossary based on the term, scopetag and vsntag
+                  let matchingEntries = glossary.runtime.entries.filter(entry =>
+                        entry.term === termProperties.get("term")! &&
+                        entry.scopetag === termProperties.get("scopetag")! &&
+                        (entry.vsntag === termProperties.get("vsntag")! ||
+                        entry.altvsntags?.includes(termProperties.get("vsntag")!))
                   );
 
-                  if (entry) {
+                  if (matchingEntries.length === 1) {
+                        const entry = matchingEntries[0];
                         // Convert the term using the configured converter
-                        let replacement = this.converter!.convert(entry, termProperties);
+                        let replacement = converter!.convert(entry, termProperties);
 
                         // Only execute the replacement steps if the 'replacement' string is not empty
                         if (replacement.length > 0) {
@@ -155,14 +98,42 @@ export class Resolver {
       
                               // Update the lastIndex to account for the length difference between the match and replacement
                               lastIndex += replacement.length - matchLength;
+
+                              // Log the converted term
+                              report.termConverted(entry.term!);
                         } else {
-                              this.log.warn(`Glossary item ${termProperties.get("term")} was converted to an empty string`)
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' resulted in an empty string, check the converter.`);
                         }
+                  } else if (matchingEntries.length > 1) {
+                        // Multiple matches found, display a warning
+                        const suggestions = matchingEntries.map(entry => `${entry.source}`).join(', ');
+                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' has multiple matching MRG entries. Located in: ${suggestions}`);
                   } else {
-                        this.log.warn(`Glossary item '${termProperties.get("term")}' could not be located`)
+                        const properties = ['term', 'scopetag', 'vsntag'];
+
+                        let overallRating = 0;
+                        let bestMatchIndices: { [key: string]: number } = {};
+
+                        properties.forEach(prop => {
+                              const propertyValue = termProperties.get(prop) || '';
+                              const propertyMatches = stringSimilarity.findBestMatch(propertyValue, glossary.runtime.entries.map(entry => entry[prop] || ''));
+                              overallRating += propertyMatches.bestMatch.rating;
+                              bestMatchIndices[prop] = propertyMatches.bestMatchIndex;
+                        });
+
+                        overallRating /= properties.length;
+
+                        if (overallRating > 0.5) {
+                              const bestMatchEntry = glossary.runtime.entries[bestMatchIndices['term']];
+                              const TermRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`
+                              const suggestedTermRef = `${bestMatchEntry.term}@${bestMatchEntry.scopetag}:${bestMatchEntry.vsntag}`;
+                              const errorMessage = `Match '${match[0]}' could not be matched with a MRG entry. Did you mean to reference '${suggestedTermRef}' instead of '${TermRef}'?`;
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, errorMessage);
+                        } else {
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Match '${match[0]}' could not be matched with a MRG entry`);
+                        }
                   }
             }
-
             return data;
       }
 
@@ -170,26 +141,42 @@ export class Resolver {
        * Resolves and converts files in the specified input path.
        */
       public async resolve(): Promise<boolean> {
+            // Initialize the runtime glossary
+            await(glossary.initialize());
+
             // Log information about the interpreter, converter and the files being read
-            this.log.info(`Using interpreter '${this.interpreter.getType()}' and converter '${this.converter.getType()}'`)
-            this.log.info(`Reading files using pattern '${this.globPattern}'`);
+            log.info(`Using interpreter '${interpreter.getType()}' and converter '${converter.getType()}'`)
+            log.info(`Reading files using pattern string '${this.globPattern}'`);
 
             // Get the list of files based on the glob pattern
             const files = await glob(this.globPattern);
 
             // Process each file
             for (let filePath of files) {
-                  // Check if the file has a valid extension (.md or .html)
-                  if ([".md", ".html"].includes(path.extname(filePath))) {
-                        // Read the file content
-                        const data = fs.readFileSync(filePath, "utf8");
-                        this.log.trace(`Reading '${filePath}'`);
+                  // Read the file content
+                  let data;
+                  try {
+                        data = fs.readFileSync(filePath, "utf8");
+                  } catch (err) {
+                        console.log(`Could not read file: '${filePath}'`);
+                        continue;
+                  }
 
-                        // Interpret and convert the file data
-                        const convertedData = this.interpretAndConvert(data);
+                  // Interpret and convert the file data
+                  let convertedData;
+                  try {
+                        convertedData = await this.interpretAndConvert(filePath, data);
+                  } catch (err) {
+                        console.log(`Could not interpret and convert file: '${filePath}'`);
+                        continue;
+                  }
 
-                        // Write the converted data to the output file
-                        this.writeFile(path.join(this.outputPath, path.dirname(filePath)), path.basename(filePath), await convertedData);
+                  // Write the converted data to the output file
+                  if (convertedData) {
+                        this.writeFile(path.join(this.outputPath, path.dirname(filePath)),
+                        path.basename(filePath),
+                        convertedData
+                        );
                   }
             }
 

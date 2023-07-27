@@ -15,5 +15,4 @@ jobs:
           npm install
           npm run build
           npm install -g
-          trrt -o __tests__/output -s src/test_files 'src/test_files/terminology/*'
-          trrt -o ./ -s src/test_files '**/*'
+          npm test

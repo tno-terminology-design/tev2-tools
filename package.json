@@ -1,6 +1,6 @@
 {
-  "name": "@essif-lab/trrt",
-  "version": "0.2.2",
+  "name": "@tno-terminology-design/trrt",
+  "version": "1.0.0",
   "description": "Term Reference Resolution Tool (TRRT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
@@ -10,36 +10,39 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p .",
-    "rebuild": "npm uninstall @essif-lab/trrt -g && rm lib -rf && npm run build && npm i -g"
+    "rebuild": "npm uninstall @tno-terminology-design/trrt -g && rm lib -rf && npm run build && npm i -g",
+    "test": "mocha __tests__/**/*.test.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/essif-lab/trrt"
+    "url": "git+https://github.com/tno-terminology-design/trrt"
   },
   "keywords": [],
-  "author": "eSSIF-Lab",
+  "author": "TNO Terminology Design",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/essif-lab/trrt/issues"
+    "url": "https://github.com/tno-terminology-design/trrt/issues"
   },
-  "homepage": "https://github.com/essif-lab/trrt#readme",
+  "homepage": "https://github.com/tno-terminology-design/trrt#readme",
   "dependencies": {
     "chalk": "^4.1.2",
     "clear": "0.1.0",
     "commander": "10.0.0",
-    "download": "^8.0.0",
     "figlet": "^1.6.0",
     "glob": "^10.2.6",
+    "handlebars": "^4.7.7",
     "js-yaml": "^4.1.0",
+    "string-similarity": "^4.0.4",
     "tslog": "^4.4.4"
   },
   "devDependencies": {
     "@types/clear": "^0.1.2",
-    "@types/download": "^8.0.1",
     "@types/figlet": "^1.5.5",
-    "@types/jest": "^29.5.1",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^18.11.18",
+    "@types/string-similarity": "^4.0.0",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
     "typescript": "^4.9.5"
   },
   "files": [

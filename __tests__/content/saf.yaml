@@ -7,10 +7,11 @@
 scope:
   website: placeholder.com/docs # home page of the terminology
   scopetag: default # identifier that curators have determined for this terminology
-  scopedir: ./src/test_files  # URL of the scope-directory
+  scopedir: ./__tests__/content  # URL of the scope-directory
   curatedir: terminology # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
   glossarydir: terminology # directory where all glossary files and GDFs are located. Full URL is `scopedir`/`glossarydir`
-  mrgfile: manual-mrg.yaml # file that contains the (default) machine readable glossary. Full URL is `glossarydir`/`mrgfile`
+  defaultvsn: latest # default version tag that is used when no version tag is specified
+  mrgfile: mrg.default.main.yaml # file that contains the (default) machine readable glossary. Full URL is `glossarydir`/`mrgfile`
   # hrgfile: glossary-default # file that contains the (default) human readable glossary. Full URL is `glossarydir`/`hrgfile`
   # license: LICENSE.md # file that contains the (default) licensing conditions. Full URL is `scopedir`/`license`
   # statuses: [ proposed, approved, deprecated ] # list of status tags that are defined for terminological artifacts in this scope
@@ -31,14 +32,14 @@ scopes:
 #
 versions:
 - vsntag: main # this version MUST only be used for testing the MRG generator
-  mrgfile: manual-mrg.yaml # URL: <scopedir>/<glossarydir>/<mrgfile>
+  mrgfile: mrg.default.main.yaml # URL: <scopedir>/<glossarydir>/<mrgfile>
   altvsntags: # alternative verstiontags
     - latest
   termselcrit:
   - "*@essif-lab"
   - "*@default" # import all default terms
 - vsntag: lain # this version MUST only be used for testing the MRG generator
-  mrgfile: manual-mrg.yaml # URL: <scopedir>/<glossarydir>/<mrgfile>
+  mrgfile: mrg.default.lain.yaml # URL: <scopedir>/<glossarydir>/<mrgfile>
   termselcrit:
   - "*@essif-lab"
   - "*@default" # import all default terms
