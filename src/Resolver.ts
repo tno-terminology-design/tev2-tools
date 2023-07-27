@@ -34,14 +34,14 @@ export class Resolver {
                   try {
                         fs.mkdirSync(dirPath, { recursive: true });
                   } catch (err) {
-                        log.error("Error creating directory " + dirPath + ": " + err);
+                        log.error(`Error creating directory '${dirPath}':`, err);
                   }
             };
             try {
-                  log.trace("Writing: " + path.join(dirPath, file));
+                  log.trace(`Writing: ${path.join(dirPath, file)}`);
                   fs.writeFileSync(path.join(dirPath, file), data);
             } catch (err) {
-                  log.error("Error writing file " + path.join(dirPath, file) + ": " + err);
+                  log.error(`Error writing file '${path.join(dirPath, file)}':`, err);
             }
       }
 
@@ -102,12 +102,12 @@ export class Resolver {
                               // Log the converted term
                               report.termConverted(entry.term!);
                         } else {
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' resulted in an empty string, check the converter.`);
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' resulted in an empty string, check the converter`);
                         }
                   } else if (matchingEntries.length > 1) {
                         // Multiple matches found, display a warning
-                        const suggestions = matchingEntries.map(entry => `${entry.source}`).join(', ');
-                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' has multiple matching MRG entries. Located in: ${suggestions}`);
+                        const source = matchingEntries.map(entry => `${entry.source}`).join(', ');
+                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' has multiple matching MRG entries. Located in: ${source}`);
                   } else {
                         const properties = ['term', 'scopetag', 'vsntag'];
 
@@ -123,14 +123,14 @@ export class Resolver {
 
                         overallRating /= properties.length;
 
+                        const TermRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`
                         if (overallRating > 0.5) {
                               const bestMatchEntry = glossary.runtime.entries[bestMatchIndices['term']];
-                              const TermRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`
                               const suggestedTermRef = `${bestMatchEntry.term}@${bestMatchEntry.scopetag}:${bestMatchEntry.vsntag}`;
                               const errorMessage = `Match '${match[0]}' could not be matched with a MRG entry. Did you mean to reference '${suggestedTermRef}' instead of '${TermRef}'?`;
                               report.termHelp(file, data.substring(0, match.index).split('\n').length, errorMessage);
                         } else {
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Match '${match[0]}' could not be matched with a MRG entry`);
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Match '${match[0]}', resulting in '${TermRef}', could not be matched with a MRG entry`);
                         }
                   }
             }
@@ -158,7 +158,7 @@ export class Resolver {
                   try {
                         data = fs.readFileSync(filePath, "utf8");
                   } catch (err) {
-                        console.log(`Could not read file: '${filePath}'`);
+                        console.log(`Could not read file '${filePath}':`, err);
                         continue;
                   }
 
@@ -167,7 +167,7 @@ export class Resolver {
                   try {
                         convertedData = await this.interpretAndConvert(filePath, data);
                   } catch (err) {
-                        console.log(`Could not interpret and convert file: '${filePath}'`);
+                        console.log(`Could not interpret and convert file '${filePath}':`, err);
                         continue;
                   }
 

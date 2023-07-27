@@ -58,7 +58,7 @@ async function main(): Promise<void> {
                   // Merge config options with command line options
                   options = { ...config, ...options };
             } catch (err) {
-                  log.error('Failed to read or parse the config file:', err);
+                  log.error(`Failed to read or parse the config file '${options.config}':`, err);
                   process.exit(1);
             }
       }

@@ -117,11 +117,11 @@ export class Glossary {
                   const missingProperties = requiredProperties.filter(prop => !saf.scope[prop]);
 
                   if (missingProperties.length > 0) {
-                        log.error(`Missing required property in SAF at '${safURL}': ${missingProperties.join(', ')}`);
+                        log.error(`Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`);
                         process.exit(1);
                   }
             } catch (err) {
-                  log.error(`An error occurred while attempting to load the SAF at '${safURL}'`, err);
+                  log.error(`An error occurred while attempting to load the SAF at '${safURL}':`, err);
                   process.exit(1);
             }
 
@@ -147,8 +147,8 @@ export class Glossary {
                   const missingProperties = requiredProperties.filter(prop => !terminology[prop]);
 
                   if (missingProperties.length > 0) {
-                        const errorMessage = `Missing required property in MRG at '${mrgURL}': ${missingProperties.join(', ')}`;
-                        report.mrgHelp(mrgURL, 0, errorMessage);
+                        log.error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
+                        process.exit(1);
                   }
 
                   const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
@@ -158,7 +158,7 @@ export class Glossary {
       
                         if (missingProperties.length > 0) {
                               const lineNumber = await this.findmrgindex(mrgfile.split('\n'), entry);
-                              const errorMessage = `Invalid entry in MRG at '${mrgURL}' (line ${lineNumber + 1}): Missing required property: ${missingProperties.join(', ')}`;
+                              const errorMessage = `Invalid entry in MRG at '${mrgURL}' (line ${lineNumber + 1}): missing required property: '${missingProperties.join("', '")}'`;
                               report.mrgHelp(mrgURL, lineNumber + 1, errorMessage);
       
                               // Remove the invalid entry from the MRG entries
@@ -166,7 +166,8 @@ export class Glossary {
                         }
                   }
             } catch (err) {
-                  log.error(`An error occurred while attempting to load a MRG at '${mrgURL}'`, err);
+                  log.error(`An error occurred while attempting to load a MRG at '${mrgURL}':`, err);
+                  process.exit(1);
             }
       
             return mrg;
@@ -293,7 +294,7 @@ export class Glossary {
                         }
                   }
             } catch (err) {
-                  log.error(`An error occurred while attempting to process the MRG at '${filename}'`, err);
+                  log.error(`An error occurred while attempting to process the MRG at '${filename}':`, err);
             } finally {
                   return this.runtime;
             }
