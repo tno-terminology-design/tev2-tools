@@ -141,7 +141,7 @@ Interpretation of a [term ref](@) leads to the population of the following varia
 <details>
 <summary>Using regexes to find the values for the variables</summary>
 
-Finding a [term ref](@) in the file can be done by using a regular expressions (regexes - you can use [debuggex](https://www.debuggex.com/) to see what these regexps do (make sure you choose PCRE as the regex flavor to work with)).
+Finding a [term ref](@) in the file can be done by using regular expressions (regexes - you can use [debuggex](https://www.debuggex.com/ to see what these regexps do (make sure you choose PCRE as the regex flavor to work with)).
 
 - For the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax), you can use the PCRE regex
   - [``(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))``](https://www.debuggex.com/r/G1uvznpNG1mhqEx5) to find the `[` that starts a [term ref](@), and
