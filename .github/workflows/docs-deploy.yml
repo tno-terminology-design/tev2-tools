@@ -29,8 +29,10 @@ jobs:
       # Terminology reference resolution
       - name: Install TRRT
         run: npm install -g @tno-terminology-design/trrt@1.x
+        working-directory: /
       - name: Run TRRT
         run: trrt --output . --scopedir __tests__/content '**/*.md' --force
+        working-directory: /
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
