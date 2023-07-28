@@ -59,7 +59,7 @@ async function main(): Promise<void> {
                   // Merge config options with command line options
                   options = { ...config, ...options };
             } catch (err) {
-                  log.error(`Failed to read or parse the config file '${options.config}':`, err);
+                  log.error(`E011 Failed to read or parse the config file '${options.config}':`, err);
                   process.exit(1);
             }
       }
@@ -91,7 +91,7 @@ async function main(): Promise<void> {
                   report.print();
                   process.exit(0);
             } catch (err) {
-                  log.error("Something unexpected went wrong while resoluting terms:", err);
+                  log.error("E012 Something unexpected went wrong while resoluting terms:", err);
                   process.exit(1);
             }
       }

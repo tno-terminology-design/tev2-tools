@@ -39,12 +39,12 @@ export class Resolver {
                   try {
                         fs.mkdirSync(dirPath, { recursive: true });
                   } catch (err) {
-                        log.error(`Error creating directory '${dirPath}':`, err);
+                        log.error(`E007 Error creating directory '${dirPath}':`, err);
                         return; // Stop further execution if directory creation failed
                   }
             } else if (!force && fs.existsSync(path.join(dirPath, file))) {
                   // If the file already exists and force is not enabled, don't overwrite
-                  log.error(`File '${path.join(dirPath, file)}' already exists. Use --force to overwrite`);
+                  log.error(`E013 File '${path.join(dirPath, file)}' already exists. Use --force to overwrite`);
                   return; // Stop further execution if force is not enabled and file exists
             }
 
@@ -52,7 +52,7 @@ export class Resolver {
                   log.trace(`Writing: ${path.join(dirPath, file)}`);
                   fs.writeFileSync(path.join(dirPath, file), data);
             } catch (err) {
-                  log.error(`Error writing file '${path.join(dirPath, file)}':`, err);
+                  log.error(`E008 Error writing file '${path.join(dirPath, file)}':`, err);
             }
       }
           
@@ -170,7 +170,7 @@ export class Resolver {
                   try {
                         data = fs.readFileSync(filePath, "utf8");
                   } catch (err) {
-                        console.log(`Could not read file '${filePath}':`, err);
+                        console.log(`E009 Could not read file '${filePath}':`, err);
                         continue;
                   }
 
@@ -179,7 +179,7 @@ export class Resolver {
                   try {
                         convertedData = await this.interpretAndConvert(filePath, data);
                   } catch (err) {
-                        console.log(`Could not interpret and convert file '${filePath}':`, err);
+                        console.log(`E010 Could not interpret and convert file '${filePath}':`, err);
                         continue;
                   }
 

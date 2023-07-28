@@ -86,7 +86,7 @@ export class Glossary {
             let mrgfiles = await glob(path.join(glossarydir, 'mrg.*.*.yaml'));
 
             if (mrgfiles.length < 1) {
-                  log.error(`No MRG files found in the glossary directory '${glossarydir}'`);
+                  log.error(`E001 No MRG files found in the glossary directory '${glossarydir}'`);
                   process.exit(1);
             }
 
@@ -117,11 +117,11 @@ export class Glossary {
                   const missingProperties = requiredProperties.filter(prop => !saf.scope[prop]);
 
                   if (missingProperties.length > 0) {
-                        log.error(`Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`);
+                        log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`);
                         process.exit(1);
                   }
             } catch (err) {
-                  log.error(`An error occurred while attempting to load the SAF at '${safURL}':`, err);
+                  log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err);
                   process.exit(1);
             }
 
@@ -147,7 +147,7 @@ export class Glossary {
                   const missingProperties = requiredProperties.filter(prop => !terminology[prop]);
 
                   if (missingProperties.length > 0) {
-                        log.error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
+                        log.error(`E003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
                         process.exit(1);
                   }
 
@@ -166,7 +166,7 @@ export class Glossary {
                         }
                   }
             } catch (err) {
-                  log.error(`An error occurred while attempting to load a MRG at '${mrgURL}':`, err);
+                  log.error(`E005 An error occurred while attempting to load a MRG at '${mrgURL}':`, err);
                   process.exit(1);
             }
       
@@ -294,7 +294,7 @@ export class Glossary {
                         }
                   }
             } catch (err) {
-                  log.error(`An error occurred while attempting to process the MRG at '${filename}':`, err);
+                  log.error(`E006 An error occurred while attempting to process the MRG at '${filename}':`, err);
             } finally {
                   return this.runtime;
             }
