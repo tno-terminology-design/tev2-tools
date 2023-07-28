@@ -222,7 +222,7 @@ Any values from the standard interpreters and all properties supplied in the mat
   <summary>Examples of term-ref converters</summary>
 
 <Tabs
-  defaultValue="simple"
+  defaultValue="markdown"
   values={[
     {label: 'Markdown Style', value: 'markdown'},
     {label: 'HTML Style', value: 'html'},
