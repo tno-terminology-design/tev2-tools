@@ -40,6 +40,7 @@ program
       .option('-s, --scopedir <path>', 'Path of the scope directory where the SAF is located')
       .option('-int, --interpreter <type> or <regex>', 'Type of interpreter, either: a regex, alt, or basic')
       .option('-con, --converter <type> or <mustache>', 'Type of converter, either: a mustache template, http, or markdown')
+      .option('-f, --force', 'Allow overwriting of existing files')
       .parse(process.argv);
 
 program.parse()
@@ -79,7 +80,8 @@ async function main(): Promise<void> {
             // Create a resolver with the provided options
             resolver = new Resolver({
                   outputPath: resolve(options.output),
-                  globPattern: options.input
+                  globPattern: options.input,
+                  force: options.force
             });
             
             // Resolve terms

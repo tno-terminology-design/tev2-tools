@@ -121,6 +121,7 @@ The columns in the following table are defined as follows:
 | `scopedir` | `<path>`        | Y | Path of the [scope directory](@) from which the tool is called. It MUST contain the [SAF](@) for that [scope](@), which we will refer to as the 'current scope' for the [TRRT](@). |
 | `interpreter` | `<type>` or `<regex>`   | n | Allows for the switching between existing and custom interpreter types. By default `alt` and `basic` are available, but a custom regex pattern may be provided. When this parameter is omitted, the basic [term ref](@) syntax is interpreted. |
 | `converter` | `<type>` or `<mustache>`   | n | The type of converter which creates the [renderable refs](@). Allows for the switching between existing and custom converter types. By default `http` and `markdown` are available, but a custom [Mustache template](https://handlebarsjs.com/guide/) may be provided. When this parameter is omitted, the Markdown converter is used. |
+| `force` | | n | Allow overwriting of existing files. Meant to prevent accidental overwriting of files that include [term refs](@). |
 
 ## Term Ref Resolution
 

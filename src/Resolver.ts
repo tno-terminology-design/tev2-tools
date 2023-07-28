@@ -9,16 +9,20 @@ import path = require('path');
 export class Resolver {
       private outputPath: string;
       private globPattern: string;
+      private force: boolean;
 
       public constructor({
             outputPath,
             globPattern,
+            force,
       }: {
             outputPath: string;
             globPattern: string;
+            force: boolean;
       }) {
             this.outputPath = outputPath;
             this.globPattern = globPattern;
+            this.force = force;
       }
       
       /**
@@ -26,8 +30,9 @@ export class Resolver {
        * @param dirPath - The directory path.
        * @param file - The file name.
        * @param data - The data to write.
+       * @param force - Whether to overwrite existing files.
        */
-      private writeFile(dirPath: string, file: string, data: string) {
+      private writeFile(dirPath: string, file: string, data: string, force: boolean = false) {
             // Check if the directory path doesn't exist
             if (!fs.existsSync(dirPath)) {
                   // Create the directory and any necessary parent directories recursively
@@ -35,8 +40,14 @@ export class Resolver {
                         fs.mkdirSync(dirPath, { recursive: true });
                   } catch (err) {
                         log.error(`Error creating directory '${dirPath}':`, err);
+                        return; // Stop further execution if directory creation failed
                   }
-            };
+            } else if (!force && fs.existsSync(path.join(dirPath, file))) {
+                  // If the file already exists and force is not enabled, don't overwrite
+                  log.error(`File '${path.join(dirPath, file)}' already exists. Use --force to overwrite`);
+                  return; // Stop further execution if force is not enabled and file exists
+            }
+
             try {
                   log.trace(`Writing: ${path.join(dirPath, file)}`);
                   fs.writeFileSync(path.join(dirPath, file), data);
@@ -44,6 +55,7 @@ export class Resolver {
                   log.error(`Error writing file '${path.join(dirPath, file)}':`, err);
             }
       }
+          
 
       /**
        * Interprets and converts terms in the given data string based on the interpreter and converter.
@@ -174,8 +186,7 @@ export class Resolver {
                   // Write the converted data to the output file
                   if (convertedData) {
                         this.writeFile(path.join(this.outputPath, path.dirname(filePath)),
-                        path.basename(filePath),
-                        convertedData
+                        path.basename(filePath), convertedData, this.force
                         );
                   }
             }
