@@ -3,8 +3,9 @@ When cloning the entire [TRRT repository](https://github.com/tno-terminology-des
 npm test
 ```
 which should execute the `mocha __tests__/**/*.test.js` command and run all available unit tests.
-Keep in mind that working with the repository instead of the package will result in an uncompiled version of the [TRRT](@) that will first have to be compiled using:
+Keep in mind that working with the repository instead of the package will result in an uncompiled version of the [TRRT](@). This uncompiled version will need the dependencies to be compiled, compiling can be achieved by executing:
 ```bash
+npm install
 npm run build
 ```
 after which the tool can be installed using:
