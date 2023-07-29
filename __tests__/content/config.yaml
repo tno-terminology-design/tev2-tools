@@ -1,0 +1,9 @@
+# TRRT configuration file (yaml)
+output: __tests__/output
+scopedir: __tests__/content
+interpreter: (?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\) # `alt` or `basic` are also valid
+converter: <a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{glossaryText}}">{{showtext}}</a> # `http`, `essif` or `markdown` are also valid
+
+# glob pattern strings for files to be processed
+input:
+  - __tests__/content/terminology/*.md
