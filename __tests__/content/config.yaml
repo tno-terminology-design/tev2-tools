@@ -1,0 +1,3 @@
+# MRG Import Tool configuration file (yaml)
+scopedir: 
+onNotExist: throw
