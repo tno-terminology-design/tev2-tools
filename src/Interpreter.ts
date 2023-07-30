@@ -1,6 +1,6 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
-import { log, report, onNotExistError } from './Report.js';
+import { log, onNotExistError } from './Report.js';
 
 import fs = require("fs");
 import path = require('path');
@@ -60,6 +60,66 @@ interface Entry {
     [key: string]: any;
 }
 
+// Read SAF from current scopedir
+async function initialize({ scopedir }: { scopedir: string }) {
+    const env = new Interpreter({ scopedir: scopedir })
+    const saf = await env.saf;
+
+    // for each scope in the scopes-section of the 'own' SAF
+    for (const scope of saf.scopes) {
+        // read the SAF of the import scope
+        const importEnv = new Interpreter({ scopedir: scope.scopedir });
+        const importSaf = await importEnv.saf;
+
+        // for each MRG file (version) in the import scope
+        for (const version of importSaf.versions) {
+            // get MRG Map {import-scopedir}/{import-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
+            let mrgfile = `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`;
+            const mrg = await importEnv.getMrgMap(path.join(importSaf.scope.scopedir, importSaf.scope.glossarydir, mrgfile));
+
+            // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
+            writeFile(path.join(saf.scope.scopedir, saf.scope.glossarydir), mrgfile, yaml.dump(mrg), true);
+
+            // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
+            for (const altvsntag of version.altvsntags) {
+                mrgfile = `mrg.${importSaf.scope.scopetag}.${altvsntag}.yaml`;
+                fs.symlinkSync(path.join(importSaf.scope.glossarydir, `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`), path.join(saf.scope.glossarydir, mrgfile));
+            }
+        }
+    }
+}
+
+/**
+ * Creates directory tree and writes data to a file.
+ * @param dirPath - The directory path.
+ * @param file - The file name.
+ * @param data - The data to write.
+ * @param force - Whether to overwrite existing files.
+ */
+function writeFile(dirPath: string, file: string, data: string, force: boolean = false) {
+    // Check if the directory path doesn't exist
+    if (!fs.existsSync(dirPath)) {
+        // Create the directory and any necessary parent directories recursively
+        try {
+            fs.mkdirSync(dirPath, { recursive: true });
+        } catch (err) {
+            log.error(`E007 Error creating directory '${dirPath}':`, err);
+            return; // Stop further execution if directory creation failed
+        }
+    } else if (!force && fs.existsSync(path.join(dirPath, file))) {
+        // If the file already exists and force is not enabled, don't overwrite
+        log.error(`E013 File '${path.join(dirPath, file)}' already exists. Use --force to overwrite`);
+        return; // Stop further execution if force is not enabled and file exists
+    }
+
+    try {
+        log.trace(`Writing: ${path.join(dirPath, file)}`);
+        fs.writeFileSync(path.join(dirPath, file), data);
+    } catch (err) {
+        log.error(`E008 Error writing file '${path.join(dirPath, file)}':`, err);
+    }
+}
+
 export class Interpreter {
     public scopedir: string;
     public saf!: Promise<SAF>;
@@ -68,33 +128,6 @@ export class Interpreter {
         this.scopedir = scopedir;
 
         this.saf = this.getSafMap(path.join(this.scopedir, 'saf.yaml'));
-
-        // main function should be called from external file to control recursion
-        // this.main()
-    }
-
-    private async main() {
-        const safMap = await this.saf
-
-        const myOwnScopetag = safMap.scope.curatedir;
-        const myOwnScopedir = safMap.scope.scopedir;
-        const myOwnGlossarydir = safMap.scope.glossarydir;
-
-        // for each scope in the scopes-section of the SAF
-        for (const scope of safMap.scopes) {
-            const importSaf = new Interpreter({ scopedir: scope.scopedir });
-            const importSafMap = await importSaf.saf;
-            
-            const importScopetag = importSafMap.scope.scopetag;
-            const importScopedir = importSafMap.scope.scopedir;
-            const importGlossarydir = importSafMap.scope.glossarydir;
-
-            // read the file {import-scopedir}/{import-glossarydir}/mrg.{other-scopetag}.{other-vsntag}.yaml
-            // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{other-vsntag}.yaml
-            // create a symbolic link {mrg.{import-scopetag}.{other-altvsntag}.yaml} for every {other-altvsntags}
-        }
-        // {import-scopetag} = scopetag-field from the scopes-section of the SAF
-        // {import-scopedir} = scopedir-field from the scopes-section of the SAF
     }
 
     /**
@@ -156,7 +189,7 @@ export class Interpreter {
                 if (missingProperties.length > 0) {
                     const lineNumber = await this.findmrgindex(mrgfile.split('\n'), entry);
                     const errorMessage = `Invalid entry in MRG at '${mrgURL}' (line ${lineNumber + 1}): missing required property: '${missingProperties.join("', '")}'`;
-                    report.mrgHelp(mrgURL, lineNumber + 1, errorMessage);
+                    log.warn(errorMessage);
 
                     // Remove the invalid entry from the MRG entries
                     (await mrg).entries.splice((await mrg).entries.indexOf(entry), 1);
