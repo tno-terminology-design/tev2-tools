@@ -11,6 +11,8 @@ import clear from 'clear';
 import figlet from 'figlet';
 const program = new Command();
 
+export let onNotExist: string = 'throw';
+
 clear();
 
 console.log(
@@ -53,31 +55,33 @@ async function main(): Promise<void> {
 
     // Check if required option is missing
     if (!options.scopedir) {
-        program.addHelpText('after', '\nRequired option is missing\n' +
-        'Provide at least the following option: --scopedir <path>');
+        program.addHelpText('after', '\nA required option is missing\n' +
+            'Provide at least the following option: --scopedir <path>');
         program.help();
         process.exit(1);
     }
 
-    // Check if `onNotExist` is set to an invalid value
-    const onNotExist = ['throw', 'warn', 'log', 'ignore'];
-    if (options.onNotExist && !onNotExist.includes(options.onNotExist)) {
-        program.addHelpText('after', `\nOption 'onNotExist' is not set properly\n` +
-        `Provide one of the following values: 'throw', 'warn', 'log', 'ignore'`);
-        program.help();
-        process.exit(1);
-    } else {
-        // Set default value
-        options.onNotExist = 'throw';
+    // When `onNotExist` is set, make sure it is set to a correct value
+    if (options.onNotExist) {
+        if (['throw', 'warn', 'log', 'ignore'].includes(options.onNotExist.toLowerCase())) {
+            onNotExist = options.onNotExist.toLowerCase();
+        } else {
+            program.addHelpText('after', `\nOption 'onNotExist' is not set properly\n` +
+                `Provide one of the following values: 'throw', 'warn', 'log', 'ignore'`
+            );
+            program.help();
+            process.exit(1);
+        }
     }
 
     try {
         // await running program
+        // options.scopedir needs to be resolved to an absolute path before passing it to the Interpreter
         log.info("Done");
         // report.print();
         process.exit(0);
     } catch (err) {
-        // log.error("E012 Something unexpected went wrong while ...:", err);
+        log.error("E012 Something unexpected went wrong while ...:", err);
         process.exit(1);
     }
 }

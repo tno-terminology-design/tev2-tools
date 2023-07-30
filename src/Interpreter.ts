@@ -1,6 +1,6 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
-import { log } from './Report.js';
+import { log, report, onNotExistError } from './Report.js';
 
 import fs = require("fs");
 import path = require('path');
