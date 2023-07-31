@@ -140,7 +140,7 @@ export class Glossary {
                   const mrgfile = fs.readFileSync(mrgURL, 'utf8');
                   mrg = yaml.load(mrgfile) as Promise<MRG>;
 
-                  // Check for missing required properties in MRG
+                  // Check for missing required properties in MRG terminology
                   type TerminologyProperty = keyof Terminology;
                   const requiredProperties: TerminologyProperty[] = ['scopetag', 'scopedir', 'curatedir', 'vsntag'];
                   const terminology = (await mrg).terminology;
@@ -154,6 +154,7 @@ export class Glossary {
                   const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
       
                   for (const entry of (await mrg).entries) {
+                        // Check for missing required properties in MRG entries
                         const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
       
                         if (missingProperties.length > 0) {

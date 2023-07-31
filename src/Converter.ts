@@ -1,5 +1,9 @@
-import { Entry } from "./Glossary.js";
 import Handlebars from 'handlebars';
+import { interpreter } from './Run.js'
+import { Entry } from './Glossary.js';
+
+type AnyObject = { [key: string]: any };
+
 
 export class Converter {
       private type: string;
@@ -8,11 +12,40 @@ export class Converter {
       public constructor({ template }: { template: any }) {
             const map: { [key: string]: string } = {
                   http: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>',
-                  essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{glossaryText}}">{{showtext}}</a>', 
+                  essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText}}">{{showtext}}</a>',
                   markdown: '[{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})',
             };
 
-            let key = template.toLowerCase()
+            function noRefsHelper(text: string) {
+                  // Then the resulting text is scanned for termrefs, and any termref that appears in the contents
+                  // of the resulting text shall be replaced with the text that consists of the same words as the 
+                  // of the termref, where the first character of every word is made uppercase and the other characters remain untouched.
+                  let matches: RegExpMatchArray[] = Array.from(text.matchAll(interpreter!.getRegex()));
+
+                  if (matches.length > 0) {
+                        // Iterate over each match found in the text string
+                        for (const match of matches) {
+                              const termProperties: Map<string, string> = interpreter!.interpret(match);
+                  
+                              if (termProperties.get("showtext")) {
+                                    // replace the match with the showtext property and make the first letter capitalized
+                                    text = text.replace(match[0], capFirstHelper(termProperties.get("showtext")!));
+                              }
+                        }
+                  }
+
+                  return text;
+            }
+
+            function capFirstHelper(text: string) {
+                  // The first character of the resulting text shall be made uppercase and the other characters remain untouched.
+                  return text.charAt(0).toUpperCase() + text.slice(1);
+            }
+
+            Handlebars.registerHelper('noRefs', noRefsHelper);
+            Handlebars.registerHelper('capFirst', capFirstHelper);
+
+            let key = template.toLowerCase();
             let exist = map.hasOwnProperty(key);
             // Check if the template parameter is a key in the defaults map
             if (exist) {
@@ -24,16 +57,26 @@ export class Converter {
             }
       }
 
-      convert(entry: Entry, term: Map<string, string>): string {
-            const template = Handlebars.compile(this.template, {noEscape: true});
-
-            // Merge the term properties with the entry properties
-            const data = {
-                  ...entry,
-                  ...Object.fromEntries(term),
-            };
-
+      // Helper function to evaluate expressions inside properties
+      private evaluateExpressions(input: string, data: AnyObject): string {
+            const template = Handlebars.compile(input, {noEscape: true, compat: true});
             return template(data);
+      }
+
+      convert(entry: Entry, term: Map<string, string>): string {
+            // Evaluate the properties inside the entry object
+            const evaluatedEntry: AnyObject = {};
+            for (const [key, value] of Object.entries(entry)) {
+                  if (typeof value === 'string') {
+                        evaluatedEntry[key] = this.evaluateExpressions(value, { ...entry, ...Object.fromEntries(term) });
+                  } else {
+                        evaluatedEntry[key] = value;
+                  }
+            }
+
+            const template = Handlebars.compile(this.template, {noEscape: true, compat: true});
+
+            return template(evaluatedEntry);
       }
 
       getType(): string {
