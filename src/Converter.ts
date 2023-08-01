@@ -38,8 +38,12 @@ export class Converter {
             }
 
             function capFirstHelper(text: string) {
-                  // The first character of the resulting text shall be made uppercase and the other characters remain untouched.
-                  return text.charAt(0).toUpperCase() + text.slice(1);
+                  // The first character of every word separated by spaces will be capitalized
+                  const words = text.split(' ');
+                  const capitalizedWords = words.map((word) =>
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                  );
+                  return capitalizedWords.join(' ');
             }
 
             Handlebars.registerHelper('noRefs', noRefsHelper);
