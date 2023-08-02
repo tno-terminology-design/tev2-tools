@@ -13,21 +13,20 @@ export async function download(url: URL, localPath: string): Promise<void> {
       }
   
       // Determine the raw URL based on the Git hosting platform
-      let rawUrl: string;
+      let rawUrl: URL;
       if (parsedUrl.source === 'github.com') {
-        rawUrl = path.join('https://raw.githubusercontent.com', parsedUrl.owner, parsedUrl.name, parsedUrl.ref, parsedUrl.filepath);
+        rawUrl = new URL(path.join('https://raw.githubusercontent.com', parsedUrl.owner, parsedUrl.name, parsedUrl.ref, parsedUrl.filepath));
       } else if (parsedUrl.source === 'gitlab.com') {
-        rawUrl = path.join('https://gitlab.com', parsedUrl.owner, parsedUrl.name, 'raw', parsedUrl.ref, parsedUrl.filepath);
+        rawUrl = new URL(path.join('https://gitlab.com', parsedUrl.owner, parsedUrl.name, 'raw', parsedUrl.ref, parsedUrl.filepath));
       } else {
         throw new Error('Unsupported Git platform');
       }
   
-      log.info(`Downloading ${rawUrl}`);
-      const response = await axios.get(rawUrl, { responseType: 'arraybuffer' });
+      log.info(`Attempting to download '${rawUrl}'`);
+      const response = await axios.get(rawUrl.href, { responseType: 'arraybuffer' });
       writeFile(localPath, response.data);
-      log.info(`File downloaded and saved to ${localPath}`);
+      log.info(`File downloaded and saved to '${localPath}'`);
     } catch (err) {
-      log.error(`Error downloading ${url.href}`);
       throw err;
     }
 }
@@ -58,7 +57,6 @@ export function writeFile(fullPath: string, data: string, force: boolean = true)
     }
 
     try {
-        log.trace(`Writing: ${path.join(dirPath, file)}`);
         fs.writeFileSync(path.join(dirPath, file), data);
     } catch (err) {
         log.error(`E008 Error writing file '${path.join(dirPath, file)}':`, err);

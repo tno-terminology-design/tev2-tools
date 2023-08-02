@@ -120,11 +120,10 @@ export class Interpreter {
                 const parsedURL = new URL(safURL);
                 const tempPath = path.join(os.tmpdir(), `saf.yaml`);
                 await download(parsedURL, tempPath);
-                log.info('Downloaded SAF to', tempPath);
                 safPath = tempPath;
             } catch (err) {
                 if (err instanceof TypeError && err.message.includes('Invalid URL')) {
-                    log.error('SAF is a local path');
+                    // `safURL` is not a valid URL, so assume it's a local path
                 } else {
                     // Handle other errors if needed
                     log.error('An error occurred:', err);
@@ -132,9 +131,9 @@ export class Interpreter {
             }
     
             // Try to load the SAF map from the `safPath`
-            log.info('Trying to load SAF map from', safPath);
             const safContent = await fs.promises.readFile(safPath, 'utf8');
             saf = yaml.load(safContent) as SAF;
+            log.trace(`Loaded SAF map '${safPath}'`)
     
             // Check for missing required properties in SAF
             type ScopeProperty = keyof Scope;
@@ -171,7 +170,7 @@ export class Interpreter {
                 mrgPath = tempPath;
             } catch (err) {
                 if (err instanceof TypeError && err.message.includes('Invalid URL')) {
-                    log.info('MRG is a local path');
+                    // `mrgURL` is not a valid URL, so assume it's a local path
                 } else {
                     // Handle other errors if needed
                     throw err;
@@ -189,8 +188,7 @@ export class Interpreter {
             const missingProperties = requiredProperties.filter(prop => !terminology[prop]);
 
             if (missingProperties.length > 0) {
-                log.error(`E003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
-                process.exit(1);
+                throw new Error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
             }
 
             const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
@@ -208,9 +206,7 @@ export class Interpreter {
                 }
             }
         } catch (err) {
-            if (err instanceof Error) {
-                err.message = `E005 An error occurred while attempting to load a MRG at '${mrgURL}':`, err;
-            }
+            throw err;
         }
 
         return mrg;
