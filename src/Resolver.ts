@@ -27,12 +27,13 @@ export class Resolver {
       
       /**
        * Creates directory tree and writes data to a file.
-       * @param dirPath - The directory path.
-       * @param file - The file name.
+       * @param fullPath - The full file path.
        * @param data - The data to write.
        * @param force - Whether to overwrite existing files.
        */
-      private writeFile(dirPath: string, file: string, data: string, force: boolean = false) {
+      private writeFile(fullPath: string, data: string, force: boolean = false) {
+            const dirPath = path.dirname(fullPath);
+            const file = path.basename(fullPath);
             // Check if the directory path doesn't exist
             if (!fs.existsSync(dirPath)) {
                   // Create the directory and any necessary parent directories recursively
@@ -185,8 +186,9 @@ export class Resolver {
 
                   // Write the converted data to the output file
                   if (convertedData) {
-                        this.writeFile(path.join(this.outputPath, path.dirname(filePath)),
-                        path.basename(filePath), convertedData, this.force
+                        this.writeFile(
+                              path.join(this.outputPath, path.dirname(filePath), path.basename(filePath)),
+                              convertedData, this.force
                         );
                   }
             }
