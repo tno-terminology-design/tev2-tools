@@ -1,7 +1,10 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
 import { log, onNotExistError } from './Report.js';
+import { download, writeFile } from './Handler.js';
 
+import { URL } from 'url';
+import os from 'os';
 import fs = require("fs");
 import path = require('path');
 import yaml = require('js-yaml');
@@ -61,7 +64,7 @@ interface Entry {
 }
 
 // Read SAF from current scopedir
-async function initialize({ scopedir }: { scopedir: string }) {
+export async function initialize({ scopedir }: { scopedir: string }) {
     const env = new Interpreter({ scopedir: scopedir })
     const saf = await env.saf;
 
@@ -73,50 +76,23 @@ async function initialize({ scopedir }: { scopedir: string }) {
 
         // for each MRG file (version) in the import scope
         for (const version of importSaf.versions) {
-            // get MRG Map {import-scopedir}/{import-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
             let mrgfile = `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`;
-            const mrg = await importEnv.getMrgMap(path.join(importSaf.scope.scopedir, importSaf.scope.glossarydir, mrgfile));
+            try {
+                // get MRG Map {import-scopedir}/{import-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
+                const mrg = await importEnv.getMrgMap(path.join(importSaf.scope.scopedir, importSaf.scope.glossarydir, mrgfile));
 
-            // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
-            writeFile(path.join(saf.scope.scopedir, saf.scope.glossarydir), mrgfile, yaml.dump(mrg), true);
-
-            // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
-            for (const altvsntag of version.altvsntags) {
-                mrgfile = `mrg.${importSaf.scope.scopetag}.${altvsntag}.yaml`;
-                fs.symlinkSync(path.join(importSaf.scope.glossarydir, `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`), path.join(saf.scope.glossarydir, mrgfile));
+                // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
+                writeFile(path.join(saf.scope.scopedir, saf.scope.glossarydir, mrgfile), yaml.dump(mrg), true);
+                
+                // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
+                for (const altvsntag of version.altvsntags) {
+                    mrgfile = `mrg.${importSaf.scope.scopetag}.${altvsntag}.yaml`;
+                    fs.symlinkSync(path.join(importSaf.scope.glossarydir, `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`), path.join(saf.scope.glossarydir, mrgfile));
+                }
+            } catch (err) {
+                onNotExistError(err);
             }
         }
-    }
-}
-
-/**
- * Creates directory tree and writes data to a file.
- * @param dirPath - The directory path.
- * @param file - The file name.
- * @param data - The data to write.
- * @param force - Whether to overwrite existing files.
- */
-function writeFile(dirPath: string, file: string, data: string, force: boolean = false) {
-    // Check if the directory path doesn't exist
-    if (!fs.existsSync(dirPath)) {
-        // Create the directory and any necessary parent directories recursively
-        try {
-            fs.mkdirSync(dirPath, { recursive: true });
-        } catch (err) {
-            log.error(`E007 Error creating directory '${dirPath}':`, err);
-            return; // Stop further execution if directory creation failed
-        }
-    } else if (!force && fs.existsSync(path.join(dirPath, file))) {
-        // If the file already exists and force is not enabled, don't overwrite
-        log.error(`E013 File '${path.join(dirPath, file)}' already exists. Use --force to overwrite`);
-        return; // Stop further execution if force is not enabled and file exists
-    }
-
-    try {
-        log.trace(`Writing: ${path.join(dirPath, file)}`);
-        fs.writeFileSync(path.join(dirPath, file), data);
-    } catch (err) {
-        log.error(`E008 Error writing file '${path.join(dirPath, file)}':`, err);
     }
 }
 
@@ -136,16 +112,35 @@ export class Interpreter {
      */
     private async getSafMap(safURL: string): Promise<SAF> {
         let saf = {} as SAF;
-
+        let safPath = safURL;
+    
         try {
-            // Try to load the SAF map from the scopedir
-            saf = yaml.load(fs.readFileSync(safURL, 'utf8')) as SAF;
-
+            // If the `safURL` is a remote URL, download it to a temporary file
+            try {
+                const parsedURL = new URL(safURL);
+                const tempPath = path.join(os.tmpdir(), `saf.yaml`);
+                await download(parsedURL, tempPath);
+                log.info('Downloaded SAF to', tempPath);
+                safPath = tempPath;
+            } catch (err) {
+                if (err instanceof TypeError && err.message.includes('Invalid URL')) {
+                    log.error('SAF is a local path');
+                } else {
+                    // Handle other errors if needed
+                    log.error('An error occurred:', err);
+                }
+            }
+    
+            // Try to load the SAF map from the `safPath`
+            log.info('Trying to load SAF map from', safPath);
+            const safContent = await fs.promises.readFile(safPath, 'utf8');
+            saf = yaml.load(safContent) as SAF;
+    
             // Check for missing required properties in SAF
             type ScopeProperty = keyof Scope;
             const requiredProperties: ScopeProperty[] = ['scopetag', 'scopedir', 'curatedir'];
             const missingProperties = requiredProperties.filter(prop => !saf.scope[prop]);
-
+    
             if (missingProperties.length > 0) {
                 log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`);
                 process.exit(1);
@@ -154,9 +149,9 @@ export class Interpreter {
             log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err);
             process.exit(1);
         }
-
+    
         return saf;
-    }
+    }    
 
     /**
      * Retrieves the MRG (Machine Readable Glossary) map.
@@ -164,10 +159,27 @@ export class Interpreter {
      */
     public async getMrgMap(mrgURL: string): Promise<MRG> {
         let mrg = {} as Promise<MRG>;
+        let mrgPath = mrgURL;
 
         try {
-            // Try to load the MRG map from the `mrgURL`
-            const mrgfile = fs.readFileSync(mrgURL, 'utf8');
+            // If the `mrgURL` is a remote URL, download it to a temporary file
+            try {
+                const parsedURL = new URL(mrgURL);
+                const tempPath = path.join(os.tmpdir(), path.basename(mrgURL));
+                await download(parsedURL, tempPath);
+                log.info('Downloaded MRG to', tempPath);
+                mrgPath = tempPath;
+            } catch (err) {
+                if (err instanceof TypeError && err.message.includes('Invalid URL')) {
+                    log.info('MRG is a local path');
+                } else {
+                    // Handle other errors if needed
+                    throw err;
+                }
+            }
+
+            // Try to load the MRG map from the `mrgPath`
+            const mrgfile = fs.readFileSync(mrgPath, 'utf8');
             mrg = yaml.load(mrgfile) as Promise<MRG>;
 
             // Check for missing required properties in MRG
@@ -196,8 +208,9 @@ export class Interpreter {
                 }
             }
         } catch (err) {
-            log.error(`E005 An error occurred while attempting to load a MRG at '${mrgURL}':`, err);
-            process.exit(1);
+            if (err instanceof Error) {
+                err.message = `E005 An error occurred while attempting to load a MRG at '${mrgURL}':`, err;
+            }
         }
 
         return mrg;

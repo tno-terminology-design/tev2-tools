@@ -3,7 +3,7 @@ import { onNotExist } from './Run.js';
 
 export const log = new Logger();
 
-export function onNotExistError(error: Error) {
+export function onNotExistError(error: any) {
     switch (onNotExist) {
         case 'throw':
             // an error is thrown (an exception is raised), and processing will stop

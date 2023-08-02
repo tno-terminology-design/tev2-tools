@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { log } from './Report.js';
+import { Interpreter, initialize } from './Interpreter.js';
 
 import yaml from 'js-yaml';
 import chalk from 'chalk';
@@ -76,7 +77,9 @@ async function main(): Promise<void> {
 
     try {
         // await running program
-        // options.scopedir needs to be resolved to an absolute path before passing it to the Interpreter
+        await initialize({scopedir: resolve(options.scopedir)});
+        // TODO: could the 'own' SAF be retrieved externally as well, or is it always local? 
+
         log.info("Done");
         // report.print();
         process.exit(0);
