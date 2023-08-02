@@ -242,7 +242,9 @@ where `navurl` is gathered from the matching [MRG entry](@). The trait leading w
 
 A more complex example is what is done within eSSIF-Lab, where the [curators](@) not only want [terms](@) to be linked to their (rendered) [curated texts](@), but also want them to be provided with a tooltip that states their [definitions](@). This can be achieved by using the template below.
 
-`<Term reference="{{term}}" popup="{{popuptext}}">{{showtext}}</Term>`
+```Handlebars
+<Term reference="{{term}}" popup="{{popuptext}}">{{showtext}}</Term>
+```
 
 In this [scope](@), the [term ref](@) `[Actions](@)` is replaced with `<Term reference="action" popup="<popuptext>">Actions</Term>` where:
 

@@ -64,6 +64,37 @@ Different types of interpreters are present, allowing for the switching between 
 The [TRRT](@) interpreter attempts to obtain the [term ref](@) properties: `showtext`, `id`, `trait`, `scopetag`, and `vsntag`. If `id` is not set, `showtext` is converted to lowercase, `'()` characters are removed, and any non-alphabetic, non-numeric characters are replaced by a `-`, leaving only alphabetic, numeric, underscore or dash characters as part of `id`.
 
 ## Converter
-Similar to the [interpreter](#interpreter), default converters are available, but custom ones may also be set. In this case they may be set through the use of [Mustache templates](https://handlebarsjs.com/guide/). Any values from the standard interpreters, and all properties supplied in the matching [MRG Entry](@), can be used as [Mustache expressions](https://handlebarsjs.com/guide/expressions) (some contents enclosed using double curly braces `{{}}`). These template, which are handled by the [Handlebars](https://handlebarsjs.com/) package, provide a simple template to generate any text format.
+Similar to the [interpreter](#interpreter), default converters are available, but custom ones may also be set. In this case they may be set through the use of [Mustache templates](https://handlebarsjs.com/guide/). Any values from the standard interpreters, and all properties supplied in the matching [MRG entry](@), can be used as [Mustache expressions](https://handlebarsjs.com/guide/expressions) (some contents enclosed using double curly braces `{{}}`). These template, which are handled by the [Handlebars](https://handlebarsjs.com/) package, provide a simple template to generate any text format.
+The properties of the MRG entry that the [Mustache expressions](https://handlebarsjs.com/guide/expressions) may use, may also include expressions themselves. In addition, two [helper functions](#helper-functions) have been included to handle certain repeatable tasks.
+
+**An example, which includes the use of [Mustache expressions](https://handlebarsjs.com/guide/expressions) and [helper functions](#helper-functions) is outlined below.**
+
+Imagine the properties below are part of the [MRG entry](@) that describes a [curator](@). In this case we would like our external rendering tool to display text when a [renderable ref](@) is being hovered over.
+
+```yaml
+glossaryText: "a person responsible for [curating](@) the [terminologies](@) within a [scope](@), to ensure shared understanding among a [community](@) working together on a particular set of objectives."
+hoverText: "{{term}}: {glossaryText}"
+```
+
+We have defined a custom converter template to make use of this `hoverText` property, which we have achieved by using [Mustache expressions](https://handlebarsjs.com/guide/expressions) in our converter string. The `hoverText` property is unformatted currently, using it will make it start without any capitalization (`term` property is lowercase), and will use the unresolved [term ref](@) syntaxes as included in the `glossaryText`. To tidy up the values we use the [helper functions](#helper-functions), and could even skip the use of the `hoverText` property all together by being smart with our custom converter.
+
+```Handlebars
+<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText}}">{{showtext}}</a>
+```
+
+The above converter will result in the `title` html element being filled with the following renderable string.
+
+```
+"Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives."
+```
+
+### Helper functions
+Two [helper functions](https://handlebarsjs.com/guide/expressions.html#helpers) have been specified, which can be used within [Mustache expressions](https://handlebarsjs.com/guide/expressions) to modify the output of an expression. An example of using the `capFirst` and `noRefs` helpers inside a converter template can be seen at the [converter](#converter) section above. The input to a helper function is always the evaluated value of the expression that follows.
+
+#### `capFirst`
+This simple helper with identifier `capFirst` replaces every word's first character with the capitalized equivalent. Words are obtained by splitting the input on the ` ` (space) character. *It takes the input, splits the input on spaces, and capitalizes the first character of every split item, after which the output is returned*
+
+#### `noRefs`
+This helper with identifier `noRefs` uses the configured [interpreter](#interpreter) to convert all references to the `showtext` term property value. It also capitalizes the `showtext` replacement using the `capFirst` helper. *It takes the input, finds matches using the configured [interpreter](#interpreter) and uses the capitalized `showtext` property as a replacement, after which the output is returned.*
 
 **For more information about the different syntaxes, template examples, [term ref](@) properties, and regexes, refer to the [TRRT](@) [specifications](link-to-specifications).**
