@@ -9,7 +9,7 @@ export async function download(url: URL, localPath: string): Promise<void> {
     try {
       const parsedUrl = gitUrlParse(url.href);
       if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.filepath) {
-        throw new Error('Invalid Git URL');
+        throw new Error('  - Invalid Git URL');
       }
   
       // Determine the raw URL based on the Git hosting platform
@@ -19,14 +19,16 @@ export async function download(url: URL, localPath: string): Promise<void> {
       } else if (parsedUrl.source === 'gitlab.com') {
         rawUrl = new URL(path.join('https://gitlab.com', parsedUrl.owner, parsedUrl.name, 'raw', parsedUrl.ref, parsedUrl.filepath));
       } else {
-        throw new Error('Unsupported Git platform');
+        throw new Error('  - Unsupported Git platform');
       }
   
-      log.info(`Attempting to download '${rawUrl}'`);
+      log.info(`  - Getting '${rawUrl}'`);
       const response = await axios.get(rawUrl.href, { responseType: 'arraybuffer' });
       writeFile(localPath, response.data);
-      log.info(`File downloaded and saved to '${localPath}'`);
     } catch (err) {
+      if (err instanceof Error) {
+        err.message = `    - ${err.message}`;
+      }
       throw err;
     }
 }
@@ -47,18 +49,16 @@ export function writeFile(fullPath: string, data: string, force: boolean = true)
         try {
             fs.mkdirSync(dirPath, { recursive: true });
         } catch (err) {
-            log.error(`E007 Error creating directory '${dirPath}':`, err);
+            log.error(`  - E007 Error creating directory '${dirPath}':`, err);
             return; // Stop further execution if directory creation failed
         }
     } else if (!force && fs.existsSync(path.join(dirPath, file))) {
-        // If the file already exists and force is not enabled, don't overwrite
-        log.error(`E013 File '${path.join(dirPath, file)}' already exists. Use --force to overwrite`);
         return; // Stop further execution if force is not enabled and file exists
     }
 
     try {
         fs.writeFileSync(path.join(dirPath, file), data);
     } catch (err) {
-        log.error(`E008 Error writing file '${path.join(dirPath, file)}':`, err);
+        log.error(`  - E008 Error writing file '${path.join(dirPath, file)}':`, err);
     }
 }
