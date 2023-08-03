@@ -23,7 +23,7 @@ scope:
 #
 scopes:
 - scopetag: essiflab # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
-  scopedir: https://github.com/essif-lab/framework/tree/master/docs/tev2 # URL of the scope-directory
+  scopedir: https://github.com/tno-terminology-design/trrt/tree/main/__tests__/content # URL of the scope-directory
 
 #
 # The third section specifies the versions that are actively maintained by the curators.
