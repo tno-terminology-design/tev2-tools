@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { log } from './Report.js';
-import { Interpreter, initialize } from './Interpreter.js';
+import { initialize } from './Interpreter.js';
 
 import yaml from 'js-yaml';
 import chalk from 'chalk';
@@ -76,12 +76,9 @@ async function main(): Promise<void> {
     }
 
     try {
-        // await running program
-        await initialize({scopedir: resolve(options.scopedir)});
-        // TODO: could the 'own' SAF be retrieved externally as well, or is it always local? 
-
+        // Execute the interpreter
+        await initialize({scopedir: options.scopedir});
         log.info("The MRG Import Tool has finished execution");
-        // report.print();
         process.exit(0);
     } catch (err) {
         log.error("E012 Something unexpected went wrong:", err);
