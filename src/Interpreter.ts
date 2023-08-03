@@ -26,7 +26,7 @@ interface Scope {
 }
 
 interface Scopes {
-    scopetags: string[];
+    scopetag: string;
     scopedir: string;
 }
 
@@ -69,25 +69,39 @@ export async function initialize({ scopedir }: { scopedir: string }) {
     const saf = await env.saf;
 
     // for each scope in the scopes-section of the 'own' SAF
+    log.info(`Found ${saf.scopes.length} import scope(s) in scopedir '${saf.scope.scopedir}'`)
     for (const scope of saf.scopes) {
         // read the SAF of the import scope
         const importEnv = new Interpreter({ scopedir: scope.scopedir });
         const importSaf = await importEnv.saf;
 
         // for each MRG file (version) in the import scope
+        log.info(`Found ${importSaf.versions.length} maintained MRG file(s) in SAF '${scope.scopedir}/saf.yaml'`)
         for (const version of importSaf.versions) {
-            let mrgfile = `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`;
             try {
                 // get MRG Map {import-scopedir}/{import-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
-                const mrg = await importEnv.getMrgMap(path.join(importSaf.scope.scopedir, importSaf.scope.glossarydir, mrgfile));
+                let mrgURL = path.join(scope.scopedir, importSaf.scope.glossarydir, `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`);
+                const mrg = await importEnv.getMrgMap(mrgURL);
 
                 // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
-                writeFile(path.join(saf.scope.scopedir, saf.scope.glossarydir, mrgfile), yaml.dump(mrg), true);
+                mrgURL = path.join(saf.scope.scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`);
+                writeFile(mrgURL, yaml.dump(mrg));
+                log.info(`    - Storing MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`)
                 
                 // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
+                log.info(`    - Creating symbolic link for ${version.altvsntags.length} alternative version(s)`);
                 for (const altvsntag of version.altvsntags) {
-                    mrgfile = `mrg.${importSaf.scope.scopetag}.${altvsntag}.yaml`;
-                    fs.symlinkSync(path.join(importSaf.scope.glossarydir, `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`), path.join(saf.scope.glossarydir, mrgfile));
+                    let altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`);
+                    try {
+                        fs.symlinkSync(path.basename(mrgURL), altmrgURL);
+                    } catch (err) {
+                        if (err instanceof Error && err.message.includes('file already exists')) {
+                            // ignore link already exists
+                        } else {
+                            // Handle other errors if needed
+                            throw err;
+                        }
+                    }
                 }
             } catch (err) {
                 onNotExistError(err);
@@ -126,14 +140,13 @@ export class Interpreter {
                     // `safURL` is not a valid URL, so assume it's a local path
                 } else {
                     // Handle other errors if needed
-                    log.error('An error occurred:', err);
+                    throw err;
                 }
             }
     
             // Try to load the SAF map from the `safPath`
             const safContent = await fs.promises.readFile(safPath, 'utf8');
             saf = yaml.load(safContent) as SAF;
-            log.trace(`Loaded SAF map '${safPath}'`)
     
             // Check for missing required properties in SAF
             type ScopeProperty = keyof Scope;
@@ -166,7 +179,6 @@ export class Interpreter {
                 const parsedURL = new URL(mrgURL);
                 const tempPath = path.join(os.tmpdir(), path.basename(mrgURL));
                 await download(parsedURL, tempPath);
-                log.info('Downloaded MRG to', tempPath);
                 mrgPath = tempPath;
             } catch (err) {
                 if (err instanceof TypeError && err.message.includes('Invalid URL')) {
