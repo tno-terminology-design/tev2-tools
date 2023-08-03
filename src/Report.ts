@@ -1,8 +1,6 @@
 import { Logger } from 'tslog';
 import { onNotExist } from './Run.js';
 
-export const log = new Logger();
-
 export function onNotExistError(error: any) {
     switch (onNotExist) {
         case 'throw':
@@ -21,3 +19,7 @@ export function onNotExistError(error: any) {
             break;
     }
 }
+
+export const log = new Logger({
+    prettyLogTemplate: "{{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t",
+  });
