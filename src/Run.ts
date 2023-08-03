@@ -33,7 +33,7 @@ program
     .option('-o, --onNotExist <action>', 'The action in case a MRG file unexpectedly does not exist')
     .parse(process.argv);
 
-program.parse()
+program.parse();
 
 async function main(): Promise<void> {
     // Parse command line parameters
@@ -80,11 +80,11 @@ async function main(): Promise<void> {
         await initialize({scopedir: resolve(options.scopedir)});
         // TODO: could the 'own' SAF be retrieved externally as well, or is it always local? 
 
-        log.info("Done");
+        log.info("The MRG Import Tool has finished execution");
         // report.print();
         process.exit(0);
     } catch (err) {
-        log.error("E012 Something unexpected went wrong while ...:", err);
+        log.error("E012 Something unexpected went wrong:", err);
         process.exit(1);
     }
 }
