@@ -1,8 +1,8 @@
 import { interpreter, converter, glossary } from './Run.js'
 import { report, log } from './Report.js';
 import { glob } from 'glob';
+import leven from 'leven';
 
-import stringSimilarity = require("string-similarity");
 import fs = require("fs");
 import path = require('path');
 
@@ -128,10 +128,22 @@ export class Resolver {
                         let bestMatchIndices: { [key: string]: number } = {};
 
                         properties.forEach(prop => {
-                              const propertyValue = termProperties.get(prop) || '';
-                              const propertyMatches = stringSimilarity.findBestMatch(propertyValue, glossary.runtime.entries.map(entry => entry[prop] || ''));
-                              overallRating += propertyMatches.bestMatch.rating;
-                              bestMatchIndices[prop] = propertyMatches.bestMatchIndex;
+                        const propertyValue = termProperties.get(prop) || '';
+                        const propertyMatches = glossary.runtime.entries.map(entry => entry[prop] || '');
+
+                        let bestMatchIndex = -1;
+                        let bestMatchScore = -1;
+
+                        propertyMatches.forEach((match, index) => {
+                        const similarityScore = leven(propertyValue, match);
+                        if (similarityScore > bestMatchScore) {
+                              bestMatchScore = similarityScore;
+                              bestMatchIndex = index;
+                        }
+                        });
+
+                        overallRating += bestMatchScore;
+                        bestMatchIndices[prop] = bestMatchIndex;
                         });
 
                         overallRating /= properties.length;
@@ -140,10 +152,10 @@ export class Resolver {
                         if (overallRating > 0.5) {
                               const bestMatchEntry = glossary.runtime.entries[bestMatchIndices['term']];
                               const suggestedTermRef = `${bestMatchEntry.term}@${bestMatchEntry.scopetag}:${bestMatchEntry.vsntag}`;
-                              const errorMessage = `Match '${match[0]}' could not be matched with a MRG entry. Did you mean to reference '${suggestedTermRef}' instead of '${TermRef}'?`;
+                              const errorMessage = `Match '${match[0]}' > '${TermRef}' could not be matched with a MRG entry. Did you mean to reference '${suggestedTermRef}'?`;
                               report.termHelp(file, data.substring(0, match.index).split('\n').length, errorMessage);
                         } else {
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Match '${match[0]}', resulting in '${TermRef}', could not be matched with a MRG entry`);
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Match '${match[0]}' > '${TermRef}', could not be matched with a MRG entry`);
                         }
                   }
             }
