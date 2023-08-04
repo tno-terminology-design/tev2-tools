@@ -11,7 +11,6 @@ import { report, log } from './Report.js';
 
 import yaml from 'js-yaml';
 import chalk from 'chalk';
-import clear from 'clear';
 import figlet from 'figlet';
 
 export let interpreter: Interpreter;
@@ -19,14 +18,6 @@ export let converter: Converter;
 export let glossary: Glossary;
 export let resolver: Resolver;
 const program = new Command();
-
-clear();
-
-console.log(
-      chalk.red(
-            figlet.textSync('trrt-cli', { horizontalLayout: 'full' })
-      )
-);
 
 program
       .name('trrt')
@@ -51,6 +42,12 @@ async function main(): Promise<void> {
       if (program.args[0]) {
             options.input = program.args[0]
       }
+
+      console.log(
+            chalk.red(
+                  figlet.textSync('trrt-cli', { horizontalLayout: 'full' })
+            )
+      );
 
       if (options.config) {
             try {
