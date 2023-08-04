@@ -8,19 +8,10 @@ import { initialize } from './Interpreter.js';
 
 import yaml from 'js-yaml';
 import chalk from 'chalk';
-import clear from 'clear';
 import figlet from 'figlet';
 const program = new Command();
 
 export let onNotExist: string = 'throw';
-
-clear();
-
-console.log(
-    chalk.red(
-        figlet.textSync('mrg-import', { horizontalLayout: 'full' })
-    )
-);
 
 program
     .name('mrg-import')
@@ -41,6 +32,12 @@ async function main(): Promise<void> {
     if (program.args[0]) {
         options.input = program.args[0]
     }
+
+    console.log(
+        chalk.red(
+            figlet.textSync('mrg-import', { horizontalLayout: 'full' })
+        )
+    );
 
     if (options.config) {
         try {
