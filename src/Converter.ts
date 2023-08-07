@@ -11,7 +11,7 @@ export class Converter {
 
       public constructor({ template }: { template: any }) {
             const map: { [key: string]: string } = {
-                  http: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>',
+                  html: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>',
                   essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText}}">{{showtext}}</a>',
                   markdown: '[{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})',
             };
