@@ -1,3 +1,5 @@
+# Error Reporting
+
 ## Help Messages
 When the process of resoluting completes, a resolution report is outputted which displays information about the tool's execution. In certain cases, `TERM HELP` or `MRG HELP` is displayed as well. Below is a list of possible help messages that may be displayed.
 

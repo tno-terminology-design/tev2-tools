@@ -1,10 +1,10 @@
 ---
-sidebar_position: 1
+sidebar_label: Introduction
 ---
 
 # TRRT Documentation
 
-[This repo](https://github.com/tno-terminology-design/trrt) contains the specifications and documentation for the [TRRT](@) tool of the [TNO Terminology Design] effort, which can be found by navigating across the sections of this documentation, and the broader context of the tool can be found at the [TEv2 specs website](https://tno-terminology-design.github.io/tev2-specifiations).
+[This repo](https://github.com/tno-terminology-design/trrt) contains the specifications and documentation for the [TRRT](@) tool of the [TNO Terminology Design](@) effort, which can be found by navigating across the sections of this documentation, and the broader context of the tool can be found at the [TEv2 specs website](https://tno-terminology-design.github.io/tev2-specifiations).
 
 The documentation consists of the following items:
 - [Installation](./trrt/installation): prerequisites, installation steps, usage

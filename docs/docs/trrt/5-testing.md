@@ -1,3 +1,5 @@
+# Testing
+
 When cloning the entire [TRRT repository](https://github.com/tno-terminology-design/trrt) you will also get certain files to test the behavior of the tool. These test files are located in the `__tests__` directory, and include a `content` folder and an automated test written for the [mocha](https://mochajs.org/) test framework and [chai](https://www.chaijs.com/) assertion library. This automated test can be executed with: 
 ```bash
 npm test

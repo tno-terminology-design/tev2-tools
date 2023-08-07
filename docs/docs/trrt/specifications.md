@@ -1,12 +1,4 @@
----
-id: overview
-sidebar_label: Term Ref Resolution
-displayed_sidebar: tev2SideBar
-scopetag: tev2
-date: 20230725
----
-
-# Term Reference Resolution Tool
+# Specifications
 
 import useBaseUrl from '@docusaurus/useBaseUrl'
 

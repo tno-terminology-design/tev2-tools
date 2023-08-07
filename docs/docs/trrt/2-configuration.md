@@ -1,3 +1,5 @@
+# Configuration
+
 Within the [TNO Terminology Design](@) effort, the [TRRT](@) is able to interpret and locate references to terms within documents, and convert them into so-called [renderable refs](@), according to its configuration and the contents of corresponding [MRGs](mrg@).
 
 1. [Interpretation](#interpreter) happens through the use of regular expressions. These expressions are able to match the [term ref](@) syntaxes within documents, and store various variables as (named) capturing groups for use in the tool.
@@ -59,9 +61,76 @@ input:
 For more practical examples, visit [deployment](deployment).
 
 ## Interpreter
-Different types of interpreters are present, allowing for the switching between the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax) and [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax). To increase the flexibility of the [TRRT](@), a custom interpreter may also be set. All interpreters consist of a regular expression with named capturing groups that can store variables related to the [term ref](@) for later use in matching with a [MRG entry](@).
+Different types of interpreters are present, allowing for the switching between the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax) and [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax). To increase the flexibility of the [TRRT](@), a custom interpreter may also be set. All interpreters consist of a PCRE regular expression with named capturing groups that can store variables related to the [term ref](@) for later use in matching with a [MRG entry](@).
 
 The [TRRT](@) interpreter attempts to obtain the [term ref](@) properties: `showtext`, `id`, `trait`, `scopetag`, and `vsntag`. If `id` is not set, `showtext` is converted to lowercase, `'()` characters are removed, and any non-alphabetic, non-numeric characters are replaced by a `-`, leaving only alphabetic, numeric, underscore or dash characters as part of `id`.
+
+<details>
+  <summary>Examples</summary>
+
+Setting interpreters mainly allows for the use of different [term ref](@) syntaxes. As long as the basic properties listed above can be obtained from the [term ref](@), any custom interpreter may be set. When a value of a named capturing group is empty, it is filled by the [TRRT](@) with (default) values according to the [specifications](specifications#interpretation-of-the-term-ref). The following examples attempt to illustrate the differences between the default, alternative and custom interpreters. 
+
+<Tabs
+  defaultValue="basic"
+  values={[
+    {label: 'Basic', value: 'basic'},
+    {label: 'Alternative', value: 'alternative'},
+    {label: 'Custom', value: 'custom'},
+  ]}>
+
+<TabItem value="basic">
+
+
+\[`show text`\](@)\
+\[`show text`\](`showtext`@`scopetag`)\
+\[`show text`\](`term/id`#`trait`@`scopetag`:`vsntag`)\
+
+The default/basic interpreter uses a regex that can find [term refs](@) using the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax) as displayed here above. Not specifying an interpreter, or using `basic` as the value of the interpreter, sets the regex displayed below as the interpreter.
+
+~~~html
+(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))
+(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)
+~~~
+
+The first part of the regex pattern (displayed on the first line) is responsible for finding the start of a term ref using the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax). The second part of the regex pattern finds the various parts of the [term ref](@) and stores them as named capturing groups.
+
+</TabItem>
+<TabItem value="alternative">
+
+\[`show text`@\]\
+\[`show text`@`scopetag`\]\
+\[`show text`@`scopetag`:`vsntag`\](`term`#`trait`)
+
+The alternative interpreter uses a regex that can find [term refs](@) using the [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax) as displayed here above. Using `alternative` as the value of the interpreter, sets the regex displayed below as the interpreter.
+
+The alternative syntax moves the `@`-character from the basic syntax within the square brackets. This is particularly useful in the vast majority of cases, where the default processing of `showtext` results in `term`, and `trait` is absent.
+
+~~~html
+(?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)
+(?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\](?:\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?
+~~~
+
+Similar to the basis interpreter, the first part of the regex pattern (displayed on the first line) is responsible for finding the start of a term ref and the second part of the regex pattern finds the various parts of the [term ref](@) and stores them as named capturing groups.
+
+</TabItem>
+<TabItem value="custom">
+
+\ref{`show text`@}\
+\ref{`show text`@`scopetag`}\
+\ref{`show text`@`scopetag`:`vsntag`}(`term`#`trait`)
+
+Custom interpreters allow for the ability to use any kind of syntax to obtain the necessary [term ref](@) properties. The lines above show a combination of the `\ref{}` object referencing syntax used in LaTeX and the alternative syntax. Properties of this custom [term ref](@) syntax can be interpreted using the regex pattern below.
+
+```html
+(?:(?<=[^`\\])|^)\\ref{(?=[^@\}]+[:a-z0-9_-]*\}?)(?<showtext>[^\n\}@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\}(?:\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?
+```
+
+Writing custom interpreters is a precise task. Please make sure you understand the [specifications](specifications) of the [TRRT](@), and have a solid grasp on using regular expressions.
+
+</TabItem>
+</Tabs>
+
+</details>
 
 ## Converter
 Similar to the [interpreter](#interpreter), default converters are available, but custom ones may also be set. In this case they may be set through the use of [Mustache templates](https://handlebarsjs.com/guide/). Any values from the standard interpreters, and all properties supplied in the matching [MRG entry](@), can be used as [Mustache expressions](https://handlebarsjs.com/guide/expressions) (some contents enclosed using double curly braces `{{}}`). These template, which are handled by the [Handlebars](https://handlebarsjs.com/) package, provide a simple template to generate any text format.
