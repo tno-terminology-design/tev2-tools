@@ -46,8 +46,17 @@ export class Converter {
                   return capitalizedWords.join(' ');
             }
 
+            function ifValueHelper(this: any, conditional: any, options: any) {
+                  if (conditional == options.hash.equals) {
+                      return options.fn(this);
+                  } else {
+                      return options.inverse(this);
+                  }
+            };
+
             Handlebars.registerHelper('noRefs', noRefsHelper);
             Handlebars.registerHelper('capFirst', capFirstHelper);
+            Handlebars.registerHelper('ifValue', ifValueHelper);
 
             let key = template.toLowerCase();
             let exist = map.hasOwnProperty(key);
