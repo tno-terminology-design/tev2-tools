@@ -93,6 +93,7 @@ export class Resolver {
                         (entry.vsntag === termProperties.get("vsntag")! ||
                         entry.altvsntags?.includes(termProperties.get("vsntag")!))
                   );
+                  const TermRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
 
                   if (matchingEntries.length === 1) {
                         const entry = matchingEntries[0];
@@ -115,12 +116,12 @@ export class Resolver {
                               // Log the converted term
                               report.termConverted(entry.term!);
                         } else {
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' resulted in an empty string, check the converter`);
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', resulted in an empty string, check the converter`);
                         }
                   } else if (matchingEntries.length > 1) {
                         // Multiple matches found, display a warning
                         const source = matchingEntries.map(entry => `${entry.source}`).join(', ');
-                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' has multiple matching MRG entries. Located in: ${source}`);
+                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', has multiple matching MRG entries. Located in: ${source}`);
                   } else {
                         const properties = ['term', 'scopetag', 'vsntag'];
 
@@ -148,14 +149,13 @@ export class Resolver {
 
                         overallRating /= properties.length;
 
-                        const TermRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`
                         if (overallRating > 0.5) {
                               const bestMatchEntry = glossary.runtime.entries[bestMatchIndices['term']];
                               const suggestedTermRef = `${bestMatchEntry.term}@${bestMatchEntry.scopetag}:${bestMatchEntry.vsntag}`;
-                              const errorMessage = `Match '${match[0]}' > '${TermRef}' could not be matched with a MRG entry. Did you mean to reference '${suggestedTermRef}'?`;
+                              const errorMessage = `Term ref '${match[0]}' > '${TermRef}', could not be matched with a MRG entry. Did you mean to reference '${suggestedTermRef}'?`;
                               report.termHelp(file, data.substring(0, match.index).split('\n').length, errorMessage);
                         } else {
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Match '${match[0]}' > '${TermRef}', could not be matched with a MRG entry`);
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with a MRG entry`);
                         }
                   }
             }
