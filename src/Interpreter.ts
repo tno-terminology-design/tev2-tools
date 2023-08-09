@@ -8,6 +8,7 @@ import os from 'os';
 import fs = require("fs");
 import path = require('path');
 import yaml = require('js-yaml');
+import { AxiosError } from 'axios';
 
 interface SAF {
     scope: Scope;
@@ -65,28 +66,36 @@ interface Entry {
 
 // Read SAF from current scopedir
 export async function initialize({ scopedir }: { scopedir: string }) {
-    const env = new Interpreter({ scopedir: scopedir })
+    const env = new Interpreter({ scopedir: scopedir });
     const saf = await env.saf;
 
     // for each scope in the scopes-section of the 'own' SAF
-    log.info(`Found ${saf.scopes.length} import scope(s) in scopedir '${saf.scope.scopedir}'`)
+    log.info(`Found ${saf.scopes.length} import scope(s) in scopedir '${saf.scope.scopedir}'`);
     for (const scope of saf.scopes) {
+        log.info(`  - Handling import scope '${scope.scopetag}'`);
         // read the SAF of the import scope
         const importEnv = new Interpreter({ scopedir: scope.scopedir });
         const importSaf = await importEnv.saf;
 
         // for each MRG file (version) in the import scope
-        log.info(`Found ${importSaf.versions.length} maintained MRG file(s) in SAF '${scope.scopedir}/saf.yaml'`)
+        log.info(`Found ${importSaf.versions.length} maintained MRG file(s) in import scope '${scope.scopetag}'`);
         for (const version of importSaf.versions) {
             try {
                 // get MRG Map {import-scopedir}/{import-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
                 let mrgURL = path.join(scope.scopedir, importSaf.scope.glossarydir, `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`);
                 const mrg = await importEnv.getMrgMap(mrgURL);
 
+                // Set import MRG scopedir and scopetag values to the (non-relative) scope's scopedir and scopetag
+                mrg.terminology.scopedir = scope.scopedir;
+                mrg.terminology.scopetag = scope.scopetag;
+                for (const entry of mrg.entries) {
+                    entry.scopetag = scope.scopetag;
+                }
+
                 // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
                 mrgURL = path.join(saf.scope.scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`);
                 writeFile(mrgURL, yaml.dump(mrg));
-                log.info(`    - Storing MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`)
+                log.info(`    - Storing MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`);
                 
                 // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
                 log.info(`    - Creating symbolic link for ${version.altvsntags.length} alternative version(s)`);
@@ -95,7 +104,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                     try {
                         fs.symlinkSync(path.basename(mrgURL), altmrgURL);
                     } catch (err) {
-                        if (err instanceof Error && err.message.includes('file already exists')) {
+                        if (err instanceof Error && err.message.includes('EEXIST')) {
                             // ignore link already exists
                         } else {
                             // Handle other errors if needed
@@ -104,7 +113,12 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                     }
                 }
             } catch (err) {
-                onNotExistError(err);
+                if (err instanceof AxiosError && err.response) {
+                    onNotExistError(err);
+                } else {
+                    // Handle other errors if needed
+                    log.error(err)
+                }
             }
         }
     }

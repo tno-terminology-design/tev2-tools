@@ -22,7 +22,7 @@ export async function download(url: URL, localPath: string): Promise<void> {
         throw new Error('  - Unsupported Git platform');
       }
   
-      log.info(`  - Getting '${rawUrl}'`);
+      log.info(`  - Requesting '${rawUrl}'`);
       const response = await axios.get(rawUrl.href, { responseType: 'arraybuffer' });
       writeFile(localPath, response.data);
     } catch (err) {

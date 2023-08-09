@@ -5,7 +5,8 @@ export function onNotExistError(error: any) {
     switch (onNotExist) {
         case 'throw':
             // an error is thrown (an exception is raised), and processing will stop
-            throw error;
+            log.error(`${error.message}, halting execution as requested by the 'onNotExist' throw option`);
+            process.exit(1);
         case 'warn':
             // a message is displayed (and logged) and processing continues
             log.warn(error.message);
