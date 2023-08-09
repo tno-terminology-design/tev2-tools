@@ -1,12 +1,15 @@
 # Configuration
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Within the [TNO Terminology Design](@) effort, the [TRRT](@) is able to interpret and locate references to terms within documents, and convert them into so-called [renderable refs](@), according to its configuration and the contents of corresponding [MRGs](mrg@).
 
 1. [Interpretation](#interpreter) happens through the use of regular expressions. These expressions are able to match the [term ref](@) syntaxes within documents, and store various variables as (named) capturing groups for use in the tool.
 2. [Conversion](#converter) works by using Mustache templates. Any values from the standard [interpreters](#interpreter), and all properties supplied in the matching [MRG Entry](@), can be used as [Mustache expressions](https://handlebarsjs.com/guide/expressions).
 
 ## Parameters
-The behavior of the [TRRT](@) can be configured per call e.g. by a [configuration file](#configuration%20file) and/or command-line parameters. The command-line syntax is as follows:
+The behavior of the [TRRT](@) can be configured per call e.g. by a [configuration file](#configuration-file) and/or command-line parameters. The command-line syntax is as follows:
 
 ~~~bash
 trrt [ <paramlist> ] [ <globpattern> ]
@@ -14,54 +17,35 @@ trrt [ <paramlist> ] [ <globpattern> ]
 
 where:
 - `<paramlist>` (optional) is a list of key-value pairs
-- [`globpattern`](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) (optional) specifies a set of (input) files that are to be processed. If a [configuration file](#configuration%20file) is used, its contents may specify an additional set of input files to be processed.
+- [`globpattern`](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) (optional) specifies a set of (input) files that are to be processed. If a [configuration file](#configuration-file) is used, its contents may specify an additional set of input files to be processed.
 
-<details>
-  <summary>Legend</summary>
-
-The columns in the following table are defined as follows:
-1. **`Key`** is the text to be used as a key.
-2. **`Value`** represents the kind of value to be used.
-3. **`Req'd`** specifies whether (`Y`) or not (`n`) the field is required to be present when the tool is being called. If required, it MUST either be present in the configuration file, or as a command-line parameter.
-4. **`Description`** specifies the meaning of the `Value` field, and other things you may need to know, e.g. why it is needed, a required syntax, etc.
-
-</details>
-
-| Key        | Value         | Req'd | Description |
-| :--------- | :------------ | :---: | :---------- |
-| `config`   | `<path>`        | n | Path (including the filename) of the tool's (YAML) configuration file. This file contains the key-value pairs to be used. Allowed keys (and the associated values) are documented in this table. Command-line arguments override key-value pairs specified in the configuration file. This parameter MUST NOT appear in the configuration file itself. |
-| `input`    | `<globpattern>` | n | [Globpattern](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) string that specifies the set of (input) files that are to be processed. |
-| `output`   | `<dir>`         | Y | Directory where output files are to be written. This directory is specified as an absolute or relative path. |
-| `scopedir` | `<path>`        | Y | Path of the [scope directory](@) from which the tool is called. It MUST contain the [SAF](@) for that [scope](@), which we will refer to as the 'current scope' for the [TRRT](@). |
-| `interpreter` | `<type>` or `<regex>`   | n | Allows for the switching between existing and custom interpreter types. By default `alt` and `basic` are available, but a custom PCRE regex pattern may be provided. When this parameter is omitted, the basic [term ref](@) syntax is interpreted. |
-| `converter` | `<type>` or `<mustache>`   | n | The type of converter which creates the [renderable refs](@). Allows for the switching between existing and custom converter types. By default `http` and `markdown` are available, but a custom [Mustache template](https://handlebarsjs.com/guide/) may be provided. When this parameter is omitted, the Markdown converter is used. |
-| `force` | | n | Allow overwriting of existing files. Meant to prevent accidental overwriting of files that include [term refs](@). |
+**For a complete list of key-value pairs, please refer to the [Calling the Tool](specifications#calling-the-tool) section within the specifications.**
 
 ### Configuration File
-Every parameter specified above (except for `config`) can be set inside a yaml file. As an example, running the tool with the following command with the use of the `__tests__` files: 
+Every parameter specified in the [specifications](specifications#calling-the-tool) (except for `config`) can be set inside a yaml file. As an example, running the tool with the following command with the use of the `__tests__` files:
 
 ```bash
 trrt --config __tests__/content/config.yaml
 ```
 
-uses the example `config.yaml` file shown below.
+uses the example `config.yaml` file shown below. As a general guideline, we recommend storing the config files related to terminology tools in the root of the [scope directory](@) where the [SAF](@) is located as well.
 
-```yaml
+```yaml title="__tests__/content/config.yaml"
 # TRRT configuration file (yaml)
-output: __tests__/output
-scopedir: __tests__/content
-interpreter: (?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\) # `alt` or `basic` are also valid
-converter: <a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{glossaryText}}">{{showtext}}</a> # `http`, `essif` or `markdown` are also valid
+output: '__tests__/output'
+scopedir: '__tests__/content'
+interpreter: '(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)' # `alt` or `basic` are also valid values
+converter: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{glossaryText}}">{{showtext}}</a>' # `http`, `essif` or `markdown` are also valid values
 
 # glob pattern strings for files to be processed
 input:
-  - __tests__/content/terminology/*.md
+  - '__tests__/content/terminology/*.md'
 ```
 
-For more practical examples, visit [deployment](deployment).
+For more practical examples, visit [deployment](deployment) or continue reading for information about the [interpreter](#interpreter) and [converter](#converter).
 
 ## Interpreter
-Different types of interpreters are present, allowing for the switching between the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax) and [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax). To increase the flexibility of the [TRRT](@), a custom interpreter may also be set. All interpreters consist of a PCRE regular expression with named capturing groups that can store variables related to the [term ref](@) for later use in matching with a [MRG entry](@).
+Different types of interpreters are present, allowing for the switching between the [basic syntax](specifications#interpretation-of-the-term-ref) and [alternative syntax](specifications#interpretation-of-the-term-ref). To increase the flexibility of the [TRRT](@), a custom interpreter may also be set. All interpreters consist of a PCRE regular expression with named capturing groups that can store variables related to the [term ref](@) for later use in matching with a [MRG entry](@).
 
 The [TRRT](@) interpreter attempts to obtain the [term ref](@) properties: `showtext`, `id`, `trait`, `scopetag`, and `vsntag`. If `id` is not set, `showtext` is converted to lowercase, `'()` characters are removed, and any non-alphabetic, non-numeric characters are replaced by a `-`, leaving only alphabetic, numeric, underscore or dash characters as part of `id`.
 
@@ -81,51 +65,52 @@ Setting interpreters mainly allows for the use of different [term ref](@) syntax
 <TabItem value="basic">
 
 
-\[`show text`\](@)\
-\[`show text`\](`showtext`@`scopetag`)\
-\[`show text`\](`term/id`#`trait`@`scopetag`:`vsntag`)\
+\[`show text`\](@)<br/>
+\[`show text`\](`showtext`@`scopetag`)<br/>
+\[`show text`\](`term`#`trait`@`scopetag`:`vsntag`)<br/>
 
-The default/basic interpreter uses a regex that can find [term refs](@) using the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax) as displayed here above. Not specifying an interpreter, or using `basic` as the value of the interpreter, sets the regex displayed below as the interpreter.
+The default/basic interpreter uses a regex that can find [term refs](@) using the [basic syntax](specifications#interpretation-of-the-term-ref) as displayed here above. Not specifying an interpreter, or using `basic` as the value of the interpreter, sets the regex displayed below as the interpreter.
 
-~~~html
+~~~regex
 (?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))
 (?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)
 ~~~
 
-The first part of the regex pattern (displayed on the first line) is responsible for finding the start of a term ref using the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax). The second part of the regex pattern finds the various parts of the [term ref](@) and stores them as named capturing groups.
+The first part of the regex pattern (displayed on the first line) is responsible for finding the start of a term ref using the [basic syntax](specifications#interpretation-of-the-term-ref). The second part of the regex pattern finds the various parts of the [term ref](@) and stores them as named capturing groups.
 
 </TabItem>
 <TabItem value="alternative">
 
-\[`show text`@\]\
-\[`show text`@`scopetag`\]\
+\[`show text`@\]<br/>
+\[`show text`@`scopetag`\]<br/>
 \[`show text`@`scopetag`:`vsntag`\](`term`#`trait`)
 
-The alternative interpreter uses a regex that can find [term refs](@) using the [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax) as displayed here above. Using `alternative` as the value of the interpreter, sets the regex displayed below as the interpreter.
+The alternative interpreter uses a regex that can find [term refs](@) using the [alternative syntax](specifications#interpretation-of-the-term-ref) as displayed here above. Using `alternative` as the value of the interpreter, sets the regex displayed below as the interpreter.
 
 The alternative syntax moves the `@`-character from the basic syntax within the square brackets. This is particularly useful in the vast majority of cases, where the default processing of `showtext` results in `term`, and `trait` is absent.
 
-~~~html
+~~~regex
 (?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)
 (?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\](?:\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?
 ~~~
 
-Similar to the basis interpreter, the first part of the regex pattern (displayed on the first line) is responsible for finding the start of a term ref and the second part of the regex pattern finds the various parts of the [term ref](@) and stores them as named capturing groups.
+Similar to the other example interpreters, the first part of the regex pattern (displayed on the first line) is responsible for finding the start of a term ref and the second part of the regex pattern finds the various parts of the [term ref](@) and stores them as named capturing groups.
 
 </TabItem>
 <TabItem value="custom">
 
-\ref{`show text`@}\
-\ref{`show text`@`scopetag`}\
+\ref{`show text`@}<br/>
+\ref{`show text`@`scopetag`}<br/>
 \ref{`show text`@`scopetag`:`vsntag`}(`term`#`trait`)
 
 Custom interpreters allow for the ability to use any kind of syntax to obtain the necessary [term ref](@) properties. The lines above show a combination of the `\ref{}` object referencing syntax used in LaTeX and the alternative syntax. Properties of this custom [term ref](@) syntax can be interpreted using the regex pattern below.
 
-```html
-(?:(?<=[^`\\])|^)\\ref{(?=[^@\}]+[:a-z0-9_-]*\}?)(?<showtext>[^\n\}@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\}(?:\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?
+```regex
+(?:(?<=[^`\\])|^)\\ref{(?=[^@\}]+[:a-z0-9_-]*\}?)
+(?<showtext>[^\n\}@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\}(?:\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?
 ```
-
-Writing custom interpreters is a precise task. Please make sure you understand the [specifications](specifications) of the [TRRT](@), and have a solid grasp on using regular expressions.
+Similar to the other example interpreters, the first part of the regex pattern (displayed on the first line) is responsible for finding the start of a term ref and the second part of the regex pattern finds the various parts of the [term ref](@) and stores them as named capturing groups.<br/>
+***Writing custom interpreters is a precise task. Please make sure you understand the [specifications](specifications) of the [TRRT](@), and have a solid grasp on using regular expressions.***
 
 </TabItem>
 </Tabs>
@@ -133,37 +118,141 @@ Writing custom interpreters is a precise task. Please make sure you understand t
 </details>
 
 ## Converter
-Similar to the [interpreter](#interpreter), default converters are available, but custom ones may also be set. In this case they may be set through the use of [Mustache templates](https://handlebarsjs.com/guide/). Any values from the standard interpreters, and all properties supplied in the matching [MRG entry](@), can be used as [Mustache expressions](https://handlebarsjs.com/guide/expressions) (some contents enclosed using double curly braces `{{}}`). These template, which are handled by the [Handlebars](https://handlebarsjs.com/) package, provide a simple template to generate any text format.
+Similar to the [interpreter](#interpreter), default converters are available, but custom ones may also be set. In this case they may be set through the use of [Mustache templates](https://handlebarsjs.com/guide/). Any values from the standard interpreters, and all properties supplied in the matching [MRG entry](@), can be used as [Mustache expressions](https://handlebarsjs.com/guide/expressions) (some contents enclosed using double curly braces `{{}}`). These template, which are handled by the [Handlebars](https://handlebarsjs.com/) package, provide a simple template to generate any text format.<br/>
 The properties of the MRG entry that the [Mustache expressions](https://handlebarsjs.com/guide/expressions) may use, may also include expressions themselves. In addition, two [helper functions](#helper-functions) have been included to handle certain repeatable tasks.
 
-**An example, which includes the use of [Mustache expressions](https://handlebarsjs.com/guide/expressions) and [helper functions](#helper-functions) is outlined below.**
+**A pre-configured [Handlebars](https://handlebarsjs.com/) playground can be found [here](https://handlebarsjs.com/playground.html#format=1&currentExample=%7B%22template%22%3A%22-%20Markdown%3A%20%5B%7B%7Bshowtext%7D%7D%5D(%7B%7Bnavurl%7D%7D%7B%7B%23trait%7D%7D%23%7B%7B%2Ftrait%7D%7D%7B%7Btrait%7D%7D)%5Cn-%20HTML%3A%20%3Ca%20href%3D%5C%22%7B%7Bnavurl%7D%7D%7B%7B%23trait%7D%7D%23%7B%7B%2Ftrait%7D%7D%7B%7Btrait%7D%7D%5C%22%3E%7B%7Bshowtext%7D%7D%3C%2Fa%3E%5Cn-%20eSSIF-Lab%3A%20%3Ca%20href%3D%5C%22%7B%7Bnavurl%7D%7D%7B%7B%23trait%7D%7D%23%7B%7B%2Ftrait%7D%7D%7B%7Btrait%7D%7D%5C%22%20title%3D%5C%22%7B%7BcapFirst%20term%7D%7D%3A%20%7B%7BnoRefs%20glossaryText%7D%7D%5C%22%3E%7B%7Bshowtext%7D%7D%3C%2Fa%3E%5Cn-%20Custom%3A%20%7B%7B%23ifValue%20termType%20equals%3D%5C%22concept%5C%22%7D%7D%3Ca%20href%3D%5C%22%7B%7Bnavurl%7D%7D%7B%7B%23trait%7D%7D%23%7B%7B%2Ftrait%7D%7D%7B%7Btrait%7D%7D%5C%22%3E%7B%7Bshowtext%7D%7D%3C%2Fa%3E%7B%7B%2FifValue%7D%7D%7B%7B%23ifValue%20termType%20equals%3D%5C%22image%5C%22%7D%7D%3Cimg%20src%3D%5C%22%7B%7Blocator%7D%7D.jpg%5C%22%20alt%3D%5C%22%7B%7Bshowtext%7D%7D%5C%22%20width%3D%5C%22500%5C%22%20height%3D%5C%22600%5C%22%3E%7B%7B%2FifValue%7D%7D%5Cn%22%2C%22partials%22%3A%5B%5D%2C%22input%22%3A%22%7B%5Cn%20%20showtext%3A%20%5C%22Curators%5C%22%2C%5Cn%20%20trait%3A%20%5C%22examples%5C%22%2C%5Cn%20%20term%3A%20%5C%22curator%5C%22%2C%5Cn%20%20scopetag%3A%20%5C%22termdsn%5C%22%2C%5Cn%20%20vsntag%3A%20%5C%22main%5C%22%2C%5Cn%20%20termType%3A%20%5C%22concept%5C%22%2C%5Cn%20%20glossaryTerm%3A%20%5C%22Curator%20(of%20a%20Scope)%5C%22%2C%5Cn%20%20glossaryText%3A%20%5C%22a%20person%20responsible%20for%20%5Bcurating%5D(%40)%20the%20%5Bterminologies%5D(%40)%20within%20a%20%5Bscope%5D(%40)%2C%20to%20ensure%20shared%20understanding%20among%20a%20%5Bcommunity%5D(%40)%20working%20together%20on%20a%20particular%20set%20of%20objectives.%5C%22%2C%5Cn%20%20grouptags%3A%20%5C%22terminology%5C%22%2C%5Cn%20%20locator%3A%20%5C%22curator%5C%22%2C%5Cn%20%20navurl%3A%20%5C%22terminology%2Fcurator.md%5C%22%5Cn%7D%5Cn%22%2C%22output%22%3A%22-%20Markdown%3A%20%5BCurators%5D(terminology%2Fcurator.md%23examples)%5Cn-%20HTML%3A%20%3Ca%20href%3D%5C%22terminology%2Fcurator.md%23examples%5C%22%3ECurators%3C%2Fa%3E%5Cn-%20eSSIF-Lab%3A%20%3Ca%20href%3D%5C%22terminology%2Fcurator.md%23examples%5C%22%20title%3D%5C%22Curator%3A%20a%20person%20responsible%20for%20Curating%20the%20Terminologies%20within%20a%20Scope%2C%20to%20ensure%20shared%20understanding%20among%20a%20Community%20working%20together%20on%20a%20particular%20set%20of%20objectives.%5C%22%3ECurators%3C%2Fa%3E%5Cn-%20Custom%3A%20%3Ca%20href%3D%5C%22terminology%2Fcurator.md%23examples%5C%22%3ECurators%3C%2Fa%3E%5Cn%22%2C%22preparationScript%22%3A%22const%20pattern%20%3D%20'%2F(%3F%3A%5B%5E%60%5C%5C%5C%5C%5C%5C%5C%5C%5D%7C%5E)%5C%5C%5C%5C%5B(%3F%3D%5B%5E%40%5C%5C%5C%5C%5D%5D%2B%5C%5C%5C%5C%5D%5C%5C%5C%5C(%5B%23a-z0-9_-%5D*%40%5B%3Aa-z0-9_-%5D*%5C%5C%5C%5C))(%3F%3Cshowtext%3E%5B%5E%5C%5C%5C%5Cn%5C%5C%5C%5C%5D%40%5D%2B)%5C%5C%5C%5C%5D%5C%5C%5C%5C((%3F%3A(%3F%3Cid%3E%5Ba-z0-9_-%5D*)%3F(%3F%3A%23(%3F%3Ctrait%3E%5Ba-z0-9_-%5D%2B))%3F)%3F%40(%3F%3Cscopetag%3E%5Ba-z0-9_-%5D*)(%3F%3A%3A(%3F%3Cvsntag%3E%5Ba-z0-9_-%5D%2B))%3F%5C%5C%5C%5C)%2Fg'%3B%5Cn%2F%2F%20Basic%20Term%20Ref%20syntax%2C%20but%20with%20escaped%20symbols%20to%20function%20correctly%5Cn%5Cnfunction%20noRefsHelper(text)%20%7B%5Cn%20%5Ctlet%20regex%20%3D%20new%20RegExp(pattern.replace(%2F%5E%5C%5C%2F%7C%5C%5C%2F%5Ba-z%5D*%24%2Fg%2C%20'')%2C%20'g')%3B%5Cn%20%20%20%20let%20matches%20%3D%20Array.from(text.matchAll(regex))%3B%5Cn%20%20%20%20if%20(matches.length%20%3E%200)%20%7B%5Cn%20%20%20%20%20%20%20%20%2F%2F%20Iterate%20over%20each%20match%20found%20in%20the%20text%20string%5Cn%20%20%20%20%5Ctfor%20(const%20match%20of%20matches)%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20if%20(match.groups.showtext)%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20replace%20the%20match%20with%20the%20showtext%20property%20and%20make%20the%20first%20letter%20capitalized%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20text%20%3D%20text.replace(match%5B0%5D%2C%20capFirstHelper('%20'%20%2B%20match.groups.showtext))%3B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5Cn%20%20%20%20return%20text%3B%5Cn%7D%5Cn%5Cnfunction%20capFirstHelper(text)%20%7B%5Cn%5Ctconst%20words%20%3D%20text.split('%20')%3B%5Cn%20%20%20%20const%20capitalizedWords%20%3D%20words.map((word)%20%3D%3E%5Cn%20%20%20%20%5Ctword.charAt(0).toUpperCase()%20%2B%20word.slice(1)%5Cn%20%20%20%20)%3B%5Cn%20%20%20%20return%20capitalizedWords.join('%20')%3B%5Cn%7D%5Cn%5Cnfunction%20ifValueHelper(conditional%2C%20options)%20%7B%5Cn%20%20if%20(conditional%20%3D%3D%20options.hash.equals)%20%7B%5Cn%20%20%20%20return%20options.fn(this)%3B%5Cn%20%20%7D%5Cn%20%20else%20%7B%5Cn%20%20%20%20return%20options.inverse(this)%3B%5Cn%20%20%7D%5Cn%7D%5Cn%5CnHandlebars.registerHelper('noRefs'%2C%20noRefsHelper)%3B%5CnHandlebars.registerHelper('capFirst'%2C%20capFirstHelper)%3B%5CnHandlebars.registerHelper('ifValue'%2C%20ifValueHelper)%3B%5Cn%22%2C%22handlebarsVersion%22%3A%224.7.8%22%7D), this playground includes the [helper functions](#helper-functions) and also matches the example cases outlined below.** Note that although a [MRG entry](@) allows [Mustache expressions](https://handlebarsjs.com/guide/expressions) in its property values, the `input` box in the playground does not.
 
-Imagine the properties below are part of the [MRG entry](@) that describes a [curator](@). In this case we would like our external rendering tool to display text when a [renderable ref](@) is being hovered over.
+<details>
+  <summary>Examples</summary>
+
+Every explored example uses the following [MRG entry](@) properties. The converter also has access to the properties of the [term ref](@), which in this case is the term [Curator](@).<br/>
+For the examples, we imagine that the following [term ref](@), using the [basic syntax](specifications#interpretation-of-the-term-ref), was found by the interpreter: \[`Curators`\](#`examples`@`termdsn`:`main`).
+
+<details>
+  <summary>MRG Entry</summary>
 
 ```yaml
-glossaryText: "a person responsible for [curating](@) the [terminologies](@) within a [scope](@), to ensure shared understanding among a [community](@) working together on a particular set of objectives."
-hoverText: "{{term}}: {glossaryText}"
+-
+  term: 'curator'
+  scopetag: 'termdsn'
+  vsntag: 'main'
+  termType: 'concept'
+  glossaryTerm: 'Curator (of a Scope)'
+  glossaryText: 'a person responsible for [curating](@) the [terminologies](@) within a [scope](@), to ensure shared understanding among a [community](@) working together on a particular set of objectives.'
+  hoverText: '{{term}}: {{glossaryText}}'
+  grouptags: 'terminology'
+  formPhrases: 'curator{ss}, terminology-curator{ss}'
+  navurl: 'terminology/curator.md'
+  headingids:
+    - 'curator-of-a-scope'
+    - 'examples'
+    - 'notes'
+-
 ```
 
-We have defined a custom converter template to make use of this `hoverText` property, which we have achieved by using [Mustache expressions](https://handlebarsjs.com/guide/expressions) in our converter string. The `hoverText` property is unformatted currently, using it will make it start without any capitalization (`term` property is lowercase), and will use the unresolved [term ref](@) syntaxes as included in the `glossaryText`. To tidy up the values we use the [helper functions](#helper-functions), and could even skip the use of the `hoverText` property all together by being smart with our custom converter.
+</details>
 
-```Handlebars
-<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText}}">{{showtext}}</a>
+<Tabs
+  defaultValue="markdown"
+  values={[
+    {label: 'Markdown', value: 'markdown'},
+    {label: 'HTML', value: 'html'},
+    {label: 'eSSIF-Lab', value: 'essif'},
+    {label: 'Custom', value: 'custom'},
+  ]}>
+
+<TabItem value="markdown">
+
+The most basic converter can be used by not specifiying a converter, or by setting `markdown`, or the template string below, as the value of `converter`. In this case, the original `showtext` of the [term ref](@) properties is used in addition to the `navurl` property of the [MRG entry](@) with the `trait` property of the [term ref](@) being added if it is available leading with a `#`-character.
+
+```hbs title="Markdown Mustache template"
+ [{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})
+```
+
+Resulting in the following [renderable ref](@) Markdown that results in a hyperlink to the `navurl`.
+
+`[Curators](terminology/curator.md#examples)`
+
+</TabItem>
+<TabItem value="html">
+
+The HTML converter can be used by setting `html`, or the template string below, as the value of `converter`. Similar to the Markdown converter, the original `showtext` of the [term ref](@) properties is used in addition to the `navurl` [MRG entry](@) property with the `trait` [term ref](@) property being added if it is available leading with a `#`-character.
+
+```hbs title="HTML Mustache template"
+ <a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>
+```
+
+Resulting in the following [renderable ref](@) HTML `<a>` tag that defines a hyperlink to the `navurl`.
+
+```html
+ <a href="terminology/curator.md#examples">Curators</a>
+```
+
+</TabItem>
+<TabItem value="essif">
+
+This example converter can be used by setting `essif`, or the template string below, as the value of `converter`. In this case we would like our external rendering tool to display text when a [renderable ref](@) is being hovered over in a HTML context.
+
+The `glossaryText` property in the [MRG entry](@) is unformatted currently; using it will make it start without any capitalization (`term` property is lowercase), and will use the unresolved [term ref](@) syntaxes (i.e., \[curating\](@)) as included in the `glossaryText`. To tidy up the properties we use the [helper functions](#helper-functions), and skip the use of the `hoverText` property all together by being smart with our custom converter.
+
+```hbs title="eSSIF Mustache template"
+ <a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText}}">{{showtext}}</a>
 ```
 
 The above converter will result in the `title` html element being filled with the following renderable string.
 
 ```
-"Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives."
+ "Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives."
 ```
 
+Resulting in the following [renderable ref](@) HTML `<a>` tag that defines a hyperlink to the `navurl` and can display a text on **<u title="Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives.">hover</u>**.
+
+```html
+<a href="terminology/curator.md#examples" title="Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives.">Curators</a>
+```
+
+</TabItem>
+<TabItem value="custom">
+
+This example uses the [`ifValue`](#ifvalue) helper to conditionally render a block based on the `termType` [MRG entry](@) property value. When the type is of value `concept`, a converter similar to the HTML example is displayed. When the type is of value `image`, an image is displayed using the value of `locator`. The converter below attempts to show the creative possibilities of using the converters, expressions and helper functions.
+
+```hbs title="Custom Mustache template"
+ {{#ifValue termType equals="concept"}}<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>{{/ifValue}}
+ {{#ifValue termType equals="image"}}<img src="{{locator}}.jpg" alt="{{showtext}}" width="500" height="600">{{/ifValue}}
+```
+
+Resulting in the following [renderable ref](@) HTML `<a>` or `<img>` tag that defines a hyperlink or an image based on the `termType` [MRG entry](@) property value.
+
+```html
+ <a href="terminology/curator.md#example">Curators</a>
+ or
+ <img src="curator.jpg" alt="Curators" width="500" height="600">
+```
+
+By changing the value of property `termType` in the `input` of the abovementioned [playground](#converter), the changed `output` should be visible instantly.
+
+</TabItem>
+
+</Tabs>
+
+</details>
+
 ### Helper functions
-Two [helper functions](https://handlebarsjs.com/guide/expressions.html#helpers) have been specified, which can be used within [Mustache expressions](https://handlebarsjs.com/guide/expressions) to modify the output of an expression. An example of using the `capFirst` and `noRefs` helpers inside a converter template can be seen at the [converter](#converter) section above. The input to a helper function is always the evaluated value of the expression that follows.
+Three [helper functions](https://handlebarsjs.com/guide/expressions.html#helpers) have been specified, which can be used within [Mustache expressions](https://handlebarsjs.com/guide/expressions) to modify the converter output. The `capFirst` and `noRefs` helpers are used inside the eSSIF-Lab converter template, mentioned in the [example](#converter) section above. The `ifValue` helper is used inside the Custom converter templat [example](#converter). The input to a helper function is always the evaluated value of the expression that follows, possibly with extra options.
 
 #### `capFirst`
-This simple helper with identifier `capFirst` replaces every word's first character with the capitalized equivalent. Words are obtained by splitting the input on the ` ` (space) character. *It takes the input, splits the input on spaces, and capitalizes the first character of every split item, after which the output is returned*
+This simple helper with identifier `capFirst` replaces every word's first character with the capitalized equivalent. Words are obtained by splitting the input on the ` ` (space) characters. *It takes the input, splits the input at spaces, and capitalizes the first character of every split item, after which the output is returned*
 
 #### `noRefs`
 This helper with identifier `noRefs` uses the configured [interpreter](#interpreter) to convert all references to the `showtext` term property value. It also capitalizes the `showtext` replacement using the `capFirst` helper. *It takes the input, finds matches using the configured [interpreter](#interpreter) and uses the capitalized `showtext` property as a replacement, after which the output is returned.*
 
-**For more information about the different syntaxes, template examples, [term ref](@) properties, and regexes, refer to the [TRRT](@) [specifications](link-to-specifications).**
+#### `ifValue`
+This helper with identifier `ifValue` allows for equality checking by comparing the first value with the value specified as the `equals` option. Pay attention to the use of a `#`-character in front of the opening helper tag (`#ifValue`) and a `/`-character at the closing (`/ifValue`) tag. *It compares the input given as the value trailing the opening helper identifier (`ifValue`) and the value of the `equals` option, and shows the value inbetween the opening and closing helper tag if they have the same value.*
+
+```hbs title="Usage example"
+ {{#ifValue termType equals="concept"}}Artifact is a concept{{/ifValue}}
+ {{#ifValue termType equals="image"}}Artifact is an image{{/ifValue}}
+```
+
+**For more information about the different syntaxes and [term ref](@) properties, refer to the [TRRT specifications](specifications).**
