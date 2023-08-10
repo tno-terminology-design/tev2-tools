@@ -3,15 +3,16 @@
 [This repo](https://github.com/tno-terminology-design/trrt) contains the specifications and documentation for the [TRRT](@) tool of the [TNO Terminology Design](@) effort, which can be found by navigating across the sections of this documentation. The broader context of the tool can be found at the [TEv2 specs website](https://tno-terminology-design.github.io/tev2-specifiations).
 
 The documentation consists of the following items:
-- [Installation](./trrt/installation): prerequisites, installation steps, usage
-- [Configuration](./trrt/configuration): parameters, configuration file, interpreter, converter
-- [Deployment](./trrt/deployment): deployment info and examples
-- [Error reporting](./trrt/error-reporting): available help, and error messages
-- [Testing](./trrt/testing): building, and testing the tool
+- [Installation](trrt/installation): [prerequisites](trrt/installation#prerequisites), [quick installation](trrt/installation#quick-installation)
+- [Usage](trrt/usage): [parameters](trrt/usage#parameters), [configuration file](trrt/usage#configuration-file)
+- [Customization](trrt/customization): [interpreter](trrt/customization#interpreter), [converter](trrt/customization/converter)
+- [Deployment](trrt/deployment): [examples](trrt/deployment#trrt-example), [deployment steps](trrt/deployment#executed-steps)
+- [Error reporting](trrt/error-reporting): [help messages](trrt/error-reporting#help-messages), [error messages](trrt/error-reporting#error-messages)
+- [Testing](trrt/testing): [cloning](trrt/testing), [compiling](trrt/testing)
 
-The [specifications](./trrt/specifications) consists of the following items:
-- Calling the Tool
-- Term Ref Resolution
-- Processing, Errors and Warnings
-- Deploying the Tool
-- Discussion Notes
+The [specifications](trrt/specifications) consist of the following items:
+- [Calling the Tool](trrt/specifications#calling-the-tool)
+- [Term Ref Resolution](trrt/specifications#term-ref-resolution)
+- [Processing, Errors and Warnings](trrt/specifications#processing-errors-and-warnings)
+- [Deploying the Tool](trrt/specifications#deploying-the-tool)
+- [Discussion Notes](trrt/specifications#discussion-notes)

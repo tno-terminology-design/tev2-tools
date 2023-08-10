@@ -27,16 +27,4 @@ Refer to [deployment](deployment) for a complete example of how the [TRRT](@) an
     ```
     This should display the version number of the [TRRT](@), confirming that the installation was successful.
 
-## Usage
-
-The behavior of the [TRRT](@) can be configured per call e.g. by a configuration file and/or command-line parameters. The command-line syntax is as follows:
-
-```bash
-trrt [ <paramlist> ] [ <globpattern> ]
-```
-
-where:
-- `<paramlist>` (optional) is a list of key-value pairs
-- `<globpattern>` (optional) specifies a set of (input) files that are to be processed
-
-**For configuration of the tool please refer to the [configuration](configuration) section next.**
+**For configuration and usage of the tool please refer to the [usage](usage) section next.**

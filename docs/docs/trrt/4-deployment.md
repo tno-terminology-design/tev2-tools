@@ -1,7 +1,7 @@
 # Deployment
 
 ## TRRT Example
-The [TRRT](@) is designed to be usable in both a command-line interface and a CI/CD pipeline. Features like the [configuration file](configuration#configuration-file), make the execution of the tool easily maintainable, and [error reporting](error-reporting) is available to assist further in the resolution of terms.
+The [TRRT](@) is designed to be usable in both a command-line interface and a CI/CD pipeline. Features like the [configuration file](usage#configuration-file), make the execution of the tool easily maintainable, and [error reporting](error-reporting) is available to assist further in the resolution of terms.
 
 The GitHub repository of the [TRRT](@), located [here](https://github.com/tno-terminology-design/trrt) acts as an example of the tool's deployment. Within the `.github/workflows/docs-deploy.yml` GitHub Actions Workflow file are the following lines of code. This code is located in the deploy job before the website is built, modifying the input files in runtime before they are used to build the Docusaurus site.
 
@@ -16,7 +16,7 @@ The GitHub repository of the [TRRT](@), located [here](https://github.com/tno-te
 This execution of the [TRRT](@) is run from the root of the repository, any input files that contain successfully converted [term refs](@) will be output starting from that location as well. The [scope directory](@) is set to `__tests__/content`, as this is where the SAF resides. Every file that matches the `'**/**.md'` glob pattern string is given to the [TRRT](@), in this case meaning every file in every directory ending with `.md` is seen as input.
 As the output directory is the same as the current directory, converted files will overwrite the existing files when we use the `force` flag. This behavior is useful for deployment inside pipelines where the original files are usually not modified, but should be avoided during local use in order to preserve the original documents that include [term refs](@).
 
-## Example Deployment
+## Example Deployment Case
 The [TRRT](@) needs one [SAF](@) and one or more [MRG](@)'s in order to function and it will check to make sure the required properties within these files are set. Not being able to load a [SAF](@) or [MRG](@) will cause the program to exit. An invalid entry within a [MRG](@) will not cause the program to be stopped, but will be displayed as a `MRG HELP` item (see [Error Reporting](error-reporting)).
 
 To demonstrate the tool's possibilities, lets imagine the following scenario.
@@ -73,7 +73,7 @@ This makes the [TRRT](@) CLI command available all throughout your system and do
 3. **Configure the [SAF](@) and make sure the necessary [MRG](@)'s are present.** <br/>
 Our example deployment `saf.yaml` can be viewed [here](https://github.com/tno-terminology-design/trrt/blob/main/__tests__/content/saf.yaml) within the `__tests__/content` directory, with the [MRG](@)'s located in the [glossarydir](https://github.com/tno-terminology-design/trrt/tree/main/__tests__/content/terminology) at `__tests__/content/terminology`.
 
-4. **Setup the [TRRT](@) behavior per [configuration file](#configuration-file) and/or command-line parameters.** <br/>
+4. **Setup the [TRRT](@) behavior per [configuration file](usage#configuration-file) and/or command-line parameters.** <br/>
 See the [example deployment](#example-deployment) above for the yaml configuration file that is used. In this case we will be executing the [TRRT](@) from the root of our repository and not the root of the [scopedir](@). This means you may have to change working directory before executing step 5.
 
 5. **Execute the [TRRT](@).** <br/>

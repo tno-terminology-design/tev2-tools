@@ -1,4 +1,4 @@
-# Configuration
+# Customization
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -7,42 +7,6 @@ Within the [TNO Terminology Design](@) effort, the [TRRT](@) is able to interpre
 
 1. [Interpretation](#interpreter) happens through the use of regular expressions. These expressions are able to match the [term ref](@) syntaxes within documents, and store various variables as (named) capturing groups for use in the tool.
 2. [Conversion](#converter) works by using Mustache templates. Any values from the standard [interpreters](#interpreter), and all properties supplied in the matching [MRG Entry](@), can be used as [Mustache expressions](https://handlebarsjs.com/guide/expressions).
-
-## Parameters
-The behavior of the [TRRT](@) can be configured per call e.g. by a [configuration file](#configuration-file) and/or command-line parameters. The command-line syntax is as follows:
-
-~~~bash
-trrt [ <paramlist> ] [ <globpattern> ]
-~~~
-
-where:
-- `<paramlist>` (optional) is a list of key-value pairs
-- [`globpattern`](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) (optional) specifies a set of (input) files that are to be processed. If a [configuration file](#configuration-file) is used, its contents may specify an additional set of input files to be processed.
-
-**For a complete list of key-value pairs, please refer to the [Calling the Tool](specifications#calling-the-tool) section within the specifications.**
-
-### Configuration File
-Every parameter specified in the [specifications](specifications#calling-the-tool) (except for `config`) can be set inside a yaml file. As an example, running the tool with the following command with the use of the `__tests__` files:
-
-```bash
-trrt --config __tests__/content/config.yaml
-```
-
-uses the example `config.yaml` file shown below. As a general guideline, we recommend storing the config files related to terminology tools in the root of the [scope directory](@) where the [SAF](@) is located as well.
-
-```yaml title="__tests__/content/config.yaml"
-# TRRT configuration file (yaml)
-output: '__tests__/output'
-scopedir: '__tests__/content'
-interpreter: '(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)' # `alt` or `basic` are also valid values
-converter: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{glossaryText}}">{{showtext}}</a>' # `http`, `essif` or `markdown` are also valid values
-
-# glob pattern strings for files to be processed
-input:
-  - '__tests__/content/terminology/*.md'
-```
-
-For more practical examples, visit [deployment](deployment) or continue reading for information about the [interpreter](#interpreter) and [converter](#converter).
 
 ## Interpreter
 Different types of interpreters are present, allowing for the switching between the [basic syntax](specifications#interpretation-of-the-term-ref) and [alternative syntax](specifications#interpretation-of-the-term-ref). To increase the flexibility of the [TRRT](@), a custom interpreter may also be set. All interpreters consist of a PCRE regular expression with named capturing groups that can store variables related to the [term ref](@) for later use in matching with a [MRG entry](@).
@@ -254,5 +218,3 @@ This helper with identifier `ifValue` allows for equality checking by comparing 
  {{#ifValue termType equals="concept"}}Artifact is a concept{{/ifValue}}
  {{#ifValue termType equals="image"}}Artifact is an image{{/ifValue}}
 ```
-
-**For more information about the different syntaxes and [term ref](@) properties, refer to the [TRRT specifications](specifications).**
