@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **MRG Import Tool** ensures that the scope within which it is run, obtains a local copy of all MRGs that are available in the scopes that are mentioned in the [scopes section](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/spec-files/saf#scopes) of its SAF. This makes life easy for various tools, e.g., the MRGT and the TRRT, that can now assume that all MRGs that they may need to consult in order to do their job, are readily available. There is more information about 
+The **MRG Import Tool** ensures that the scope within which it is run, obtains a local copy of all MRGs that are available in the scopes that are mentioned in the [scopes section](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/spec-files/saf#scopes) of its SAF. This makes life easy for various tools, e.g., the [MRGT](https://tno-terminology-design.github.io/mrgt/) and the [TRRT](https://tno-terminology-design.github.io/trrt/), that can now assume that all MRGs that they may need to consult in order to do their job, are readily available. There is more information about 
 - the [MRG Import Tool documentation](https://tno-terminology-design.github.io/mrg-import/),
 - [overview of the TEv2 tools](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-overview) of which the MRG Import Tool is a part.
 
@@ -33,4 +33,4 @@ where:
 | -V, --version              | Output the version number of the tool. |   n   |
 | -h, --help                 | Display usage and options help text. |   n   |
 
-Please refer to the [TRRT documentation](https://tno-terminology-design.github.io/mrg-import/) for more information.
+Please refer to the [MRG Import Tool documentation](https://tno-terminology-design.github.io/mrg-import/) for more information.
