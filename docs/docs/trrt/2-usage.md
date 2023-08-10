@@ -10,7 +10,7 @@ where:
 - `<paramlist>` (optional) is a list of key-value pairs
 - [`globpattern`](https://en.wikipedia.org/wiki/Glob_(programming)#Syntax) (optional) specifies a set of (input) files that are to be processed. If a [configuration file](#configuration-file) is used, its contents may specify an additional set of input files to be processed.
 
-## Paramaters and options
+## Parameters and options
 
 <details>
   <summary>Legend</summary>
@@ -37,7 +37,7 @@ The columns in the following table are defined as follows:
 
 
 ### Configuration File
-Every parameter specified in the [options](#paramaters-and-options) table above (except for `config`) can be set inside a yaml file. As an example, running the tool with the following command with the use of the `__tests__` files:
+Every parameter specified in the [options](#parameters-and-options) table above (except for `config`) can be set inside a yaml file. As an example, running the tool with the following command with the use of the `__tests__` files:
 
 ```bash
 trrt --config __tests__/content/config.yaml
