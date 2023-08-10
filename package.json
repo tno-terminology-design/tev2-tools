@@ -32,7 +32,6 @@
     "handlebars": "^4.7.7",
     "js-yaml": "^4.1.0",
     "leven": "^4.0.0",
-    "string-similarity-js": "^2.1.4",
     "tslog": "^4.4.4"
   },
   "devDependencies": {
