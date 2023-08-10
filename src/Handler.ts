@@ -6,31 +6,24 @@ import axios from 'axios';
 import gitUrlParse from 'git-url-parse';
 
 export async function download(url: URL, localPath: string): Promise<void> {
-    try {
-      const parsedUrl = gitUrlParse(url.href);
-      if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.filepath) {
-        throw new Error('  - Invalid Git URL');
-      }
-  
-      // Determine the raw URL based on the Git hosting platform
-      let rawUrl: URL;
-      if (parsedUrl.source === 'github.com') {
-        rawUrl = new URL(path.join('https://raw.githubusercontent.com', parsedUrl.owner, parsedUrl.name, parsedUrl.ref, parsedUrl.filepath));
-      } else if (parsedUrl.source === 'gitlab.com') {
-        rawUrl = new URL(path.join('https://gitlab.com', parsedUrl.owner, parsedUrl.name, 'raw', parsedUrl.ref, parsedUrl.filepath));
-      } else {
-        throw new Error('  - Unsupported Git platform');
-      }
-  
-      log.info(`  - Requesting '${rawUrl}'`);
-      const response = await axios.get(rawUrl.href, { responseType: 'arraybuffer' });
-      writeFile(localPath, response.data);
-    } catch (err) {
-      if (err instanceof Error) {
-        err.message = `    - ${err.message}`;
-      }
-      throw err;
-    }
+  const parsedUrl = gitUrlParse(url.href);
+  if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.filepath) {
+    throw new Error('  - Invalid Git URL');
+  }
+
+  // Determine the raw URL based on the Git hosting platform
+  let rawUrl: URL;
+  if (parsedUrl.source === 'github.com') {
+    rawUrl = new URL(path.join('https://raw.githubusercontent.com', parsedUrl.owner, parsedUrl.name, parsedUrl.ref, parsedUrl.filepath));
+  } else if (parsedUrl.source === 'gitlab.com') {
+    rawUrl = new URL(path.join('https://gitlab.com', parsedUrl.owner, parsedUrl.name, 'raw', parsedUrl.ref, parsedUrl.filepath));
+  } else {
+    throw new Error(`  - E007 Unsupported Git platform ${parsedUrl.source}`);
+  }
+
+  log.info(`  - Requesting '${rawUrl}'`);
+  const response = await axios.get(rawUrl.href, { responseType: 'arraybuffer' });
+  writeFile(localPath, response.data);
 }
 
 

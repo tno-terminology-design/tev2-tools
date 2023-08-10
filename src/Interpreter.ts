@@ -172,8 +172,16 @@ export class Interpreter {
                 process.exit(1);
             }
         } catch (err) {
-            log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err);
-            process.exit(1);
+            if (err instanceof AxiosError && err.response) {
+                log.error(`E004 SAF request of '${new URL(safURL)}' failed with status code ${err.response.status}`);
+                process.exit(1);
+            } else if (err instanceof yaml.YAMLException) {
+                log.error(`E005 SAF interpretation of '${new URL(safURL)}' failed due to a YAML parsing error: ${err.message}`);
+                process.exit(1);
+            } else {
+                // Handle other errors if needed
+                throw err;
+            }
         }
     
         return saf;
