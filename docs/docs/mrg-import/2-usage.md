@@ -22,13 +22,13 @@ The columns in the following table are defined as follows:
 
 </details>
 
-| Key                     | Value     | Req'd | Description |
-| :---------------------- | :-------- | :---: | :---------- |
-| `-c`<br/>`--config`     | `<path>`  |   n   | Path (including the filename) of the tool's (YAML) [configuration file](#configuration-file) as an absolute or relative path from where the tool is called. This file contains the key-value pairs to be used. Allowed keys (and the associated values) are documented in this table. Command-line arguments override key-value pairs specified in the [configuration file](#configuration-file). This parameter MUST NOT appear in the [configuration file](#configuration-file) itself. |
-| `-s`<br/>`--scopedir`   | `<path>`  |   Y   | Path of the [scope directory](@) from which the tool is called. It MUST contain the [SAF](@) for that [scope](@), which we will refer to as the 'own scope' for the [MRG Import Tool](@). |
-| `-o`<br/>`--onNotExist` | `<action` |   n   | Specifies the action to take in case a [MRG](@) file that was expected to exist, does not exist. Default is `throw`.
-| `-V`<br/>`--version`    |           |   n   | Output the version number of the tool. |
-| `-h`<br/>`--help`       |           |   n   | Display usage and options help text. |
+| Key                     | Value      | Req'd | Description |
+| :---------------------- | :--------- | :---: | :---------- |
+| `-c`<br/>`--config`     | `<path>`   |   n   | Path (including the filename) of the tool's (YAML) [configuration file](#configuration-file) as an absolute or relative path from where the tool is called. This file contains the key-value pairs to be used. Allowed keys (and the associated values) are documented in this table. Command-line arguments override key-value pairs specified in the [configuration file](#configuration-file). This parameter MUST NOT appear in the [configuration file](#configuration-file) itself. |
+| `-s`<br/>`--scopedir`   | `<path>`   |   Y   | Path of the [scope directory](@) from which the tool is called. It MUST contain the [SAF](@) for that [scope](@), which we will refer to as the 'own scope' for the [MRG Import Tool](@). |
+| `-o`<br/>`--onNotExist` | `<action>` |   n   | Specifies the action to take in case a [MRG](@) file that was expected to exist, does not exist. Default is `throw`. |
+| `-V`<br/>`--version`    |            |   n   | Output the version number of the tool. |
+| `-h`<br/>`--help`       |            |   n   | Display usage and options help text. |
 
 The `<action>` parameter can take the following values.
 
