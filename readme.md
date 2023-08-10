@@ -10,15 +10,15 @@ The **Term Ref(erence) Resolution Tool (TRRT)** takes files that contain so-call
 
 Install from the command line and make globally available.
 
-'''bash
+```bash
 npm install @tno-terminology-design/trrt -g
-'''
+```
 
 ## Calling the Tool
 
 The behavior of the TRRT can be configured per call e.g. by a configuration file and/or command-line parameters. The command-line syntax is as follows:
 
-'''bash
+```bash
 trrt [ <paramlist> ] [ <globpattern> ]
 ```
 
