@@ -102,18 +102,18 @@ const config = {
           {
             title: 'TEv2 User Manuals',
             items: [
-              { label: 'Curators',      href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/manuals/curator' },
-              { label: 'Contributors',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/manuals/contributor' },
-              { label: 'Authors',       href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/manuals/author' },
+              { label: 'Curators',      href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/curator' },
+              { label: 'Contributors',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/contributor' },
+              { label: 'Authors',       href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/author' },
               // { label: 'Github', href: 'https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs/terms' },
             ],
           },
           {
             title: 'TEv2 Specifications',
             items: [
-              { label: 'Files',     href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-spec-files' },
-              { label: 'Syntaxes',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-syntax' },
-              { label: 'Toolbox',   href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-toolbox' },
+              { label: 'Files',     href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-spec-files' },
+              { label: 'Syntaxes',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-syntax' },
+              { label: 'Toolbox',   href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-toolbox' },
               { label: 'Github', href: 'https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs/terms' },
             ],
           },

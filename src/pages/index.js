@@ -23,7 +23,7 @@ function Home() {
                 'button button--outline button--secondary button--lg',
                 styles.getStarted,
               )}
-              to={useBaseUrl('docs/tev2/tev2-overview')}>
+              to={useBaseUrl('docs/tev2-overview')}>
               Terminology Engine v2
             </Link>
             &nbsp;&nbsp;&nbsp;
