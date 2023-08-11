@@ -1,5 +1,5 @@
 #
-# This is a Scope Administration File that can be used in conjunction with [Terminology Engine v2](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-overview).
+# This is a Scope Administration File that can be used in conjunction with [Terminology Engine v2](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-overview).
 #
 # The first section defines meta-data concerning the scope itself, both for technical use and human use.
 # It shows where directories and files live that ar part of the scope, and also
@@ -29,7 +29,7 @@ scope:
 #
 scopes:  #
 - scopetag: tev2 # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
-  scopedir: https://github.com/tno-terminology-design/tev2-specifications/tree/main/docs/tev2 # URL of the scope-directory
+  scopedir: https://github.com/tno-terminology-design/tev2-specifications/tree/main/docs # URL of the scope-directory
 - scopetag: essif-lab # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
   scopedir: https://github.com/essif-lab/framework/tree/master/docs # URL of the scope-directory
 #

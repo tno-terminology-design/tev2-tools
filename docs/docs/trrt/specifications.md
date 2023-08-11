@@ -125,8 +125,8 @@ The [term ref](@) resolution process has three steps:
 ### Interpretation of the Term Ref
 
 The following kinds of [term ref](@) syntaxes are supported:
-- the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax), i.e. \[`show text`\](`term`#`trait`@`scopetag`:`vsntag`);
-- the [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax), e.g. \[`show text`@\], which basically moves the `@`-character from the basic syntax within the square brackets, which in many (if not most) cases is more convenient for [authors](@), but has the drawback that the rendering of the plain markdown text would be rendered as [show text@], which may be inconvenient.
+- the [basic syntax](/docs/spec-syntax/term-ref-syntax#basic-syntax), i.e. \[`show text`\](`term`#`trait`@`scopetag`:`vsntag`);
+- the [alternative syntax](/docs/spec-syntax/term-ref-syntax#alternative-syntax), e.g. \[`show text`@\], which basically moves the `@`-character from the basic syntax within the square brackets, which in many (if not most) cases is more convenient for [authors](@), but has the drawback that the rendering of the plain markdown text would be rendered as [show text@], which may be inconvenient.
 - custom syntaxes interpreted by the `interpreter` parameter of the [TRRT](@) through the use of regular expressions.
 
 Interpretation of a [term ref](@) leads to the population of the following variables:
@@ -136,11 +136,11 @@ Interpretation of a [term ref](@) leads to the population of the following varia
 
 Finding a [term ref](@) in the file can be done by using regular expressions (regexes - you can use [debuggex](https://www.debuggex.com/ to see what these regexps do (make sure you choose PCRE as the regex flavor to work with)).
 
-- For the [basic syntax](/docs/tev2/spec-syntax/term-ref-syntax#basic-syntax), you can use the PCRE regex
+- For the [basic syntax](/docs/spec-syntax/term-ref-syntax#basic-syntax), you can use the PCRE regex
   - [``(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))``](https://www.debuggex.com/r/G1uvznpNG1mhqEx5) to find the `[` that starts a [term ref](@), and
   - [``(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)``](https://www.debuggex.com/r/36D57uOvsnyPehh3) to find the various parts of the [term ref](@) as (named) capturing groups.
 
-- For the [alternative syntax](/docs/tev2/spec-syntax/term-ref-syntax#alternative-syntax), you can use the PCRE regex
+- For the [alternative syntax](/docs/spec-syntax/term-ref-syntax#alternative-syntax), you can use the PCRE regex
   - [``(?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)``](https://www.debuggex.com/r/7dEYEdoc52QeIxf4) to find the `[` that starts a [term ref](@), and
   - [``(?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\](?:\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))?``](https://www.debuggex.com/r/tMBiAk_W9ipNc9Mm) to subsequently obtain the various fields as (named) capturing groups from the PCRE regex.
 
@@ -167,7 +167,7 @@ If not specified, the current [scope](@) (from which the [TRRT](@) is being call
 
 `vsntag` is a [versiontag](@) that [identifies](@) the version of the [terminology](@) in the [scope](@) (as [identified] by the `scopetag`). It MUST appear either in the `vsntag` field, or as one of the elements in the `altvsntags` field of the [SAF](@) that contains the administration of that [scope](@).
 
-If omitted (in which case the preceding `:`-character may also be omitted from the syntax), its value will [identify](@) the default [MRG](@) of the [scope](@) (as [specified](/docs/tev2/spec-files/saf#terminology) in the `mrgfile` field os the [SAF](@)).
+If omitted (in which case the preceding `:`-character may also be omitted from the syntax), its value will [identify](@) the default [MRG](@) of the [scope](@) (as [specified](/docs/spec-files/saf#terminology) in the `mrgfile` field os the [SAF](@)).
 
 #### `term` (optional) {#id}
 
@@ -178,10 +178,10 @@ If omitted, <!-- and the `term` field is empty as well, --> it is generated as f
 - set `term`:=`showtext`;
 - convert every character in the (regex) range `[A-Z]` to lower-case;
 - convert every sequence of characters `[^A-Za-z_-]+` to (a single) `-` character;
-- if the resulting `term` [matches an element in the list of texts](/docs/tev2/spec-syntax/form-phrase-syntax) in the `formphrases` field of an [MRG entry](@), then replace `term` with the contents of the `term`-field of that same [MRG entry](@).
+- if the resulting `term` [matches an element in the list of texts](/docs/spec-syntax/form-phrase-syntax) in the `formphrases` field of an [MRG entry](@), then replace `term` with the contents of the `term`-field of that same [MRG entry](@).
 
 :::info Editor's note
-We should clarify the extent to which this `matching` supports formphrase macro's, Currently, this is documented as part of the [form-phrase syntax](/docs/tev2/spec-syntax/form-phrase-syntax) which doesn't seem right.
+We should clarify the extent to which this `matching` supports formphrase macro's, Currently, this is documented as part of the [form-phrase syntax](/docs/spec-syntax/form-phrase-syntax) which doesn't seem right.
 :::
 
 It is an error if the resulting `term` does not [identify](@) an [MRG entry](@) in the selected [MRG](@). This may mean that the `showtext` has misspellings, the `term` field was not specified where it had to, or the list of `formphrases` in some [MRG entry](@) should have included more elements.
@@ -194,7 +194,7 @@ Perhaps the [TRRT](@) may use this tool as a means for generating the `term` fie
 
 #### `trait` (optional) {#trait}
 
-`trait` [identifies](@) a particular kind of descriptive text that is associated with the [knowledge artifact](@). If specified, it must be one of the elements in the list of headingid's as specified in [the `headingids` field](/docs/tev2/spec-files/mrg#mrg-entries) of the [MRG entry](@). If omitted, the preceding `#`-character should also be omitted.
+`trait` [identifies](@) a particular kind of descriptive text that is associated with the [knowledge artifact](@). If specified, it must be one of the elements in the list of headingid's as specified in [the `headingids` field](/docs/spec-files/mrg#mrg-entries) of the [MRG entry](@). If omitted, the preceding `#`-character should also be omitted.
 
 ### Locating the identified MRG Entry
 
