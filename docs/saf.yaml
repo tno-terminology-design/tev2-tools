@@ -1,21 +1,21 @@
 #
-# This is a Scope Administration File that can be used in conjunction with [Terminology Engine v2](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/tev2-overview).
+# This is a Scope Administration File that can be used in conjunction with [Terminology Engine v2](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-overview).
 #
 # The first section defines meta-data concerning the scope itself, both for technical use and human use.
 # It shows where directories and files live that ar part of the scope, and also
 # ways in which people can contribute, raise issues, see what's going on, discuss, etc.
 #
 scope:
-  scopetag: trrt # identifier that curators have determined for this terminology
-  scopedir: https://github.com/tno-terminology-design/trrt/tree/main/docs  # URL of the scope-directory
+  scopetag: mrgimp # identifier that curators have determined for this terminology
+  scopedir: https://github.com/tno-terminology-design/mrg-import/tree/main/docs  # URL of the scope-directory
   curatedir: terms # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
   glossarydir: glossaries # directory where all glossary files and GDFs are located. Full URL is `scopedir`/`glossarydir`
-  website: https://tno-terminology-design.github.io/trrt # base URL for creating links to rendered versions of Curated Texts. It should also serve as the home page of the Tterminology.
+  website: https://tno-terminology-design.github.io/mrg-import # base URL for creating links to rendered versions of Curated Texts. It should also serve as the home page of the Tterminology.
   navpath: /terms # Path to the directory where Curated Texts are rendered. What `curatedir` is for Curated Texts is, `navpath` is for the rendered versions of Curated Texts.
-  defaultvsn: ctexts # vsntag that identifies the default terminology. MRG is located at `scopedir`/`glossarydir`/mrg.tev2.latest.yaml
+  defaultvsn: terms # vsntag that identifies the default terminology. MRG is located at `scopedir`/`glossarydir`/mrg.tev2.latest.yaml
   license: LICENSE.md # file that contains the (default) licensing conditions. Full URL is `scopedir`/`license`
   statuses: [ proposed, approved, deprecated ] # list of status tags that are defined for terminological artifacts in this scope
-  issues: https://github.com/tno-terminology-design/trrt/issues # URL where issues can be raised and handled
+  issues: https://github.com/tno-terminology-design/mrg-import/issues # URL where issues can be raised and handled
   curators: # contacting individual curators
   - name: Ca5e
   - name: RieksJ
@@ -38,7 +38,7 @@ scopes:  #
 # See the Glossary Generation Tool (GGT) for details about the syntax and semantics.
 #
 versions:
-- vsntag: ctexts # this version includes only the terms that are actually curated in this scope
+- vsntag: terms # this version includes only the terms that are actually curated in this scope
   termselcrit:
   - "*@trrt" # import all terms curated in this scope
 - vsntag: v0.1
