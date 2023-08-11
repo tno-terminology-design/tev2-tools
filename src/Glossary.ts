@@ -82,7 +82,7 @@ export class Glossary {
        */
       public async initialize() {
             // Find all mrgfiles in the glossarydir
-            let glossarydir = path.join(this.saf.scope.scopedir, this.saf.scope.glossarydir);
+            let glossarydir = path.join(this.scopedir, this.saf.scope.glossarydir);
             let mrgfiles = await glob(path.join(glossarydir, 'mrg.*.*.yaml'));
 
             if (mrgfiles.length < 1) {
