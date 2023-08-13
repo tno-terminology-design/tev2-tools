@@ -17,10 +17,10 @@ This execution of the [TRRT](@) is run from the root of the repository, any inpu
 As the output directory is the same as the current directory, converted files will overwrite the existing files when we use the `force` flag. This behavior is useful for deployment inside pipelines where the original files are usually not modified, but should be avoided during local use in order to preserve the original documents that include [term refs](@).
 
 ## Example Deployment Case
-The [TRRT](@) needs one [SAF](@) and one or more [MRG](@)'s in order to function and it will check to make sure the required properties within these files are set. Not being able to load a [SAF](@) or [MRG](@) will cause the program to exit. An invalid entry within a [MRG](@) will not cause the program to be stopped, but will be displayed as a `MRG HELP` item (see [Error Reporting](error-reporting)).
+The [TRRT](@) needs one [SAF](@) and one or more [MRG](@)'s in order to function and it will check to make sure the required properties within these files are set. Not being able to load a [SAF](@) or [MRG](@) will cause the program to exit. An invalid entry within an [MRG](@) will not cause the program to be stopped, but will be displayed as a `MRG HELP` item (see [Error Reporting](error-reporting)).
 
 To demonstrate the tool's possibilities, lets imagine the following scenario.
-You are part of a community that wishes to curate their terminologies. You have read up on the [TNO Terminology Design](@) specifications and have constructed a [SAF](@) to fit your needs. The [SAF](@) includes information about the scopes you and your colleagues would want to be able to reference. Inside the written texts of your community, the [basic term ref syntax](specifications#interpretation-of-the-term-ref) has been used to reference terms. All of the used terms are located in a [MRG](@), which is located in the `glossarydir` as defined in the [SAF](@).
+You are part of a community that wishes to curate their terminologies. You have read up on the [TNO Terminology Design](@) specifications and have constructed a [SAF](@) to fit your needs. The [SAF](@) includes information about the scopes you and your colleagues would want to be able to reference. Inside the written texts of your community, the [basic term ref syntax](specifications#interpretation-of-the-term-ref) has been used to reference terms. All of the used terms are located in an [MRG](@), which is located in the `glossarydir` as defined in the [SAF](@).
 The standard converters of the [TRRT](@) do not fit the needs of your community. Your colleagues have already set up a website to display the files and have done some work to streamline existing terms using a custom JavaScript element. The custom element they made looks like this while being used inline:
 
 ```html
@@ -31,7 +31,7 @@ The standard converters of the [TRRT](@) do not fit the needs of your community.
 </term-info>
 ```
 
-Assuming the term 'mishmash' is part of a [MRG](@), and the default scope tag and version tag have been set, mishmash can be referenced by using the syntax `[mishmash](@)`. Running the [TRRT](@) with the following config example should achieve the wanted results. *Pay special attention to the converter.*
+Assuming the term 'mishmash' is part of an [MRG](@), and the default scope tag and version tag have been set, mishmash can be referenced by using the syntax `[mishmash](@)`. Running the [TRRT](@) with the following config example should achieve the wanted results. *Pay special attention to the converter.*
 
 ```yaml title="__tests__/content/config.yaml"
 # TRRT configuration file (yaml)
@@ -97,7 +97,7 @@ The [TRRT](@) CLI outputs information about its execution to the console accordi
   Resolution Report:
         Number of terms converted: 42
     Term Errors:
-  TERM HELP    docs/README.md:3         Match '[TEv2 toolbox](@)' > 'tev2-toolbox@default:latest', could not be matched with a MRG entry
-  TERM HELP    docs/docs/intro.md:7     Match '[TRRG](@)' > 'trrg@default:latest', could not be matched with a MRG entry. Did you mean to reference 'TRRT@default:main'?
-  TERM HELP    docs/docs/intro.md:14    Match '[TNO Terminology Design](@)' > 'tno-terminology-design@default:latest', could not be matched with a MRG entry.
+  TERM HELP    docs/README.md:3         Match '[TEv2 toolbox](@)' > 'tev2-toolbox@default:latest', could not be matched with an MRG entry
+  TERM HELP    docs/docs/intro.md:7     Match '[TRRG](@)' > 'trrg@default:latest', could not be matched with an MRG entry. Did you mean to reference 'TRRT@default:main'?
+  TERM HELP    docs/docs/intro.md:14    Match '[TNO Terminology Design](@)' > 'tno-terminology-design@default:latest', could not be matched with an MRG entry.
   ```

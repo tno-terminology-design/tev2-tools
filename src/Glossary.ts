@@ -167,7 +167,7 @@ export class Glossary {
                         }
                   }
             } catch (err) {
-                  log.error(`E005 An error occurred while attempting to load a MRG at '${mrgURL}':`, err);
+                  log.error(`E005 An error occurred while attempting to load an MRG at '${mrgURL}':`, err);
                   process.exit(1);
             }
       
@@ -175,7 +175,7 @@ export class Glossary {
       }
       
       /**
-       * Finds the index of an entry in a MRG file.
+       * Finds the index of an entry in an MRG file.
        * @returns A promise that resolves to the index of the entry in the MRG file.
        * @param lines The lines of the MRG file.
        * @param entry The entry to find the index of.

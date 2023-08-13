@@ -13,14 +13,14 @@ The supplied converter would result in a [term ref](@) being replaced by an empt
 - ***TERM HELP Term ref '`match`' > '`termRef`', has multiple matching MRG entries. Located in: `source`***<br/>
 The combination of `term`, `scopetag`, and `vsntag` resulted in multiple matching [MRG entries](@) located inside [MRG](@)'s listed at the `source` placeholder. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
 
-- ***TERM HELP Term ref '`match`' > '`termRef`', could not be matched with a MRG entry. Did you mean to reference '`suggestedTermRef`'?***<br/>
+- ***TERM HELP Term ref '`match`' > '`termRef`', could not be matched with an MRG entry. Did you mean to reference '`suggestedTermRef`'?***<br/>
 The combination of `term`, `scopetag`, and `vsntag` resulted in no matching [MRG entry](@) inside the loaded [MRG](@)'s. There is an existing entry that seems similar, which is reported at the `suggestedTermRef` placeholder. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
 
-- ***TERM HELP Term ref '`match`' > '`termRef`', could not be matched with a MRG entry***<br/>
+- ***TERM HELP Term ref '`match`' > '`termRef`', could not be matched with an MRG entry***<br/>
 The combination of `term`, `scopetag`, and `vsntag` resulted in no matching [MRG entry](@) inside the loaded [MRG](@)'s. No similar [MRG entry](@) has been found. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
 
 - ***MRG HELP Invalid entry in MRG at '`mrgURL`' (line `lineNumber`): Missing required property: '`missingProperties`'***<br/>
-A [MRG entry](@) inside the specified [MRG](@) is missing certain properties. The specific [MRG](@), the linenumber that starts the specific [MRG entry](@), and the missing properties are reported as placeholders `mrgURL`, `lineNumber`, and `missingProperties` respectively.
+An [MRG entry](@) inside the specified [MRG](@) is missing certain properties. The specific [MRG](@), the linenumber that starts the specific [MRG entry](@), and the missing properties are reported as placeholders `mrgURL`, `lineNumber`, and `missingProperties` respectively.
 
 ## Error Messages
 
@@ -36,7 +36,7 @@ A required property could not be located in the [MRG](@)'s terminology section a
 - ***ERROR E004 An error occurred while attempting to load the SAF at '`safURL`'***<br/>
 The [TRRT](@) has failed to process the supplied [SAF](@) at `safURL`. Some additional information on the cause of this error should be displayed underneath this message and the program should be stopped.
 
-- ***ERROR E005 An error occurred while attempting to load a MRG at '`mrgURL`'***<br/>
+- ***ERROR E005 An error occurred while attempting to load an MRG at '`mrgURL`'***<br/>
 The [TRRT](@) has failed to process a supplied [MRG](@) at `mrgURL`. Some additional information on the cause of this error should be displayed underneath this message.
 
 - ***ERROR E006 An error occurred while attempting to process the MRG at '`mrgURL`'***<br/>

@@ -152,10 +152,10 @@ export class Resolver {
                         if (overallRating > 0.5) {
                               const bestMatchEntry = glossary.runtime.entries[bestMatchIndices['term']];
                               const suggestedTermRef = `${bestMatchEntry.term}@${bestMatchEntry.scopetag}:${bestMatchEntry.vsntag}`;
-                              const errorMessage = `Term ref '${match[0]}' > '${TermRef}', could not be matched with a MRG entry. Did you mean to reference '${suggestedTermRef}'?`;
+                              const errorMessage = `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry. Did you mean to reference '${suggestedTermRef}'?`;
                               report.termHelp(file, data.substring(0, match.index).split('\n').length, errorMessage);
                         } else {
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with a MRG entry`);
+                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry`);
                         }
                   }
             }
