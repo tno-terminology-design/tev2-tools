@@ -1,7 +1,7 @@
 {
   "name": "@tno-terminology-design/mrgt",
   "version": "1.0.1",
-  "description": "Machine-readable Glossary (generator) tool (MRGT)",
+  "description": "Machine Readable Glossary (Generation Tool (MRGT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
   "bin": {
