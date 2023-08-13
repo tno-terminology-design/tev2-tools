@@ -20,7 +20,7 @@ The requested `safURL` could not be downloaded and the server returned [HTTP sta
 The downloaded [SAF](@) from `safURL` could not be interpreted by the YAML parser. Some additional information on the cause of this error should be displayed underneath this message.
 
 - ***E006 `error`, halting execution as requested by the 'onNotExist' throw option***<br/>
-Something with cause `error` went wrong while handling a [MRG](@). The `onNotExist` parameter value was set to `throw`, so the tool execution was halted.
+Something with cause `error` went wrong while handling an [MRG](@). The `onNotExist` parameter value was set to `throw`, so the tool execution was halted.
 
 - ***ERROR E007 Error creating directory '`dirPath`'***<br/>
 Creating the specified (sub)directory path `dirPath` has failed. Some additional information on the cause of this error should be displayed underneath this message.

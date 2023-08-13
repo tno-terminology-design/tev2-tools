@@ -247,7 +247,7 @@ export class Interpreter {
         }
 
     /**
-     * Finds the index of an entry in a MRG file.
+     * Finds the index of an entry in an MRG file.
      * @returns A promise that resolves to the index of the entry in the MRG file.
      * @param lines The lines of the MRG file.
      * @param entry The entry to find the index of.

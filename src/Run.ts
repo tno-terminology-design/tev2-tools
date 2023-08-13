@@ -21,7 +21,7 @@ program
     .description("The CLI for the MRG Import Tool")
     .option('-c, --config <path>', 'Path (including the filename) of the tool\'s (YAML) configuration file')
     .option('-s, --scopedir <path>', 'Path of the scope directory from which the tool is called')
-    .option('-o, --onNotExist <action>', 'The action in case a MRG file unexpectedly does not exist')
+    .option('-o, --onNotExist <action>', 'The action in case an MRG file unexpectedly does not exist')
     .parse(process.argv);
 
 program.parse();
