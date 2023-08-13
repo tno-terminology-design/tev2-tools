@@ -25,8 +25,8 @@ where:
 
 ## Parameters and Options
 
-| Flags                      | Description | Req'd |
-| :------------------------- | :---------- | :---: |
+| Flags                      | Description | Required |
+| :------------------------- | :---------- | :------: |
 | -c, --config \<path>       | Path (including the filename) of the tool's (YAML) [configuration file](#configuration-file) as an absolute or relative path from where the tool is called. This file contains the key-value pairs to be used. Allowed keys (and the associated values) are documented in this table. Command-line arguments override key-value pairs specified in the [configuration file](#configuration-file). This parameter MUST NOT appear in the [configuration file](#configuration-file) itself. |   n   |
 | -s, --scopedir \<path>     | Path of the [scope directory](@) from which the tool is called. It MUST contain the [SAF](@) for that [scope](@), which we will refer to as the 'own scope' for the [MRG Import Tool](@). |   Y   |
 | -o, --onNotExist \<action> | Specifies the action (i.e., throw, warn, log or ignore) to take in case a [MRG](@) file that was expected to exist, does not exist. Default is `throw`. |  n   |
