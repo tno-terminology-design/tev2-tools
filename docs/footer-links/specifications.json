@@ -1,0 +1,7 @@
+{   "title": "TEv2 Specifications",
+    "items": [
+        { "label": "Files",    "href": "https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-spec-files" },
+        { "label": "Syntaxes", "href": "https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-syntax" },
+        { "label": "Toolbox",  "href": "https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-toolbox" }
+    ]
+}

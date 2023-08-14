@@ -1,8 +1,11 @@
-// @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
-
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+
+const terminology_design = require('./footer-links/terminology-design.json');
+const manuals = require('./footer-links/manuals.json');
+const specifications = require('./footer-links/specifications.json');
+const repositories = require('./footer-links/repositories.json');
+const copyright = require('./footer-links/copyright.json');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -83,53 +86,13 @@ const config = {
       footer: {
         style: 'dark',
         links: [
-          {
-            title: 'Toolbox Repositories',
-            items: [
-              { label: 'TRRT',  href: 'https://github.com/tno-terminology-design/trrt' },
-              { label: 'MRGT',  href: 'https://github.com/tno-terminology-design/mrgt' },
-              { label: 'MRG importer',  href: 'https://github.com/tno-terminology-design/mrg-import' },
-            ],
-          },
-          {
-            title: 'Terminology Design',
-            items: [
-              { label: 'Introduction',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/terminology-design/overview' },
-              { label: 'Methods',       href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/terminology-design/methods' },
-              { label: 'Github', href: 'https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs/terms' },
-            ],
-          },
-          {
-            title: 'TEv2 User Manuals',
-            items: [
-              { label: 'Curators',      href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/curator' },
-              { label: 'Contributors',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/contributor' },
-              { label: 'Authors',       href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/author' },
-              // { label: 'Github', href: 'https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs/terms' },
-            ],
-          },
-          {
-            title: 'TEv2 Specifications',
-            items: [
-              { label: 'Files',     href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-spec-files' },
-              { label: 'Syntaxes',  href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-syntax' },
-              { label: 'Toolbox',   href: 'https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-toolbox' },
-              { label: 'Github', href: 'https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs/terms' },
-            ],
-          },
+          { title: terminology_design.title, items: terminology_design.items },
+          { title: manuals.title, items: manuals.items },
+          { title: specifications.title, items: specifications.items, },
+          { title: repositories.title, items: repositories.items },
         ],
-        copyright: `<p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/">
-                    <span property="dct:title">The TNO Terminology Design texts in this website</span> are licensed under
-                    <a href="http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">
-                    CC BY-SA 4.0
-                      <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"
-                             src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1">
-                      <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"
-                             src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1">
-                      <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"
-                             src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1">
-                    </a>.&nbsp&nbsp(Copyright © 2022-${new Date().getFullYear()} by <span property="cc:attributionName">TNO</span>).</p>`
-      },
+        copyright: copyright.text.replace("[20XX-20YY]",`2022-${new Date().getFullYear()}`)
+      }, 
       prism: {
         additionalLanguages: ['handlebars', 'regex', 'bash'],
       },
