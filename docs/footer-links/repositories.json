@@ -1,0 +1,7 @@
+{   "title": "TEv2 Tool Repo's",
+    "items": [
+        { "label": "MRGT",         "href": "https://github.com/trustoverip/ctwg-toolkit-mrg" },
+        { "label": "MRG Importer", "href": "https://github.com/tno-terminology-design/mrg-import" },
+        { "label": "TRRT",         "href": "https://github.com/tno-terminology-design/trrt" }
+    ]
+}
