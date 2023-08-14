@@ -62,9 +62,9 @@ async function main(): Promise<void> {
       }
 
       // Check if required options are provided
-      if (!options.output || !options.scopedir) {
+      if (!options.output || !options.scopedir || !options.input) {
             program.addHelpText('after', '\nRequired options are missing\n' +
-            'Provide at least the following options: --output <path>, --scopedir <path>');
+            'Provide at least the following options: output <path>, scopedir <path> and input <globpattern>\n');
             program.help();
             process.exit(1);
       
