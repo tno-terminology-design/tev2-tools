@@ -39,7 +39,7 @@ export class Interpreter {
 
     public constructor({ scopedir }: { scopedir: string }) {
         this.scopedir = scopedir;
-
+        this.TuC = [] as Entry[];
         this.saf = this.getSafMap(path.join(this.scopedir, 'saf.yaml'));
     }
 
@@ -105,7 +105,7 @@ export class Interpreter {
     
 
     private getCtextMap(): void {
-        const curatedir = path.join(this.saf.scope.scopedir, this.saf.scope.curatedir);
+        const curatedir = path.join(this.scopedir, this.saf.scope.curatedir);
 
         // Get all the curated texts from the curatedir
         let curatedirContent = fs.readdirSync(curatedir);
@@ -117,12 +117,15 @@ export class Interpreter {
         ctexts.forEach(ctext => {
             let ctextPath = path.join(curatedir, ctext);
             let ctextContent = fs.readFileSync(ctextPath, 'utf8');
-            let ctextYAML = yaml.load(ctextContent) as Entry;
 
+            const [_, frontmatter, body] = ctextContent.split('---\n', 3);
+
+            let ctextYAML = yaml.load(frontmatter) as Entry;
+            
             // TODO: Check if another body is refered to that should be used instead
 
             // Extract heading IDs from markdown content
-            let headingIds = this.extractHeadingIds(ctextContent);
+            let headingIds = this.extractHeadingIds(body);
 
             // remove properties that match specific set of predetermined properties
             Object.keys(ctextYAML).forEach(key => {
@@ -142,19 +145,23 @@ export class Interpreter {
     private addMrgEntry(instruction: string): void {
         const parts = instruction.split(/\s+/); // Split instruction into parts
         const action = parts.shift(); // Extract the action (e.g., 'terms', 'tags', '*')
-        if (action === 'terms') {
+        if (action?.startsWith('terms')) {
             // Process terms instruction
             const termList = parts[0].slice(1, -1).split(','); // Extract term list
             const scopeVersion = parts[1]?.split(':'); // Extract scope and version
             // Logic to retrieve and add MRG entries based on terms
-        } else if (action === 'tags') {
+        } else if (action?.startsWith('tags')) {
             // Process tags instruction
             const tagList = parts[0].slice(1, -1).split(','); // Extract tag list
             const scopeVersion = parts[1]?.split(':'); // Extract scope and version
             // Logic to retrieve and add MRG entries based on tags
-        } else if (action === '*') {
+        } else if (action?.startsWith('*')) {
             // Process wildcard instruction
-            const scope = parts[0]?.slice(1) || 'current-scope'; // Extract scope
+            const scopetag = parts[0]?.slice(1); // Extract scope
+            if (!scopetag || scopetag === this.saf.scope.scopetag) {
+                // Add all curated texts from the scope to the terminology under construction
+                this.getCtextMap();
+            }
             // Logic to retrieve and add all MRG entries from the scope
         }
     }
@@ -162,12 +169,12 @@ export class Interpreter {
 
     private removeMrgEntry(instruction: string): void {
         const parts = instruction.split(/\s+/); // Split instruction into parts
-        const action = parts.shift(); // Extract the action (e.g., '-tags', '-terms')
-        if (action === '-tags') {
+        const action = parts.shift(); // Extract the action (e.g., 'tags', 'terms')
+        if (action === 'tags') {
             // Process -tags instruction
             const tagList = parts[0].slice(1, -1).split(','); // Extract tag list
             // Logic to remove MRG entries based on tags
-        } else if (action === '-terms') {
+        } else if (action === 'terms') {
             // Process -terms instruction
             const termList = parts[0].slice(1, -1).split(','); // Extract term list
             // Logic to remove MRG entries based on terms

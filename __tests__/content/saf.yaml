@@ -1,0 +1,55 @@
+#
+# This is a Scope Administration File that can be used in conjunction with [Terminology Engine v2](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2-overview).
+#
+# The first section defines meta-data concerning the scope itself, both for technical use and human use.
+# It shows where directories and files live that ar part of the scope, and also
+# ways in which people can contribute, raise issues, see what's going on, discuss, etc.
+#
+scope:
+  scopetag: tev2 # identifier that curators have determined for this terminology
+  scopedir: https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs  # URL of the scope-directory
+  curatedir: terms # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
+  glossarydir: glossaries # directory where all glossary files and GDFs are located. Full URL is `scopedir`/`glossarydir`
+  website: https://tno-terminology-design.github.io/tev2-specifications/docs # base URL for creating links to rendered versions of Curated Texts. It should also serve as the home page of the Tterminology.
+  navpath: /terms # Path to the directory where Curated Texts are rendered. What `curatedir` is for Curated Texts is, `navpath` is for the rendered versions of Curated Texts.
+  defaultvsn: terms # vsntag that identifies the default terminology. MRG is located at `scopedir`/`glossarydir`/mrg.tev2.latest.yaml
+  license: LICENSE.md # file that contains the (default) licensing conditions. Full URL is `scopedir`/`license`
+  statuses: [ proposed, approved, deprecated ] # list of status tags that are defined for terminological artifacts in this scope
+  issues: https://github.com/tno-terminology-design/tev2-specifications/issues # URL where issues can be raised and handled
+  curators: # contacting individual curators
+  - name: RieksJ
+    email: # we split up the email address to reduce the likelihood of the address being harvested for spamming
+      id: rieks.joosten
+      at: tno.nl
+#
+# The second section contains a mapping between scopetags that are used within the scope, and the associated scopedirs.
+# This enables tools to find the [SAF](@) of these [scopes](@), and from there all other directories, files etc.
+# that live within them, e.g. to use/import their data.
+#
+scopes:  #
+- scopetag: essiflab # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
+  scopedir: https://github.com/tno-terminology-design/tev2-specifications/docs/tree/master/docs # URL of the scope-directory
+- scopetag: ctwg # definition of (scope)tag(s) that are used within this scope to refer to a specific terminology
+  scopedir: https://github.com/trustoverip/ctwg # URL of the scope-directory
+#
+# The third section specifies the versions that are actively maintained by the curators.
+# For each version, the set of terms is selected that constitute the terminology.
+# See the Glossary Generation Tool (GGT) for details about the syntax and semantics.
+#
+versions:
+- vsntag: terms # this version contains all terms that are curated within this scope
+  altvsntags: [ latest ] # alternative verstiontags
+  termselcrit:
+  - "*@tev2" # import all tev2 terms.
+- vsntag: test # this version MUST only be used for testing the MRG generator
+  altvsntags: # alternative verstiontags
+    - firstAltVsnTag
+    - secondAltVsnTag
+  termselcrit:
+    - "tags[management]@essif-lab" # import all terms from the mrg of `essif-lab:latest` that have grouptag `management`.
+    - "termids[party,community]@essif-lab:0.9.4" # import the terms `party` and `community` from the mrg of `essif-lab:0.9.4`.
+    - "-tags[terminology]" # remove all terms tagged with the grouptag `terminology`
+    - "*@tev2" # import all terms defined in the scope `tev2`
+  status: proposed
+  from: 20220312
+  to:
