@@ -19,8 +19,8 @@ The combination of `term`, `scopetag`, and `vsntag` resulted in no matching [MRG
 - ***TERM HELP Term ref '`match`' > '`termRef`', could not be matched with an MRG entry***<br/>
 The combination of `term`, `scopetag`, and `vsntag` resulted in no matching [MRG entry](@) inside the loaded [MRG](@)'s. No similar [MRG entry](@) has been found. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
 
-- ***MRG HELP Invalid entry in MRG at '`mrgURL`' (line `lineNumber`): Missing required property: '`missingProperties`'***<br/>
-An [MRG entry](@) inside the specified [MRG](@) is missing certain properties. The specific [MRG](@), the linenumber that starts the specific [MRG entry](@), and the missing properties are reported as placeholders `mrgURL`, `lineNumber`, and `missingProperties` respectively.
+- ***MRG HELP MRG entry missing required property: '`missingProperties`'. Entry starts with values `reference`***<br/>
+An [MRG entry](@) inside the specified [MRG](@) is missing certain properties. The missing properties are reported as placeholder `missingProperties`. The first three key-value pairs of the entry causing the help message are reported as placeholder `reference`.
 
 ## Error Messages
 

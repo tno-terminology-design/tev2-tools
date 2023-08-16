@@ -62,7 +62,11 @@ class Report {
       }
 
       private formatMessage(type: string, file: string, line: number, message: string) {
-            let locator = `${file}:${line}`;
+            let locator = `${file}`;
+            if (line > -1) {
+                  locator += `:${line}`;
+            }
+
             if (locator.length > 50) {
                   locator = `...${locator.slice(-(50 - 5))}`;
             }
