@@ -154,6 +154,11 @@ export class Glossary {
                   const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
       
                   for (const entry of (await mrg).entries) {
+                        // use vsntag from MRG if its missing in entry
+                        if (!entry.vsntag) {
+                              entry.vsntag = terminology.vsntag;
+                        }
+
                         // Check for missing required properties in MRG entries
                         const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
       
