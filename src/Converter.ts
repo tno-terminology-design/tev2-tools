@@ -77,11 +77,13 @@ export class Converter {
       }
 
       convert(entry: Entry, term: Map<string, string>): string {
+            let termObject = Object.fromEntries(term);
+
             // Evaluate the properties inside the entry object
             const evaluatedEntry: AnyObject = {};
             for (const [key, value] of Object.entries(entry)) {
                   if (typeof value === 'string') {
-                        evaluatedEntry[key] = this.evaluateExpressions(value, { ...entry, ...Object.fromEntries(term) });
+                        evaluatedEntry[key] = this.evaluateExpressions(value, { ...entry, termObject });
                   } else {
                         evaluatedEntry[key] = value;
                   }
@@ -89,7 +91,7 @@ export class Converter {
 
             const template = Handlebars.compile(this.template, {noEscape: true, compat: true});
 
-            return template(evaluatedEntry);
+            return template({ ...evaluatedEntry, ...termObject });
       }
 
       getType(): string {
