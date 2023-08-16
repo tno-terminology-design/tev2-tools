@@ -13,6 +13,7 @@ export interface SAF {
 
 interface Scope {
     website: string;
+    navpath: string;
     scopetag: string;
     scopedir: string;
     curatedir: string;
@@ -135,7 +136,7 @@ export class Interpreter {
             });
             ctextYAML.scopetag = this.saf.scope.scopetag;
             ctextYAML.locator = ctext;
-            // ctextYAML.navurl = path.join(this.saf.scope.scopetag, ctext); // TODO: Check if this is needed
+            ctextYAML.navurl = path.join(this.saf.scope.website, this.saf.scope.navpath, path.parse(ctext).name);
             ctextYAML.headingids = headingIds;
 
             this.TuC.push(ctextYAML);
