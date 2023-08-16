@@ -149,7 +149,7 @@ export class Resolver {
 
                         overallRating /= properties.length;
 
-                        if (overallRating > 0.5) {
+                        if (overallRating > 0.8) {
                               const bestMatchEntry = glossary.runtime.entries[bestMatchIndices['term']];
                               const suggestedTermRef = `${bestMatchEntry.term}@${bestMatchEntry.scopetag}:${bestMatchEntry.vsntag}`;
                               const errorMessage = `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry. Did you mean to reference '${suggestedTermRef}'?`;
