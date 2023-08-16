@@ -12,46 +12,8 @@ export class Converter {
       public constructor({ template }: { template: any }) {
             const map: { [key: string]: string } = {
                   html: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>',
-                  essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText}}">{{showtext}}</a>',
+                  essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>',
                   markdown: '[{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})',
-            };
-
-            function noRefsHelper(text: string) {
-                  // Then the resulting text is scanned for termrefs, and any termref that appears in the contents
-                  // of the resulting text shall be replaced with the text that consists of the same words as the 
-                  // of the termref, where the first character of every word is made uppercase and the other characters remain untouched.
-                  let matches: RegExpMatchArray[] = Array.from(text.matchAll(interpreter!.getRegex()));
-
-                  if (matches.length > 0) {
-                        // Iterate over each match found in the text string
-                        for (const match of matches) {
-                              const termProperties: Map<string, string> = interpreter!.interpret(match);
-                  
-                              if (termProperties.get("showtext")) {
-                                    // replace the match with the showtext property and make the first letter capitalized
-                                    text = text.replace(match[0], capFirstHelper(termProperties.get("showtext")!));
-                              }
-                        }
-                  }
-
-                  return text;
-            }
-
-            function capFirstHelper(text: string) {
-                  // The first character of every word separated by spaces will be capitalized
-                  const words = text.split(' ');
-                  const capitalizedWords = words.map((word) =>
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                  );
-                  return capitalizedWords.join(' ');
-            }
-
-            function ifValueHelper(this: any, conditional: any, options: any) {
-                  if (conditional == options.hash.equals) {
-                      return options.fn(this);
-                  } else {
-                      return options.inverse(this);
-                  }
             };
 
             Handlebars.registerHelper('noRefs', noRefsHelper);
@@ -70,12 +32,6 @@ export class Converter {
             }
       }
 
-      // Helper function to evaluate expressions inside properties
-      private evaluateExpressions(input: string, data: AnyObject): string {
-            const template = Handlebars.compile(input, {noEscape: true, compat: true});
-            return template(data);
-      }
-
       convert(entry: Entry, term: Map<string, string>): string {
             let termObject = Object.fromEntries(term);
 
@@ -83,7 +39,7 @@ export class Converter {
             const evaluatedEntry: AnyObject = {};
             for (const [key, value] of Object.entries(entry)) {
                   if (typeof value === 'string') {
-                        evaluatedEntry[key] = this.evaluateExpressions(value, { ...entry, termObject });
+                        evaluatedEntry[key] = evaluateExpressions(value, { ...entry, termObject });
                   } else {
                         evaluatedEntry[key] = value;
                   }
@@ -97,4 +53,74 @@ export class Converter {
       getType(): string {
             return this.type;
       }
+}
+
+function noRefsHelper(this: any, text: string, options: any) {
+      let type = ['interpreter']
+      if (options.hash.type !== undefined) {
+            type = options.hash.type.split(',');
+            for (let i = 0; i < type.length; i++) {
+                  type[i] = type[i].trim().toLowerCase();
+            }
+      }
+
+      if (options.hash.regex) {
+            // TODO: implement support for regexing out any references
+      }
+
+      let regex: RegExp;
+
+      type.forEach((element: string) => {
+            // switch on element to determine which interpreter to use
+            switch (element) {
+                  case 'interpreter':
+                        regex = interpreter!.getRegex();
+                        break;
+                  case 'html':
+                        regex = new RegExp(/<a\b[^>]*?>(?<showtext>.*?)<\/a>/, 'g');
+                        break;
+                  case 'markdown':
+                        regex = new RegExp(/\[(?<showtext>[^\]]+)\]\((?:[^)]+)\)/, 'g');
+                        break;
+            }
+
+            let matches = Array.from(text.matchAll(regex)) as RegExpMatchArray[];
+
+            if (matches.length > 0) {
+                  // Iterate over each match found in the text string
+                  for (const match of matches) {
+                        const termProperties: Map<string, string> = interpreter!.interpret(match);
+            
+                        if (termProperties.get("showtext")) {
+                              // replace the match with the showtext property and make the first letter(s) capitalized
+                              text = text.replace(match[0], capFirstHelper(termProperties.get("showtext")!));
+                        }
+                  }
+            }
+      });
+
+      return text;
+}
+
+function capFirstHelper(text: string) {
+      // The first character of every word separated by spaces will be capitalized
+      const words = text.split(' ');
+      const capitalizedWords = words.map((word) =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+      );
+      return capitalizedWords.join(' ');
+}
+
+function ifValueHelper(this: any, conditional: any, options: any) {
+      if (conditional == options.hash.equals) {
+          return options.fn(this);
+      } else {
+          return options.inverse(this);
+      }
+};
+
+// Helper function to evaluate expressions inside properties
+function evaluateExpressions(input: string, data: AnyObject): string {
+      const template = Handlebars.compile(input, {noEscape: true, compat: true});
+      return template(data);
 }
