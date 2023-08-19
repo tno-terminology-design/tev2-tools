@@ -204,14 +204,21 @@ export class Glossary {
                         };
             
                         this.runtime.entries.push(glossaryEntry);
-            
+                        const uniqueAlternatives = new Set();
+
                         for (const alternative of modifiedAlternatives) {
                               if (alternative === entry.term) {
                                     continue;
                               }
-                              const altEntry: Entry = { ...glossaryEntry, term: alternative };
-                              this.runtime.entries.push(altEntry);
+
+                              // Check if the alternative is already in the set
+                              if (!uniqueAlternatives.has(alternative)) {
+                                    uniqueAlternatives.add(alternative); // Add it to the set
+                                    const altEntry: Entry = { ...glossaryEntry, term: alternative };
+                                    this.runtime.entries.push(altEntry);
+                              }
                         }
+
                   }
             } catch (err) {
                   log.error(`E006 An error occurred while attempting to process the MRG at '${filename}':`, err);
