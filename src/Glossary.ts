@@ -183,8 +183,8 @@ export class Glossary {
             
                   const regexMap: { [key: string]: string[] } = {
                         "{ss}": ["", "s"],
-                        "{yies}": ["ys", "ies"],
-                        "{ying}": ["ier", "ying", "ies", "ied"],
+                        "{yies}": ["y", "ys", "ies"],
+                        "{ying}": ["y", "ier", "ying", "ies", "ied"],
                   };
             
                   for (const entry of mrgEntries) {
