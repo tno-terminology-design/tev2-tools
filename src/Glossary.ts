@@ -203,8 +203,6 @@ export class Glossary {
                         };
             
                         this.runtime.entries.push(glossaryEntry);
-
-                        console.log(modifiedAlternatives)
             
                         for (const alternative of modifiedAlternatives.filter(s => !s.includes("{"))) {
                               const altEntry: Entry = { ...glossaryEntry, term: alternative };
