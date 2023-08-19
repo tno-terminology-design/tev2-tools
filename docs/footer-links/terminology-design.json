@@ -1,6 +1,6 @@
 {   "title": "Terminology Design",
     "items": [
-        { "label": "Introduction",  "href": "https://tno-terminology-design.github.io/terminology-design/docs/overview" },
-        { "label": "Methods",       "href": "https://tno-terminology-design.github.io/terminology-design/docs/methods" }
+        { "label": "Introduction",  "href": "https://tno-terminology-design.github.io/design-methods/docs/overview" },
+        { "label": "Methods",       "href": "https://tno-terminology-design.github.io/design-methods/docs/methods" }
     ]
 }
