@@ -86,7 +86,7 @@ export class Glossary {
                   // Get the MRG map of the MRG file
                   const mrg = await this.getMrgMap(mrgfile);
                   // Populate the runtime glossary with the MRG entries
-                  if (this.runtime.entries.length > 0) {
+                  if (mrg.entries.length > 0) {
                         await this.populateRuntime(mrg, mrgfile);
                   }
             
@@ -205,7 +205,10 @@ export class Glossary {
             
                         this.runtime.entries.push(glossaryEntry);
             
-                        for (const alternative of modifiedAlternatives.filter(s => !s.includes("{"))) {
+                        for (const alternative of modifiedAlternatives) {
+                              if (alternative === entry.term) {
+                                    continue;
+                              }
                               const altEntry: Entry = { ...glossaryEntry, term: alternative };
                               this.runtime.entries.push(altEntry);
                         }
