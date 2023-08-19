@@ -80,22 +80,14 @@ export class Glossary {
        * Initializes the glossary by populating the runtime glossary.
        * @returns A promise that resolves to the populated runtime glossary.
        */
-      public async initialize() {
-            // Find all mrgfiles in the glossarydir
+      public async initialize(mrgFileName: string): Promise<Output> {
             let glossarydir = path.join(this.scopedir, this.saf.scope.glossarydir);
-            let mrgfiles = await glob(path.join(glossarydir, 'mrg.*.*.yaml'));
+            let mrgfile = path.join(glossarydir, mrgFileName);
 
-            if (mrgfiles.length < 1) {
-                  log.error(`E001 No MRG files found in the glossary directory '${glossarydir}'`);
-                  process.exit(1);
-            }
-
-            // Get the MRG map of each MRG file
-            for (const mrgfile of mrgfiles) {
+            // Get the MRG map of the MRG file
                   const mrg = await this.getMrgMap(mrgfile);
                   // Populate the runtime glossary with the MRG entries
                   await this.populateRuntime(mrg, mrgfile);
-            }
             
             return this.runtime;
       }
@@ -154,10 +146,10 @@ export class Glossary {
                   const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
       
                   for (const entry of (await mrg).entries) {
-                        // use vsntag from MRG if its missing in entry
-                        if (!entry.vsntag) {
-                              entry.vsntag = terminology.vsntag;
-                        }
+                        // add vsntag, scopetag, and altvsntags from MRG to MRG entries
+                        entry.vsntag = terminology.vsntag;
+                        entry.scopetag = terminology.scopetag;
+                        entry.altvsntags = terminology.altvsntags
 
                         // Check for missing required properties in MRG entries
                         const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
@@ -168,14 +160,11 @@ export class Glossary {
 
                               const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`;
                               report.mrgHelp(mrgURL, -1, errorMessage);
-      
-                              // Remove the invalid entry from the MRG entries
-                              (await mrg).entries.splice((await mrg).entries.indexOf(entry), 1);
                         }
                   }
             } catch (err) {
                   log.error(`E005 An error occurred while attempting to load an MRG at '${mrgURL}':`, err);
-                  process.exit(1);
+                  // process.exit(1);
             }
       
             return mrg;
@@ -183,51 +172,41 @@ export class Glossary {
 
       /**
        * Populates the runtime glossary by processing MRG entries.
+       * @param mrg - The MRG (Machine Readable Glossary) map.
+       * @param filename - The filename of the MRG being processed.
        * @returns A promise that resolves to the populated runtime glossary.
        */
       public async populateRuntime(mrg: MRG, filename: string): Promise<Output> {
             try {
                   const mrgEntries = mrg.entries;
-
+            
+                  const regexMap: { [key: string]: string[] } = {
+                        "{ss}": ["", "s"],
+                        "{yies}": ["ys", "ies"],
+                        "{ying}": ["ier", "ying", "ies", "ied"],
+                  };
+            
                   for (const entry of mrgEntries) {
-                        // Split the formPhrases string into the forms and trim each form, or set it as an empty list
                         const alternatives = entry.formPhrases ? entry.formPhrases.split(",").map(t => t.trim()) : [];
-
-                        // Mapping of macro placeholders to their corresponding replacements
-                        const regexMap: { [key: string]: string[] } = {
-                              "{ss}": ["s"],
-                              "{yies}": ["ys", "ies"],
-                              "{ying}": ["ier", "ying", "ies", "ied"],
-                        };
-
-                        // For each alternative, check if it contains a macro
+            
+                        const modifiedAlternatives = [];
+            
                         for (const alternative of alternatives) {
-                              const match = alternative.match(/\{(ss|yies|ying)}/);
-                              if (match) {
-                                    const macro = match[0];
-                                    const replacements = regexMap[macro];
-                                    if (replacements) {
-                                          // Replace the macro with each possible replacement and add the new alternative to the alternatives array
-                                          for (const replacement of replacements) {
-                                                alternatives.push(alternative.replace(match[0], replacement));
-                                          }
-                                    }
-                              }
+                              const generatedAlternatives = applyMacroReplacements(alternative, regexMap);
+                              modifiedAlternatives.push(...generatedAlternatives);
                         }
-
-                        // add altvsntag to entry based on `altvsntags` property in the MRG file
-                        // TODO: maybe only if entry.scopetag equals mrg.terminology.scopetag (same for resolved navurl), or do this in the MRGT?
+            
                         const glossaryEntry: Entry = {
                               ...entry,
                               altvsntags: mrg.terminology.altvsntags,
                               source: filename,
                         };
-
-                        // Add the original entry to the glossary
+            
                         this.runtime.entries.push(glossaryEntry);
 
-                        // Add entries of the alternative forms to the glossary
-                        for (const alternative of alternatives.filter(s => !s.includes("{"))) {
+                        console.log(modifiedAlternatives)
+            
+                        for (const alternative of modifiedAlternatives.filter(s => !s.includes("{"))) {
                               const altEntry: Entry = { ...glossaryEntry, term: alternative };
                               this.runtime.entries.push(altEntry);
                         }
@@ -239,3 +218,35 @@ export class Glossary {
             }
       }
 }
+
+/**
+ * Apply macro replacements to the given input using the provided regexMap.
+ * @param input - The input string containing macros.
+ * @param regexMap - A map of macros and their possible replacements.
+ * @returns An array of strings with all possible alternatives after macro replacements.
+ */
+function applyMacroReplacements(input: string, regexMap: { [key: string]: string[] }): string[] {
+      const match = input.match(/\{(\w+)}/);
+  
+      if (!match) {
+            return [input];
+      }
+  
+      const macroKey = match[1];
+      const replacements = regexMap[`{${macroKey}}`] || [];
+  
+      const prefix = input.substring(0, match.index);
+      const suffix = input.substring(match.index! + match[0].length);
+  
+      const result: string[] = [];
+  
+      for (const replacement of replacements) {
+            const newAlternative = prefix + replacement + suffix;
+            result.push(...applyMacroReplacements(newAlternative, regexMap));
+      }
+  
+      return result;
+}
+  
+  
+  

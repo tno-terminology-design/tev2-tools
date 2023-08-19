@@ -86,7 +86,16 @@ export class Resolver {
                         termProperties.set("vsntag", (glossary.saf).scope.defaultvsn);
                   }
 
-                  // Find the matching entry in the glossary based on the term, scopetag and vsntag
+                  // If the term scopetag and vsntag combination has no matching entry in the runtime glossary, try and initialize a new MRG
+                  if (glossary.runtime.entries.filter(entry =>
+                        entry.scopetag === termProperties.get("scopetag")! &&
+                        (entry.vsntag === termProperties.get("vsntag")! ||
+                        entry.altvsntags?.includes(termProperties.get("vsntag")!))
+                  ).length === 0) {
+                        await(glossary.initialize(`mrg.${termProperties.get("scopetag")!}.${termProperties.get("vsntag")!}.yaml`));
+                  }
+
+                  // Find the matching entry in the runtime glossary based on the term, scopetag and vsntag
                   let matchingEntries = glossary.runtime.entries.filter(entry =>
                         entry.term === termProperties.get("term")! &&
                         entry.scopetag === termProperties.get("scopetag")! &&
@@ -129,27 +138,27 @@ export class Resolver {
                         let bestMatchIndices: { [key: string]: number } = {};
 
                         properties.forEach(prop => {
-                        const propertyValue = termProperties.get(prop) || '';
-                        const propertyMatches = glossary.runtime.entries.map(entry => entry[prop] || '');
+                              const propertyValue = termProperties.get(prop) || '';
+                              const propertyMatches = glossary.runtime.entries.map(entry => entry[prop] || '');
 
-                        let bestMatchIndex = -1;
-                        let bestMatchScore = -1;
+                              let bestMatchIndex = -1;
+                              let bestMatchScore = -1;
 
-                        propertyMatches.forEach((match, index) => {
-                        const similarityScore = leven(propertyValue, match);
-                        if (similarityScore > bestMatchScore) {
-                              bestMatchScore = similarityScore;
-                              bestMatchIndex = index;
-                        }
-                        });
+                              propertyMatches.forEach((match, index) => {
+                              const similarityScore = leven(propertyValue, match);
+                              if (similarityScore > bestMatchScore) {
+                                    bestMatchScore = similarityScore;
+                                    bestMatchIndex = index;
+                              }
+                              });
 
-                        overallRating += bestMatchScore;
-                        bestMatchIndices[prop] = bestMatchIndex;
+                              overallRating += bestMatchScore;
+                              bestMatchIndices[prop] = bestMatchIndex;
                         });
 
                         overallRating /= properties.length;
 
-                        if (overallRating > 0.8) {
+                        if (overallRating > 0.9) {
                               const bestMatchEntry = glossary.runtime.entries[bestMatchIndices['term']];
                               const suggestedTermRef = `${bestMatchEntry.term}@${bestMatchEntry.scopetag}:${bestMatchEntry.vsntag}`;
                               const errorMessage = `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry. Did you mean to reference '${suggestedTermRef}'?`;
@@ -166,9 +175,6 @@ export class Resolver {
        * Resolves and converts files in the specified input path.
        */
       public async resolve(): Promise<boolean> {
-            // Initialize the runtime glossary
-            await(glossary.initialize());
-
             // Log information about the interpreter, converter and the files being read
             log.info(`Using interpreter '${interpreter.getType()}' and converter '${converter.getType()}'`)
             log.info(`Reading files using pattern string '${this.globPattern}'`);
