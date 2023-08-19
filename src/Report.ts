@@ -47,18 +47,29 @@ class Report {
             console.log(" Resolution Report:");
             console.log("       \x1b[0mNumber of terms converted: " + this.converted.items.length);
 
-            if (this.Errors.items.length > 0) {
-                  console.log("   \x1b[1;37mMain Errors:\x1b[0m");
-                  for (let item of this.Errors.items) {
-                        console.log(item.message);
-                  }
-            }
             if (this.termErrors.items.length > 0) {
                   console.log("   \x1b[1;37mTerm Errors:\x1b[0m");
                   for (let item of this.termErrors.items) {
                         console.log(item.message);
                   }
             }
+            if (this.Errors.items.length > 0) {
+                  console.log("   \x1b[1;37mMain Errors:\x1b[0m");
+              
+                  // Use a Set to store unique error messages
+                  const uniqueErrorMessages = new Set();
+              
+                  for (const item of this.Errors.items) {
+                      uniqueErrorMessages.add(item.message); // Add error message to the set
+                  }
+              
+                  // Convert the set back to an array and display the unique error messages
+                  const uniqueErrorsArray = Array.from(uniqueErrorMessages);
+                  for (const message of uniqueErrorsArray) {
+                      console.log(message);
+                  }
+              }
+              
       }
 
       private formatMessage(type: string, file: string, line: number, message: string) {

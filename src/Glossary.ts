@@ -1,5 +1,4 @@
 import { log, report } from './Report.js';
-import { glob } from 'glob';
 
 import fs = require("fs");
 import path = require('path');
@@ -84,10 +83,12 @@ export class Glossary {
             let glossarydir = path.join(this.scopedir, this.saf.scope.glossarydir);
             let mrgfile = path.join(glossarydir, mrgFileName);
 
-            // Get the MRG map of the MRG file
+                  // Get the MRG map of the MRG file
                   const mrg = await this.getMrgMap(mrgfile);
                   // Populate the runtime glossary with the MRG entries
-                  await this.populateRuntime(mrg, mrgfile);
+                  if (this.runtime.entries.length > 0) {
+                        await this.populateRuntime(mrg, mrgfile);
+                  }
             
             return this.runtime;
       }
@@ -163,8 +164,8 @@ export class Glossary {
                         }
                   }
             } catch (err) {
-                  log.error(`E005 An error occurred while attempting to load an MRG at '${mrgURL}':`, err);
-                  // process.exit(1);
+                  const errorMessage = `E005 An error occurred while attempting to load an MRG at '${mrgURL}': ${err}`;
+                  report.mrgHelp(mrgURL, -1, errorMessage);
             }
       
             return mrg;
@@ -211,11 +212,13 @@ export class Glossary {
                   }
             } catch (err) {
                   log.error(`E006 An error occurred while attempting to process the MRG at '${filename}':`, err);
+                  throw err;
             } finally {
                   return this.runtime;
             }
       }
 }
+
 
 /**
  * Apply macro replacements to the given input using the provided regexMap.
@@ -245,6 +248,3 @@ function applyMacroReplacements(input: string, regexMap: { [key: string]: string
   
       return result;
 }
-  
-  
-  
