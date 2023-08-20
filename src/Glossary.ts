@@ -86,7 +86,7 @@ export class Glossary {
                   // Get the MRG map of the MRG file
                   const mrg = await this.getMrgMap(mrgfile);
                   // Populate the runtime glossary with the MRG entries
-                  if (mrg.entries.length > 0) {
+                  if (mrg.entries) {
                         await this.populateRuntime(mrg, mrgfile);
                   }
             
@@ -164,7 +164,7 @@ export class Glossary {
                         }
                   }
             } catch (err) {
-                  const errorMessage = `E005 An error occurred while attempting to load an MRG at '${mrgURL}': ${err}`;
+                  const errorMessage = `E005 An error occurred while attempting to load an MRG: ${err}`;
                   report.mrgHelp(mrgURL, -1, errorMessage);
             }
       
