@@ -66,10 +66,8 @@ export class Resolver {
        */
       private async interpretAndConvert(file: string, data: string): Promise<string | undefined> {
             let matches: RegExpMatchArray[] = Array.from(data.matchAll(interpreter!.getRegex()));
-            if (matches.length < 1) {
-                  return undefined;
-            }
 
+            let converted = 0;
             let lastIndex = 0;
       
             // Iterate over each match found in the data string
@@ -123,7 +121,9 @@ export class Resolver {
                               lastIndex += replacement.length - matchLength;
 
                               // Log the converted term
+
                               report.termConverted(entry.term!);
+                              converted++;
                         } else {
                               report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', resulted in an empty string, check the converter`);
                         }
@@ -168,7 +168,11 @@ export class Resolver {
                         }
                   }
             }
-            return data;
+            if (converted > 0) {
+                  return data;
+            } else {
+                  return undefined;
+            }
       }
 
       /**
