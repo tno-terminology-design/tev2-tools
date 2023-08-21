@@ -214,7 +214,7 @@ This helper with identifier `noRefs` attempts to use the configured syntax `type
 Three standard values are available to be used as the value for the `type` option. Multiple values may be provided, in which case the values are interpreted in order from left to right. If no value is provided, `interpreter` is used as a default `type`. If a `type` is provided that does not match any of the standard `type` values, we assume the value is meant to be a custom regex.
 
 '`interpreter`' uses the configured [interpreter](#interpreter) to find matches.<br/>
-'`html`' uses the regex `<a\b[^>]*?>(?<showtext>.*?)<\/a>` to find HTML \<a> tags and uses the value in between the opening and closing tag as `showtext`.<br/>
+'`html`' uses the regex `<a\b[^>]*?>(?<showtext>.*?)<\/a>` to find HTML `<a>` tags and uses the value in between the opening and closing tag as `showtext`.<br/>
 '`markdown`' uses the regex `\[(?<showtext>[^\]]+)\]\((?:[^)]+)\)` to find Markdown hyperlinks and uses the link text as `showtext`.
 
 ```hbs title="NoRefs example"
