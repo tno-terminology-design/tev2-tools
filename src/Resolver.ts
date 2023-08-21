@@ -49,11 +49,13 @@ export class Resolver {
                   return; // Stop further execution if force is not enabled and file exists
             }
 
+            let filepath = path.join(dirPath, file);
             try {
-                  log.trace(`Writing: ${path.join(dirPath, file)}`);
-                  fs.writeFileSync(path.join(dirPath, file), data);
+                  
+                  fs.writeFileSync(filepath, data);
+                  report.fileWritten(filepath);
             } catch (err) {
-                  log.error(`E008 Error writing file '${path.join(dirPath, file)}':`, err);
+                  log.error(`E008 Error writing file '${filepath}':`, err);
             }
       }
           
@@ -102,70 +104,59 @@ export class Resolver {
                   );
                   const TermRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
 
+                  let replacement = "";
+                  let entry = undefined;
                   if (matchingEntries.length === 1) {
-                        const entry = matchingEntries[0];
+                        entry = matchingEntries[0];
                         // Convert the term using the configured converter
-                        let replacement = converter!.convert(entry, termProperties);
-
-                        // Only execute the replacement steps if the 'replacement' string is not empty
-                        if (replacement.length > 0) {
-                              const startIndex = match.index! + lastIndex;
-                              const matchLength = match[0].length;
-                              const textBeforeMatch = data.substring(0, startIndex);
-                              const textAfterMatch = data.substring(startIndex + matchLength);
-                              
-                              // Replace the matched term with the generated replacement in the data string
-                              data = `${textBeforeMatch}${replacement}${textAfterMatch}`;
-      
-                              // Update the lastIndex to account for the length difference between the match and replacement
-                              lastIndex += replacement.length - matchLength;
-
-                              // Log the converted term
-
-                              report.termConverted(entry.term!);
-                              converted++;
-                        } else {
+                        replacement = converter!.convert(entry, termProperties);
+                        entry.fallback = false;
+                        if (replacement === "") {
                               report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', resulted in an empty string, check the converter`);
                         }
                   } else if (matchingEntries.length > 1) {
                         // Multiple matches found, display a warning
-                        const source = matchingEntries.map(entry => `${entry.source}`).join(', ');
-                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', has multiple matching MRG entries. Located in: ${source}`);
+                        const uniqueSources = new Set();
+                        const source = matchingEntries
+                              .filter(entry => !uniqueSources.has(entry.source) && uniqueSources.add(entry.source))
+                              .map(entry => entry.source)
+                              .join(', ');
+                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`);
                   } else {
-                        const properties = ['term', 'scopetag', 'vsntag'];
+                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry`);
+                  }
 
-                        let overallRating = 0;
-                        let bestMatchIndices: { [key: string]: number } = {};
-
-                        properties.forEach(prop => {
-                              const propertyValue = termProperties.get(prop) || '';
-                              const propertyMatches = glossary.runtime.entries.map(entry => entry[prop] || '');
-
-                              let bestMatchIndex = -1;
-                              let bestMatchScore = -1;
-
-                              propertyMatches.forEach((match, index) => {
-                              const similarityScore = leven(propertyValue, match);
-                              if (similarityScore > bestMatchScore) {
-                                    bestMatchScore = similarityScore;
-                                    bestMatchIndex = index;
-                              }
-                              });
-
-                              overallRating += bestMatchScore;
-                              bestMatchIndices[prop] = bestMatchIndex;
-                        });
-
-                        overallRating /= properties.length;
-
-                        if (overallRating > 0.9) {
-                              const bestMatchEntry = glossary.runtime.entries[bestMatchIndices['term']];
-                              const suggestedTermRef = `${bestMatchEntry.term}@${bestMatchEntry.scopetag}:${bestMatchEntry.vsntag}`;
-                              const errorMessage = `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry. Did you mean to reference '${suggestedTermRef}'?`;
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, errorMessage);
-                        } else {
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry`);
+                  
+                  if (replacement === "") {
+                        // No replacement was generated, use the @ term ref as a fallback if it exists in the scope and version
+                        entry = glossary.runtime.entries.find(entry =>
+                              entry.term === `@` &&
+                              entry.scopetag === termProperties.get("scopetag")! &&
+                              (entry.vsntag === termProperties.get("vsntag")! ||
+                              entry.altvsntags?.includes(termProperties.get("vsntag")!))
+                        );
+                        if (entry) {
+                              replacement = converter!.convert(entry, termProperties);
+                              entry.fallback = true;
                         }
+                  }
+
+                  // Only execute the replacement steps if the 'replacement' string is not empty
+                  if (replacement.length > 0) {
+                        const startIndex = match.index! + lastIndex;
+                        const matchLength = match[0].length;
+                        const textBeforeMatch = data.substring(0, startIndex);
+                        const textAfterMatch = data.substring(startIndex + matchLength);
+                        
+                        // Replace the matched term with the generated replacement in the data string
+                        data = `${textBeforeMatch}${replacement}${textAfterMatch}`;
+
+                        // Update the lastIndex to account for the length difference between the match and replacement
+                        lastIndex += replacement.length - matchLength;
+
+                        // Log the converted term
+                        report.termConverted(entry);
+                        converted++;
                   }
             }
             if (converted > 0) {
@@ -180,11 +171,12 @@ export class Resolver {
        */
       public async resolve(): Promise<boolean> {
             // Log information about the interpreter, converter and the files being read
-            log.info(`Using interpreter '${interpreter.getType()}' and converter '${converter.getType()}'`)
             log.info(`Reading files using pattern string '${this.globPattern}'`);
 
             // Get the list of files based on the glob pattern
             const files = await glob(this.globPattern);
+
+            log.info(`Found ${files.length} files`);
 
             // Process each file
             for (let filePath of files) {

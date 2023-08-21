@@ -157,7 +157,7 @@ export class Glossary {
       
                         if (missingProperties.length > 0) {
                               // Create a reference to the problematic entry using the first three property-value pairs
-                              const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: ${entry[prop]}`).join(', ');
+                              const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
 
                               const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`;
                               report.mrgHelp(mrgURL, -1, errorMessage);

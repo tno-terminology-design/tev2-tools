@@ -8,24 +8,18 @@ The list of messages below gives additional information about the messages repor
 When the process of resoluting completes, a resolution report is outputted which displays information about the tool's execution. In these cases, `TERM HELP` or `MRG HELP` is displayed as well. Below is a list of possible help messages that may be displayed.
 
 - ***TERM HELP Term ref '`match`' > '`termRef`', resulted in an empty string, check the converter***<br/>
-The supplied converter would result in a [term ref](@) being replaced by an empty string. For this reason, it will not be replaced. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
+The supplied converter would result in a [term ref](@) being replaced by an empty string. For this reason, it will either not be replaced or be replaced by a fallback MRG entry. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
 
-- ***TERM HELP Term ref '`match`' > '`termRef`', has multiple matching MRG entries. Located in: `source`***<br/>
-The combination of `term`, `scopetag`, and `vsntag` resulted in multiple matching [MRG entries](@) located inside [MRG](@)'s listed at the `source` placeholder. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
-
-- ***TERM HELP Term ref '`match`' > '`termRef`', could not be matched with an MRG entry. Did you mean to reference '`suggestedTermRef`'?***<br/>
-The combination of `term`, `scopetag`, and `vsntag` resulted in no matching [MRG entry](@) inside the loaded [MRG](@)'s. There is an existing entry that seems similar, which is reported at the `suggestedTermRef` placeholder. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
+- ***TERM HELP Term ref '`match`' > '`termRef`', has multiple matching MRG entries in MRG `source`***<br/>
+The combination of `term`, `scopetag`, and `vsntag` resulted in multiple matching [MRG entries](@) located inside [MRG(s)](@) listed at the `source` placeholder. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
 
 - ***TERM HELP Term ref '`match`' > '`termRef`', could not be matched with an MRG entry***<br/>
-The combination of `term`, `scopetag`, and `vsntag` resulted in no matching [MRG entry](@) inside the loaded [MRG](@)'s. No similar [MRG entry](@) has been found. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
+The combination of `term`, `scopetag`, and `vsntag` resulted in no matching [MRG entry](@) inside the loaded [MRG(s)](@). Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
 
 - ***MRG HELP MRG entry missing required property: '`missingProperties`'. Entry starts with values `reference`***<br/>
 An [MRG entry](@) inside the specified [MRG](@) is missing certain properties. The missing properties are reported as placeholder `missingProperties`. The first three key-value pairs of the entry causing the help message are reported as placeholder `reference`.
 
 ## Error Messages
-
-- ***ERROR E001 No MRG files found in the glossary directory '`glossarydir`'***<br/>
-No file in the [glossarydir](@) is matching the glob pattern '`mrg.*.*.yaml`'. Make sure the placeholder `glossarydir` has the expected value and includes the expected [MRG](@)'s.
 
 - ***ERROR E002 Missing required property in SAF at '`safURL`': '`missingProperties`'***<br/>
 A required property could not be located in the [SAF](@)'s scope section at `safURL`, the error message should state the missing properties at the `missingProperties` placeholder. See the [specifications](specifications) to see information about the required [SAF](@) properties.

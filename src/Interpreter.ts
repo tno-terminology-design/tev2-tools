@@ -1,3 +1,5 @@
+import { log } from './Report.js';
+
 export class Interpreter {
       private type: string;
       private regex: RegExp;
@@ -19,6 +21,7 @@ export class Interpreter {
                   // Remove leading and trailing slashes, and flags
                   this.regex = new RegExp(regex.replace(/^\/|\/[a-z]*$/g, ''), 'g');
             }
+            log.info(`Using ${this.type} interpreter: '${this.regex}'`)
       }
 
       getRegex(): RegExp {

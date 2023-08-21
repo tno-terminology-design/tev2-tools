@@ -87,17 +87,20 @@ We will use the following command to run the tool according to the `__tests__/co
 The [TRRT](@) CLI outputs information about its execution to the console according to the [Error Reporting](error-reporting) messages. The output should provide enough information to resolve issues surrounding the execution of the tool and the related terminology design.
 
   ```n/a title="Sample console output"
-  INFO	   lib/Resolver.js:136  Using interpreter 'basic' and converter 'custom'
-  INFO	   lib/Resolver.js:137  Reading files using pattern string '**/*.md'
-  TRACE	   lib/Resolver.js:43   Writing: trrt/docs/README.md
-  TRACE	   lib/Resolver.js:43   Writing: trrt/docs/docs/intro.md
-  TRACE	   lib/Resolver.js:43	Writing: trrt/docs/docs/trrt/specifications.md
-  INFO	   lib/Run.js:74	    Resolution complete...
+  INFO    Converter.js    Using essif template: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>'
+  INFO    Interpreter.js  Using basic interpreter: '/(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)/g'
+  INFO    Resolver.js     Reading files using pattern string '**/*.md'
+  INFO    Resolver.js     Found 111 files
+  INFO    Run.js          Resolution complete...
 
   Resolution Report:
-        Number of terms converted: 42
+        Number of files modified: 110
+        Number of terms converted: 3224
+        Number of terms with fallback: 4
     Term Errors:
-  TERM HELP    docs/README.md:3         Match '[TEv2 toolbox](@)' > 'tev2-toolbox@default:latest', could not be matched with an MRG entry
-  TERM HELP    docs/docs/intro.md:7     Match '[TRRG](@)' > 'trrg@default:latest', could not be matched with an MRG entry. Did you mean to reference 'TRRT@default:main'?
-  TERM HELP    docs/docs/intro.md:14    Match '[TNO Terminology Design](@)' > 'tno-terminology-design@default:latest', could not be matched with an MRG entry.
+  TERM HELP    Term ref '[frontmatter](@)' > 'frontmatter@tev2:terms', could not be matched with an MRG entry:
+   docs/terms/term-identifier.md:8
+  TERM HELP    Term ref '[owner](@)' > 'owner@tev2:terms', could not be matched with an MRG entry:
+   docs/terms/scope.md:7:7
+   docs/terms/knowledge-artifact.md:29
   ```

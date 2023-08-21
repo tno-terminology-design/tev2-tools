@@ -1,4 +1,5 @@
 import Handlebars from 'handlebars';
+import { log } from './Report.js';
 import { interpreter } from './Run.js'
 import { Entry } from './Glossary.js';
 
@@ -30,6 +31,7 @@ export class Converter {
                   this.type = 'custom';
                   this.template = template;
             }
+            log.info(`Using ${this.type} template: '${this.template}'`)
       }
 
       convert(entry: Entry, term: Map<string, string>): string {
@@ -56,23 +58,25 @@ export class Converter {
 }
 
 function noRefsHelper(this: any, text: string, options: any) {
-      let type = ['interpreter']
-      if (options.hash.type !== undefined) {
-            type = options.hash.type.split(',');
-            for (let i = 0; i < type.length; i++) {
-                  type[i] = type[i].trim().toLowerCase();
-            }
+      if (!text) {
+            return text;
       }
 
-      if (options.hash.regex) {
-            // TODO: implement support for regexing out any references
+      let type = ['interpreter']
+      if (options.hash.type !== undefined) {
+            type = options.hash.type.split(',').forEach((element: string) => {
+                  element = element.trim();
+            });
+      } else {
+            // Default to interpreter if no type is specified
+            options.hash.type = 'interpreter';
       }
 
       let regex: RegExp;
 
       type.forEach((element: string) => {
             // switch on element to determine which interpreter to use
-            switch (element) {
+            switch (element.toLowerCase()) {
                   case 'interpreter':
                         regex = interpreter!.getRegex();
                         break;
@@ -82,6 +86,9 @@ function noRefsHelper(this: any, text: string, options: any) {
                   case 'markdown':
                         regex = new RegExp(/\[(?<showtext>[^\]]+)\]\((?:[^)]+)\)/, 'g');
                         break;
+                  default:
+                        // assume the element is a custom regex
+                        regex = new RegExp(element.replace(/^\/|\/[a-z]*$/g, ''), 'g')
             }
 
             let matches = Array.from(text.matchAll(regex)) as RegExpMatchArray[];
@@ -103,6 +110,10 @@ function noRefsHelper(this: any, text: string, options: any) {
 }
 
 function capFirstHelper(text: string) {
+      if (!text) {
+            return text;
+      }
+
       // The first character of every word separated by spaces will be capitalized
       const words = text.split(' ');
       const capitalizedWords = words.map((word) =>
@@ -113,9 +124,9 @@ function capFirstHelper(text: string) {
 
 function ifValueHelper(this: any, conditional: any, options: any) {
       if (conditional == options.hash.equals) {
-          return options.fn(this);
+            return options.fn(this);
       } else {
-          return options.inverse(this);
+            return options.inverse(this);
       }
 };
 

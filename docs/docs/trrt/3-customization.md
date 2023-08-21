@@ -209,12 +209,25 @@ Three [helper functions](https://handlebarsjs.com/guide/expressions.html#helpers
 This simple helper with identifier `capFirst` replaces every word's first character with the capitalized equivalent. Words are obtained by splitting the input on the ` ` (space) characters. *It takes the input, splits the input at spaces, and capitalizes the first character of every split item, after which the output is returned*
 
 #### `noRefs`
-This helper with identifier `noRefs` uses the configured [interpreter](#interpreter) to convert all references to the `showtext` term property value. It also capitalizes the `showtext` replacement using the `capFirst` helper. *It takes the input, finds matches using the configured [interpreter](#interpreter) and uses the capitalized `showtext` property as a replacement, after which the output is returned.*
+This helper with identifier `noRefs` attempts to use the configured syntax `type` to convert all links it finds to the `showtext` term property value. It also capitalizes the `showtext` replacement using the `capFirst` helper. *It takes the input, finds matches using the configured syntax `type` and uses the capitalized `showtext` property as a replacement, after which the output is returned.*
+
+Three standard values are available to be used as the value for the `type` option. Multiple values may be provided, in which case the values are interpreted in order from left to right. If no value is provided, `interpreter` is used as a default `type`. If a `type` is provided that does not match any of the standard `type` values, we assume the value is meant to be a custom regex.
+
+'`interpreter`' uses the configured [interpreter](#interpreter) to find matches.<br/>
+'`html`' uses the regex `<a\b[^>]*?>(?<showtext>.*?)<\/a>` to find HTML \<a> tags and uses the value in between the opening and closing tag as `showtext`.<br/>
+'`markdown`' uses the regex `\[(?<showtext>[^\]]+)\]\((?:[^)]+)\)` to find Markdown hyperlinks and uses the link text as `showtext`.
+
+```hbs title="NoRefs example"
+ {{noRefs glossaryText}}
+ {{noRefs glossaryText type="markdown"}}
+ {{noRefs glossaryText type="markdown, html, interpreter"}}
+ {{noRefs glossaryText type="/\[(?<showtext>[^\]]+)\]\((?:[^)]+)\)/, html"}}
+```
 
 #### `ifValue`
 This helper with identifier `ifValue` allows for equality checking by comparing the first value with the value specified as the `equals` option. Pay attention to the use of a `#`-character in front of the opening helper tag (`#ifValue`) and a `/`-character at the closing (`/ifValue`) tag. *It compares the input given as the value trailing the opening helper identifier (`ifValue`) and the value of the `equals` option, and shows the value inbetween the opening and closing helper tag if they have the same value.*
 
-```hbs title="Usage example"
+```hbs title="ifValue example"
  {{#ifValue termType equals="concept"}}Artifact is a concept{{/ifValue}}
  {{#ifValue termType equals="image"}}Artifact is an image{{/ifValue}}
 ```
