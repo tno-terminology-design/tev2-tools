@@ -10,14 +10,14 @@ The GitHub repository of the [TRRT](@), located [here](https://github.com/tno-te
 - name: Install TRRT
   run: npm install -g @tno-terminology-design/trrt@1.x
 - name: Run TRRT
-  run: trrt --output . --scopedir __tests__/content '**/**.md' --force
+  run: trrt --output . --scopedir __tests__/content '**/*.md' --force
 ```
 
-This execution of the [TRRT](@) is run from the root of the repository, any input files that contain successfully converted [term refs](@) will be output starting from that location as well. The [scope directory](@) is set to `__tests__/content`, as this is where the SAF resides. Every file that matches the `'**/**.md'` glob pattern string is given to the [TRRT](@), in this case meaning every file in every directory ending with `.md` is seen as input.
+This execution of the [TRRT](@) is run from the root of the repository, any input files that contain successfully converted [term refs](@) will be output starting from that location as well. The [scope directory](@) is set to `__tests__/content`, as this is where the SAF resides. Every file that matches the `'**/*.md'` glob pattern string is given to the [TRRT](@), in this case meaning every file in every directory ending with `.md` is seen as input.
 As the output directory is the same as the current directory, converted files will overwrite the existing files when we use the `force` flag. This behavior is useful for deployment inside pipelines where the original files are usually not modified, but should be avoided during local use in order to preserve the original documents that include [term refs](@).
 
 ## Example Deployment Case
-The [TRRT](@) needs one [SAF](@) and one or more [MRG](@)'s in order to function and it will check to make sure the required properties within these files are set. Not being able to load a [SAF](@) or [MRG](@) will cause the program to exit. An invalid entry within an [MRG](@) will not cause the program to be stopped, but will be displayed as a `MRG HELP` item (see [Error Reporting](error-reporting)).
+The [TRRT](@) needs one [SAF](@) and one or more [MRG's](@) in order to function and will check to make sure the required properties within these files are set. Not being able to load a [SAF](@) will cause the program to exit. Not being able to load a complete [MRG], or finding an invalid entry within an [MRG](@), will not cause the program to be stopped, but will be displayed as a `MRG HELP` item (see [Error Reporting](error-reporting)).
 
 To demonstrate the tool's possibilities, lets imagine the following scenario.
 You are part of a community that wishes to curate their terminologies. You have read up on the [TNO Terminology Design](@) specifications and have constructed a [SAF](@) to fit your needs. The [SAF](@) includes information about the scopes you and your colleagues would want to be able to reference. Inside the written texts of your community, the [basic term ref syntax](specifications#interpretation-of-the-term-ref) has been used to reference terms. All of the used terms are located in an [MRG](@), which is located in the `glossarydir` as defined in the [SAF](@).
@@ -31,7 +31,7 @@ The standard converters of the [TRRT](@) do not fit the needs of your community.
 </term-info>
 ```
 
-Assuming the term 'mishmash' is part of an [MRG](@), and the default scope tag and version tag have been set, mishmash can be referenced by using the syntax `[mishmash](@)`. Running the [TRRT](@) with the following config example should achieve the wanted results. *Pay special attention to the converter.*
+Assuming the term 'mishmash' is part of an [MRG](@), and the default scope and version tag have been set, mishmash can be referenced by using the syntax `[mishmash](@)`. Running the [TRRT](@) with the following config example should achieve the wanted results. *Pay special attention to the converter.*
 
 ```yaml title="__tests__/content/config.yaml"
 # TRRT configuration file (yaml)
@@ -53,7 +53,7 @@ The following steps have been executed to reach a working implementation of the 
 
 
 1. **Make sure the [prerequisites](installation#prerequisites) are met.** <br/>
-Please refer to [nvm](https://github.com/nvm-sh/nvm) installation and usage for the latest details about these commands.
+Please refer to [nvm's](https://github.com/nvm-sh/nvm) installation and usage for the latest details about these commands. This step will likely not be necessary if you are integrating the [TRRT](@) inside a pipeline.
 
   ```bash
   # Download and install nvm
@@ -71,10 +71,10 @@ This makes the [TRRT](@) CLI command available all throughout your system and do
   ```
 
 3. **Configure the [SAF](@) and make sure the necessary [MRG](@)'s are present.** <br/>
-Our example deployment `saf.yaml` can be viewed [here](https://github.com/tno-terminology-design/trrt/blob/main/__tests__/content/saf.yaml) within the `__tests__/content` directory, with the [MRG](@)'s located in the [glossarydir](https://github.com/tno-terminology-design/trrt/tree/main/__tests__/content/terminology) at `__tests__/content/terminology`.
+Our example deployment `saf.yaml` can be viewed [here](https://github.com/tno-terminology-design/trrt/blob/main/__tests__/content/saf.yaml) within the `__tests__/content` directory, with the [MRG's](@) located in the [glossarydir](https://github.com/tno-terminology-design/trrt/tree/main/__tests__/content/terminology) at `__tests__/content/terminology`.
 
 4. **Setup the [TRRT](@) behavior per [configuration file](usage#configuration-file) and/or command-line parameters.** <br/>
-See the [example deployment](#example-deployment) above for the yaml configuration file that is used. In this case we will be executing the [TRRT](@) from the root of our repository and not the root of the [scopedir](@). This means you may have to change working directory before executing step 5.
+See the [example deployment](#example-deployment) above for the yaml configuration file that is used. In this case we will be executing the [TRRT](@) from the root of our repository and not the root of the [scopedir](@). Make sure to confirm your working directory and adjust any of the path related parameters before continuing to step 5.
 
 5. **Execute the [TRRT](@).** <br/>
 We will use the following command to run the tool according to the `__tests__/content/config.yaml` config file. As the [example deployment](#example-deployment) is executed within a CI/CD pipeline we will be using the `force` flag to overwrite the input files with their renderable counterparts. The configured paths are relative to the working directory where the [TRRT](@) is executed.

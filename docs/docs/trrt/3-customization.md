@@ -203,7 +203,7 @@ By changing the value of property `termType` in the `input` of the abovementione
 </details>
 
 ### Helper functions
-Three [helper functions](https://handlebarsjs.com/guide/expressions.html#helpers) have been specified, which can be used within [Mustache expressions](https://handlebarsjs.com/guide/expressions) to modify the converter output. The `capFirst` and `noRefs` helpers are used inside the eSSIF-Lab converter template, mentioned in the [example](#converter) section above. The `ifValue` helper is used inside the Custom converter templat [example](#converter). The input to a helper function is always the evaluated value of the expression that follows, possibly with extra options.
+Three [helper functions](https://handlebarsjs.com/guide/expressions.html#helpers) have been specified, which can be used within [Mustache expressions](https://handlebarsjs.com/guide/expressions) to modify the converter output. The `capFirst` and `noRefs` helpers are used inside the eSSIF-Lab converter template, mentioned in the [example](#converter) section above. The `ifValue` helper is used inside the Custom converter template [example](#converter). The input to a helper function is always the evaluated value of the expression that follows the call, possibly with extra options.
 
 #### `capFirst`
 This simple helper with identifier `capFirst` replaces every word's first character with the capitalized equivalent. Words are obtained by splitting the input on the ` ` (space) characters. *It takes the input, splits the input at spaces, and capitalizes the first character of every split item, after which the output is returned*
@@ -213,9 +213,10 @@ This helper with identifier `noRefs` attempts to use the configured syntax `type
 
 Three standard values are available to be used as the value for the `type` option. Multiple values may be provided, in which case the values are interpreted in order from left to right. If no value is provided, `interpreter` is used as a default `type`. If a `type` is provided that does not match any of the standard `type` values, we assume the value is meant to be a custom regex.
 
-'`interpreter`' uses the configured [interpreter](#interpreter) to find matches.<br/>
+'`interpreter`' uses the regex of the configured [interpreter](#interpreter) to find matches.<br/>
 '`html`' uses the regex `<a\b[^>]*?>(?<showtext>.*?)<\/a>` to find HTML `<a>` tags and uses the value in between the opening and closing tag as `showtext`.<br/>
-'`markdown`' uses the regex `\[(?<showtext>[^\]]+)\]\((?:[^)]+)\)` to find Markdown hyperlinks and uses the link text as `showtext`.
+'`markdown`' uses the regex `\[(?<showtext>[^\]]+)\]\((?:[^)]+)\)` to find Markdown hyperlinks and uses the link text as `showtext`.<br/>
+'`custom`' a value for `type` that does not match any of the standard `type` values is assumed to be a custom regex.
 
 ```hbs title="NoRefs example"
  {{noRefs glossaryText}}
