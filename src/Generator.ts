@@ -1,42 +1,10 @@
 import { interpreter } from "./Run.js";
 import { log } from './Report.js';
-import { SAF, Version } from './Interpreter.js';
+import { SAF, Version, MRG } from './Interpreter.js';
 
 import fs = require("fs");
 import path = require('path');
 import yaml = require('js-yaml');
-
-interface MRG {
-    terminology: Terminology;
-    scopes: Scopes[];
-    entries: Entry[];
-}
-
-interface Terminology {
-    scopetag: string;
-    scopedir: string;
-    curatedir: string;
-    vsntag: string;
-    altvsntags: string[];
-}
-
-interface Scopes {
-    scopetag: string;
-    scopedir: string;
-}
-
-export interface Entry {
-    term: string;
-    vsntag: string;
-    scopetag: string;
-    locator: string;
-    formPhrases?: string;
-    glossaryText: string;
-    navurl?: string;
-    headingids?: string[];
-    altvsntags?: string[];
-    [key: string]: any;
-}
 
 export class Generator {
     public vsntag: string;
