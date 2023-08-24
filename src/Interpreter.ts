@@ -234,6 +234,36 @@ export class Interpreter {
         const parts = instruction.split(/[\s,\[\]]+/).filter(Boolean); // Split instruction into parts
         const term = parts.shift(); // Extract the term
         
+        const fieldModifiers: { [key: string]: string } = {}; // Initialize an object for field modifiers
+        
+        if (parts.length === 1) {
+            // If there is only one part, then it is a basic rename
+            fieldModifiers.term = parts[0];
+        } else if (parts.length > 1) {
+            // If there are multiple parts, then it is a rename with field modifiers
+            // Loop through the parts to extract field modifiers
+            let key = null;
+            for (const part of parts) {
+                if (part.endsWith(':')) {
+                    key = part.slice(0, -1); // Remove the trailing colon
+                } else if (key !== null) {
+                    fieldModifiers[key] = part; // Assign value to the current key
+                    key = null; // Reset the key
+                }
+            }
+        }
+
+        // Find the entries with the term
+        const entries = this.TuC.filter(entry => entry.term === term);
+        // Modify the entry based on the field modifiers
+        if (entries.length > 0) {
+            for (const entry of entries) {
+                for (const [key, value] of Object.entries(fieldModifiers)) {
+                    entry![key] = value;
+                }
+            }
+        }
+        
     }
     
 
