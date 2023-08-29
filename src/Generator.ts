@@ -66,14 +66,19 @@ export class Generator {
 
         // add TuC entries to MRG entries
         MRG.entries = interpreter.getTuCMap(vsn.termselcrit);
-        
-        // Copy entries from existing MRG
-
-
-        // For every tuple in this set, an MRG entry is created, and added to the MRG under construction. The structure of each such entry depends on the type of the knowledge artifact that the term represents, as the header of a curated text depends on that type.
 
         // Output the MRG to a file
-        writeFile(path.join(glossarydir, `mrg.${MRG.terminology.scopetag}.${MRG.terminology.vsntag}.yaml`), yaml.dump(MRG, { forceQuotes: true }));
+        let mrgFile = `mrg.${MRG.terminology.scopetag}.${MRG.terminology.vsntag}.yaml`;
+        writeFile(path.join(glossarydir, mrgFile), yaml.dump(MRG, { forceQuotes: true }));
+
+        // Create a symlink for every altvsntag
+        vsn.altvsntags.forEach(altvsntag => {
+            let altmrgFile = `mrg.${MRG.terminology.scopetag}.${altvsntag}.yaml`;
+            if (!fs.existsSync(path.join(glossarydir, altmrgFile))) {
+                log.info(`Creating symlink for altvsntag '${altvsntag}'...`);
+                fs.symlinkSync(mrgFile, path.join(glossarydir, altmrgFile));
+            }
+        });
     }
 }
 
