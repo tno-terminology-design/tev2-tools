@@ -51,6 +51,8 @@ interface Entry {
     vsntag: string;
     scopetag: string;
     locator: string;
+    bodyFile?: string;
+    synonymOf?: string;
     formPhrases?: string;
     glossaryText: string;
     navurl?: string;
@@ -105,10 +107,10 @@ export class Interpreter {
     }
 
     public getTuCMap(instructions: string[]): Entry[] {
-        const add = [] as string[];
-        const ren = [] as string[];
-        const rem = [] as string[];
-    
+        const add: string[] = [];
+        const rem: string[] = [];
+        const ren: string[] = [];
+
         instructions.forEach(instruction => {
             if (instruction.startsWith('-')) {
                 // Queue removal
@@ -122,27 +124,16 @@ export class Interpreter {
             }
         });
     
-        // Process additions
-        add.forEach(instruction => {
-            this.addMrgEntry(instruction);
-        });
-    
-        // Process removals
-        rem.forEach(instruction => {
-            this.removeMrgEntry(instruction);
-        });
-
-        // Process renames
-        rem.forEach(instruction => {
-            this.renameMrgEntry(instruction);
-        });
+        add.forEach(this.addMrgEntry.bind(this));
+        rem.forEach(this.removeMrgEntry.bind(this));
+        ren.forEach(this.renameMrgEntry.bind(this));        
     
         return this.TuC;
     }
     
 
     private getCtextEntries(): Entry[] {
-        let cTextMap = {} as Entry[];
+        let cTextMap: Entry[] = [];
         const curatedir = path.join(this.scopedir, this.saf.scope.curatedir);
 
         // Get all the curated texts from the curatedir
@@ -156,11 +147,25 @@ export class Interpreter {
             let ctextPath = path.join(curatedir, ctext);
             let ctextContent = fs.readFileSync(ctextPath, 'utf8');
 
-            const [_, frontmatter, body] = ctextContent.split('---\n', 3);
+            let [_, frontmatter, body] = ctextContent.split('---\n', 3);
 
             let ctextYAML = yaml.load(frontmatter) as Entry;
             
-            // TODO: Check if another body is refered to that should be used instead
+            // // TODO: Check if a synonym is referred to that should be used instead
+            // if (ctextYAML.synonymOf) {
+            //     // find the ctext in ctexts that matches the synonymOf
+            //     let synonymOfCtext = ctexts.find(_ => path.parse(ctextPath).name === ctextYAML.synonymOf!);
+
+            //     // if the synonymOfCtext exists, then load its properties as MRG Entry
+            //     if (synonymOfCtext) {
+            //         ctextPath = path.join(curatedir, ctext);
+            //         ctextContent = fs.readFileSync(ctextPath, 'utf8');
+
+            //         [_, frontmatter, body] = ctextContent.split('---\n', 3);
+
+            //         ctextYAML = yaml.load(frontmatter) as Entry;
+            //     }
+            // }
 
             // Extract heading IDs from markdown content
             let headingIds = this.extractHeadingIds(body);
@@ -182,60 +187,90 @@ export class Interpreter {
     }
 
     private addMrgEntry(instruction: string): void {
-        let entries = [] as Entry[];
-        const parts = instruction.split(/[\s,]+/); // Split instruction into parts
-        const action = parts.shift(); // Extract the action (i.e., 'terms', 'tags', '*')
-        if (action?.startsWith('terms')) {
-            // Process terms instruction
-            const termList = parts[0].slice(1, -1).split(','); // Extract term list
-            const [scopetag, vsntag] = parts[1]?.split(':'); // Extract scope and version
-            
-            let mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
-            entries = this.getMrgMap(mrgFile).entries.filter(entry => termList.includes(entry.term));
-        } else if (action?.startsWith('tags')) {
-            // Process tags instruction
-            const tagList = parts[0].slice(1, -1).split(','); // Extract tag list
-            const [scopetag, vsntag] = parts[1]?.split(':'); // Extract scope and version
+        const regex = /^(?<action>.+?)(?:\[(?<items>.+?)\])?(?:@(?<scopetag>.+?))?(?::(?<vsntag>.+))?$/;
+        const match = instruction.replace(/\s/g, '').match(regex);
 
-            let mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
+        if (!match) {
+            log.error(`E021 Invalid instruction: ${instruction}`);
+            return undefined;
+        }
+
+        let { action, items, scopetag, vsntag } = match.groups!;
+
+        let entries = [] as Entry[];
+        let mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
+        log.debug(`Processing instruction: ${instruction}`)
+        log.debug(`Action: ${action}`)
+        
+        if (action === 'terms') {
+            // Process terms instruction
+            const termList = items.split(','); // Extract term list
+            entries = this.getMrgMap(mrgFile).entries.filter(entry => termList.includes(entry.term));
+        } else if (action === 'tags') {
+            // Process tags instruction
+            const tagList = items.split(','); // Extract tag list
             entries = this.getMrgMap(mrgFile).entries.filter(entry => entry.grouptags?.some(tag => tagList.includes(tag)));
-        } else if (action?.startsWith('*')) {
+        } else if (action === '*') {
             // Process wildcard instruction
-            const [scopetag, vsntag] = parts[1]?.split(':'); // Extract scope and version
             if (!scopetag || scopetag === this.saf.scope.scopetag) {
                 // Add all curated texts from the scope to the terminology under construction
                 entries = this.getCtextEntries();
             } else {
                 // TODO: How do we determine the default version?
-                let mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
+                mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
                 entries = this.getMrgMap(mrgFile).entries;
             }
+        } else {
+            log.error(`E022 Invalid term selection criteria action: ${action}`);
+            return undefined;
         }
         this.TuC.push(...entries);
     }
 
     private removeMrgEntry(instruction: string): void {
-        const parts = instruction.split(/[\s,]+/); // Split instruction into parts
-        const action = parts.shift(); // Extract the action (i.e., 'tags', 'terms')
+        const regex = /^(?<action>.+?)(?:\[(?<items>.+?)\])?$/;
+        const match = instruction.replace(/\s/g, '').match(regex);
+
+        if (!match) {
+            log.error(`E021 Invalid instruction: ${instruction}`);
+            return undefined;
+        }
+
+        const { action, items } = match.groups!;
+
         if (action === 'tags') {
             // Process -tags instruction
-            const tagList = parts[0].slice(1, -1).split(','); // Extract tag list
+            const tagList = items.split(','); // Extract tag list
             // Remove mrg entries from this.TuC with grouptags that match the tag list
-            this.TuC = this.TuC.filter(entry => !entry.grouptags?.some(tag => tagList.includes(tag)));
+            this.TuC = this.TuC.filter(entry => {
+                if (entry.grouptags) {
+                    for (const tag of tagList) {
+                        if (entry.grouptags.includes(tag)) {
+                            return false; // Exclude the entry
+                        }
+                    }
+                }
+                return true; // Keep the entry
+            });
         } else if (action === 'terms') {
             // Process -terms instruction
-            const termList = parts[0].slice(1, -1).split(','); // Extract term list
+            const termList = items.split(','); // Extract term list
             // Remove mrg entries from this.TuC with term id's that match the term list
             this.TuC = this.TuC.filter(entry => !termList.includes(entry.term));
+        } else {
+            log.error(`E022 Invalid term selection criteria action: ${action}`);
+            return undefined;
         }
     }
 
     private renameMrgEntry(instruction: string): void {
-        const parts = instruction.split(/[\s,\[\]]+/).filter(Boolean); // Split instruction into parts
+        const parts = instruction.split(/[\s,\[\]]+/); // Split instruction into parts
         const term = parts.shift(); // Extract the term
         
-        const fieldModifiers: { [key: string]: string } = {}; // Initialize an object for field modifiers
+        const fieldModifiers: { [key: string]: any } = {}; // Initialize an object for field modifiers
         
+        log.debug(`Renaming '${term}' to '${parts.join(' ')}'`);
+
         if (parts.length === 1) {
             // If there is only one part, then it is a basic rename
             fieldModifiers.term = parts[0];
@@ -256,14 +291,11 @@ export class Interpreter {
         // Find the entries with the term
         const entries = this.TuC.filter(entry => entry.term === term);
         // Modify the entry based on the field modifiers
-        if (entries.length > 0) {
-            for (const entry of entries) {
-                for (const [key, value] of Object.entries(fieldModifiers)) {
-                    entry![key] = value;
-                }
+        for (const entry of entries) {
+            for (const [key, value] of Object.entries(fieldModifiers)) {
+                entry![key] = value;
             }
         }
-        
     }
     
 
@@ -320,12 +352,10 @@ export class Interpreter {
                     // Create a reference to the problematic entry using the first three property-value pairs
                     const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
 
-                    const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`;
                     // report.mrgHelp(mrgURL, -1, errorMessage);
                 }
             }
         } catch (err) {
-            const errorMessage = `E005 An error occurred while attempting to load an MRG: ${err}`;
             //   report.mrgHelp(mrgURL, -1, errorMessage);
         }
   
