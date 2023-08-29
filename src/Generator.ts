@@ -61,9 +61,6 @@ export class Generator {
         // set relevant fields in the scopes section
         MRG.scopes = [];
 
-        // Find all the curated texts that are relevant for this version
-        log.debug(`termselcrit: ${vsn.termselcrit}`);
-
         // add TuC entries to MRG entries
         MRG.entries = interpreter.getTuCMap(vsn.termselcrit);
 

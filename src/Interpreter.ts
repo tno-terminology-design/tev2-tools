@@ -187,6 +187,7 @@ export class Interpreter {
     }
 
     private addMrgEntry(instruction: string): void {
+        log.trace(`Add: ${instruction}`);
         const regex = /^(?<action>.+?)(?:\[(?<items>.+?)\])?(?:@(?<scopetag>.+?))?(?::(?<vsntag>.+))?$/;
         const match = instruction.replace(/\s/g, '').match(regex);
 
@@ -199,17 +200,21 @@ export class Interpreter {
 
         let entries = [] as Entry[];
         let mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
-        log.debug(`Processing instruction: ${instruction}`)
-        log.debug(`Action: ${action}`)
         
         if (action === 'terms') {
             // Process terms instruction
             const termList = items.split(','); // Extract term list
-            entries = this.getMrgMap(mrgFile).entries.filter(entry => termList.includes(entry.term));
+            let mrgMap = this.getMrgMap(mrgFile);
+            if (mrgMap.entries) {
+                entries = mrgMap.entries.filter(entry => termList.includes(entry.term));
+            }
         } else if (action === 'tags') {
             // Process tags instruction
             const tagList = items.split(','); // Extract tag list
-            entries = this.getMrgMap(mrgFile).entries.filter(entry => entry.grouptags?.some(tag => tagList.includes(tag)));
+            let mrgMap = this.getMrgMap(mrgFile);
+            if (mrgMap.entries) {
+                entries = mrgMap.entries.filter(entry => entry.grouptags?.some(tag => tagList.includes(tag)));
+            }
         } else if (action === '*') {
             // Process wildcard instruction
             if (!scopetag || scopetag === this.saf.scope.scopetag) {
@@ -228,6 +233,7 @@ export class Interpreter {
     }
 
     private removeMrgEntry(instruction: string): void {
+        log.trace(`Remove: ${instruction}`);
         const regex = /^(?<action>.+?)(?:\[(?<items>.+?)\])?$/;
         const match = instruction.replace(/\s/g, '').match(regex);
 
@@ -264,12 +270,11 @@ export class Interpreter {
     }
 
     private renameMrgEntry(instruction: string): void {
+        log.trace(`Rename: ${instruction}`);
         const parts = instruction.split(/[\s,\[\]]+/); // Split instruction into parts
         const term = parts.shift(); // Extract the term
         
         const fieldModifiers: { [key: string]: any } = {}; // Initialize an object for field modifiers
-        
-        log.debug(`Renaming '${term}' to '${parts.join(' ')}'`);
 
         if (parts.length === 1) {
             // If there is only one part, then it is a basic rename
@@ -297,8 +302,12 @@ export class Interpreter {
             }
         }
     }
-    
 
+    /**
+     * Extracts the heading IDs from the markdown content.
+     * @param content The markdown content.
+     * @returns An array of heading IDs.
+     */
     private extractHeadingIds(content: string): string[] {
         // Regular expression to match markdown headings
         const headingRegex = /^#+\s+(.*)$/gm;
@@ -352,11 +361,11 @@ export class Interpreter {
                     // Create a reference to the problematic entry using the first three property-value pairs
                     const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
 
-                    // report.mrgHelp(mrgURL, -1, errorMessage);
+                    log.error(`E004 MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`);
                 }
             }
         } catch (err) {
-            //   report.mrgHelp(mrgURL, -1, errorMessage);
+            log.error(`E005 An error occurred while attempting to load the MRG at '${mrgURL}': ${err}`);
         }
   
         return mrg;
