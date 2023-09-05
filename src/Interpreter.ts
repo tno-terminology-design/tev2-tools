@@ -229,7 +229,11 @@ export class Interpreter {
             log.error(`E022 Invalid term selection criteria action: ${action}`);
             return undefined;
         }
-        this.TuC.push(...entries);
+        if (entries.length > 0) {
+            this.TuC.push(...entries);
+        } else {
+            log.warn(`W001 No entries found for instruction: ${instruction}`);
+        }
     }
 
     private removeMrgEntry(instruction: string): void {
@@ -295,11 +299,16 @@ export class Interpreter {
 
         // Find the entries with the term
         const entries = this.TuC.filter(entry => entry.term === term);
-        // Modify the entry based on the field modifiers
-        for (const entry of entries) {
-            for (const [key, value] of Object.entries(fieldModifiers)) {
-                entry![key] = value;
+
+        if (entries.length > 0) {
+            // Modify the entry based on the field modifiers
+            for (const entry of entries) {
+                for (const [key, value] of Object.entries(fieldModifiers)) {
+                    entry![key] = value;
+                }
             }
+        } else {
+            log.warn(`W001 No entries found for instruction: ${instruction}`);
         }
     }
 
