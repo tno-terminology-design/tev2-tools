@@ -71,9 +71,15 @@ export class Generator {
         // Create a symlink for every altvsntag
         vsn.altvsntags.forEach(altvsntag => {
             let altmrgFile = `mrg.${MRG.terminology.scopetag}.${altvsntag}.yaml`;
-            if (!fs.existsSync(path.join(glossarydir, altmrgFile))) {
+            let altmrgURL = path.join(glossarydir, altmrgFile);
+            if (!fs.existsSync(altmrgURL)) {
                 log.info(`Creating symlink for altvsntag '${altvsntag}'...`);
-                fs.symlinkSync(mrgFile, path.join(glossarydir, altmrgFile));
+                fs.symlinkSync(mrgFile, altmrgURL);
+            } else {
+                // overwrite existing symlink
+                log.info(`Overwriting symlink for altvsntag '${altvsntag}'...`);
+                fs.unlinkSync(altmrgURL);
+                fs.symlinkSync(mrgFile, altmrgURL);
             }
         });
     }
