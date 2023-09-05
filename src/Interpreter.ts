@@ -90,16 +90,16 @@ export class Interpreter {
             const missingProperties = requiredProperties.filter(prop => !saf.scope[prop]);
 
             if (missingProperties.length > 0) {
-                log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`);
+                log.error(`\tE002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`);
                 process.exit(1);
             }
             // Check if there are existing versions
             if (!saf.versions || saf.versions.length === 0) {
-                log.error(`E003 No versions found in SAF at '${safURL}'`);
+                log.error(`\tE003 No versions found in SAF at '${safURL}'`);
                 process.exit(1);
             }
         } catch (err) {
-            log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err);
+            log.error(`\tE004 An error occurred while attempting to load the SAF at '${safURL}':`, err);
             process.exit(1);
         }
 
@@ -187,12 +187,12 @@ export class Interpreter {
     }
 
     private addMrgEntry(instruction: string): void {
-        log.trace(`Add: ${instruction}`);
+        log.trace(`\t\x1b[1;37mAdd: ${instruction}`);
         const regex = /^(?<action>.+?)(?:\[(?<items>.+?)\])?(?:@(?<scopetag>.+?))?(?::(?<vsntag>.+))?$/;
         const match = instruction.replace(/\s/g, '').match(regex);
 
         if (!match) {
-            log.error(`E021 Invalid instruction: ${instruction}`);
+            log.error(`\tE021 Invalid instruction: ${instruction}`);
             return undefined;
         }
 
@@ -201,48 +201,52 @@ export class Interpreter {
         let entries = [] as Entry[];
         let mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
         
-        if (action === 'terms') {
-            // Process terms instruction
-            const termList = items.split(','); // Extract term list
-            let mrgMap = this.getMrgMap(mrgFile);
-            if (mrgMap.entries) {
-                entries = mrgMap.entries.filter(entry => termList.includes(entry.term));
-            }
-        } else if (action === 'tags') {
-            // Process tags instruction
-            const tagList = items.split(','); // Extract tag list
-            let mrgMap = this.getMrgMap(mrgFile);
-            if (mrgMap.entries) {
-                entries = mrgMap.entries.filter(entry => entry.grouptags?.some(tag => tagList.includes(tag)));
-            }
-        } else if (action === '*') {
-            // Process wildcard instruction
-            if (!scopetag || scopetag === this.saf.scope.scopetag) {
-                // Add all curated texts from the scope to the terminology under construction
-                entries = this.getCtextEntries();
+        try {
+            if (action === 'terms') {
+                // Process terms instruction
+                const termList = items.split(','); // Extract term list
+                let mrgMap = this.getMrgMap(mrgFile);
+                if (mrgMap.entries) {
+                    entries = mrgMap.entries.filter(entry => termList.includes(entry.term));
+                }
+            } else if (action === 'tags') {
+                // Process tags instruction
+                const tagList = items.split(','); // Extract tag list
+                let mrgMap = this.getMrgMap(mrgFile);
+                if (mrgMap.entries) {
+                    entries = mrgMap.entries.filter(entry => entry.grouptags?.some(tag => tagList.includes(tag)));
+                }
+            } else if (action === '*') {
+                // Process wildcard instruction
+                if (!scopetag || scopetag === this.saf.scope.scopetag) {
+                    // Add all curated texts from the scope to the terminology under construction
+                    entries = this.getCtextEntries();
+                } else {
+                    // TODO: How do we determine the default version?
+                    mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
+                    entries = this.getMrgMap(mrgFile).entries;
+                }
             } else {
-                // TODO: How do we determine the default version?
-                mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
-                entries = this.getMrgMap(mrgFile).entries;
+                log.error(`\tE022 Invalid term selection criteria action: ${action}`);
+                return undefined;
             }
-        } else {
-            log.error(`E022 Invalid term selection criteria action: ${action}`);
-            return undefined;
-        }
-        if (entries.length > 0) {
-            this.TuC.push(...entries);
-        } else {
-            log.warn(`W001 No entries found for instruction: ${instruction}`);
+            if (entries.length > 0) {
+                this.TuC.push(...entries);
+            } else {
+                log.warn(`\tW001 No entries found for instruction: ${instruction}`);
+            }
+        } catch (err) {
+            log.error(err);
         }
     }
 
     private removeMrgEntry(instruction: string): void {
-        log.trace(`Remove: ${instruction}`);
+        log.trace(`\t\x1b[1;37mRemove: ${instruction}`);
         const regex = /^(?<action>.+?)(?:\[(?<items>.+?)\])?$/;
         const match = instruction.replace(/\s/g, '').match(regex);
 
         if (!match) {
-            log.error(`E021 Invalid instruction: ${instruction}`);
+            log.error(`\tE021 Invalid instruction: ${instruction}`);
             return undefined;
         }
 
@@ -268,13 +272,13 @@ export class Interpreter {
             // Remove mrg entries from this.TuC with term id's that match the term list
             this.TuC = this.TuC.filter(entry => !termList.includes(entry.term));
         } else {
-            log.error(`E022 Invalid term selection criteria action: ${action}`);
+            log.error(`\tE022 Invalid term selection criteria action: ${action}`);
             return undefined;
         }
     }
 
     private renameMrgEntry(instruction: string): void {
-        log.trace(`Rename: ${instruction}`);
+        log.trace(`\t\x1b[1;37mRename: ${instruction}`);
         const parts = instruction.split(/[\s,\[\]]+/); // Split instruction into parts
         const term = parts.shift(); // Extract the term
         
@@ -308,7 +312,7 @@ export class Interpreter {
                 }
             }
         } else {
-            log.warn(`W001 No entries found for instruction: ${instruction}`);
+            log.warn(`\tW001 No entries found for instruction: ${instruction}`);
         }
     }
 
@@ -351,7 +355,7 @@ export class Interpreter {
             const missingProperties = requiredProperties.filter(prop => !terminology[prop]);
 
             if (missingProperties.length > 0) {
-                log.error(`E003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
+                log.error(`\tE003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
                 process.exit(1);
             }
 
@@ -370,11 +374,11 @@ export class Interpreter {
                     // Create a reference to the problematic entry using the first three property-value pairs
                     const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
 
-                    log.error(`E004 MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`);
+                    throw `\tE004 MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`;
                 }
             }
         } catch (err) {
-            log.error(`E005 An error occurred while attempting to load the MRG at '${mrgURL}': ${err}`);
+            throw `\tE005 An error occurred while attempting to load the MRG at '${mrgURL}': ${err}`;
         }
   
         return mrg;

@@ -22,14 +22,14 @@ export class Generator {
         if (this.vsntag) {
             const vsn = this.saf.versions.find(vsn => vsn.vsntag === this.vsntag);
             if (vsn) {
-                log.info(`Processing version '${vsn.vsntag}'...`);
+                log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}'...`);
                 this.generate(vsn);
             } else {
                 // check altvsntags
                 const vsn = this.saf.versions.find(vsn => vsn.altvsntags.includes(this.vsntag));
 
                 if (vsn) {
-                    log.info(`Processing version '${vsn.vsntag}' (altvsn '${this.vsntag}')...`);
+                    log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}')...`);
                     this.generate(vsn);
                 } else {
                     // TODO Run onnotexist? Seems strange to do as there is no other vsntag to process
@@ -40,7 +40,7 @@ export class Generator {
             // If no vsntag was specified, process all versions
             log.info(`No vsntag was specified. Processing all versions...`);
             this.saf.versions.forEach(vsn => {
-                log.info(`Processing version '${vsn.vsntag}'...`);
+                log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}'...`);
                 this.generate(vsn);
             });
         }
@@ -72,12 +72,11 @@ export class Generator {
         vsn.altvsntags.forEach(altvsntag => {
             let altmrgFile = `mrg.${MRG.terminology.scopetag}.${altvsntag}.yaml`;
             let altmrgURL = path.join(glossarydir, altmrgFile);
+            log.info(`\tCreating symlink for altvsntag '${altvsntag}'`);
             if (!fs.existsSync(altmrgURL)) {
-                log.info(`Creating symlink for altvsntag '${altvsntag}'...`);
                 fs.symlinkSync(mrgFile, altmrgURL);
             } else {
                 // overwrite existing symlink
-                log.info(`Overwriting symlink for altvsntag '${altvsntag}'...`);
                 fs.unlinkSync(altmrgURL);
                 fs.symlinkSync(mrgFile, altmrgURL);
             }
@@ -100,7 +99,7 @@ export function writeFile(fullPath: string, data: string, force: boolean = true)
         try {
             fs.mkdirSync(dirPath, { recursive: true });
         } catch (err) {
-            log.error(`  - E007 Error creating directory '${dirPath}':`, err);
+            log.error(`\tE007 Error creating directory '${dirPath}':`, err);
             return; // Stop further execution if directory creation failed
         }
     } else if (!force && fs.existsSync(path.join(dirPath, file))) {
@@ -110,6 +109,6 @@ export function writeFile(fullPath: string, data: string, force: boolean = true)
     try {
         fs.writeFileSync(path.join(dirPath, file), data);
     } catch (err) {
-        log.error(`  - E008 Error writing file '${path.join(dirPath, file)}':`, err);
+        log.error(`\tE008 Error writing file '${path.join(dirPath, file)}':`, err);
     }
 }

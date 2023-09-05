@@ -83,7 +83,7 @@ async function main(): Promise<void> {
     // Resolve terms
     try {
         generator.initialize();
-        log.info("Generation complete...");
+        log.info("Generation complete");
         // report.print();
         process.exit(0);
     } catch (err) {
