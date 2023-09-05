@@ -101,15 +101,12 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                 log.info(`    - Creating symbolic link for ${version.altvsntags.length} alternative version(s)`);
                 for (const altvsntag of version.altvsntags) {
                     let altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`);
-                    try {
+                    if (!fs.existsSync(altmrgURL)) {
                         fs.symlinkSync(path.basename(mrgURL), altmrgURL);
-                    } catch (err) {
-                        if (err instanceof Error && err.message.includes('EEXIST')) {
-                            // ignore link already exists
-                        } else {
-                            // Handle other errors if needed
-                            throw err;
-                        }
+                    } else {
+                        // overwrite existing symbolic link
+                        fs.unlinkSync(altmrgURL);
+                        fs.symlinkSync(path.basename(mrgURL), altmrgURL);
                     }
                 }
             } catch (err) {
@@ -117,7 +114,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                     onNotExistError(err);
                 } else {
                     // Handle other errors if needed
-                    log.error(err)
+                    onNotExistError(err);
                 }
             }
         }
