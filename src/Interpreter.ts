@@ -222,93 +222,23 @@ export class Interpreter {
                 throw new Error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
             }
 
-            const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
+            const requiredEntryProperties = ['term', 'scopetag', 'locator', 'glossaryText'];
 
             for (const entry of (await mrg).entries) {
                 const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
 
                 if (missingProperties.length > 0) {
-                    const lineNumber = await this.findmrgindex(mrgfile.split('\n'), entry);
-                    const errorMessage = `Invalid entry in MRG at '${mrgURL}' (line ${lineNumber + 1}): missing required property: '${missingProperties.join("', '")}'`;
-                    log.warn(errorMessage);
+                    // Create a reference to the problematic entry using the first three property-value pairs
+                    const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
 
-                    // Remove the invalid entry from the MRG entries
-                    (await mrg).entries.splice((await mrg).entries.indexOf(entry), 1);
+                    const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`;
+                    log.warn(errorMessage);
                 }
             }
         } catch (err) {
             throw err;
         }
 
-        return mrg;
-        }
-
-    /**
-     * Finds the index of an entry in an MRG file.
-     * @returns A promise that resolves to the index of the entry in the MRG file.
-     * @param lines The lines of the MRG file.
-     * @param entry The entry to find the index of.
-     * @param i The current line number.
-     * @param index The possible index of the entry.
-     */
-    public async findmrgindex(lines: string[], entry: Entry, i: number = 0, index: number = -1): Promise<number> {
-        // end of file
-        if (i >= lines.length) {
-            return -1;
-        }
-        
-        const line = lines[i];
-
-        // marks the start or end of an entry
-        if (line.startsWith('-')) {
-            // if index is not -1, then we have found the end of the entry
-            if (index !== -1) {
-                return index;
-            }
-            // if index is -1, then we have found the start of the entry
-            index = i;
-            return this.findmrgindex(lines, entry, i + 1, index);
-        }
-
-        const obj = yaml.load(line) as { [key: string]: any };
-
-        // line matches properties of entry
-        if (obj) {
-            const [key] = Object.keys(obj);
-            const value = obj[key];
-
-            // if the value of the property is undefined or matches the value of the property in the entry
-            if (entry[key] !== undefined && entry[key] === value) {
-                return this.findmrgindex(lines, entry, i + 1, index);
-            }
-            // if the value of the property is an array and the value of the property in the entry is included in the array
-            if (Array.isArray(entry[key])) {
-                try {
-                    const len = entry[key].length;
-                    if (len > 1) {
-                        for (let j = 0; j < len; j++) {
-                            i++;
-
-                            const line = lines[i];
-                            const obj = yaml.load(line) as { [key: string]: any };
-                            const [key2] = Object.keys(obj);
-                            const value = obj[key2];
-
-                            if (entry[key].includes(value)) {
-                                continue;
-                            } else {
-                                break;
-                            }
-                        }
-                        return this.findmrgindex(lines, entry, i + 1, index);
-                    }
-                } catch (_err) {
-                    null;
-                }
-            }
-        }
-
-        // continue searching for next entry
-        return this.findmrgindex(lines, entry, i + 1);
+    return mrg;
     }
 }
