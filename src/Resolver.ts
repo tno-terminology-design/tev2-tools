@@ -1,8 +1,8 @@
 import { interpreter, converter, glossary } from './Run.js'
 import { report, log } from './Report.js';
 import { glob } from 'glob';
-import leven from 'leven';
 
+import matter from 'gray-matter';
 import fs = require("fs");
 import path = require('path');
 
@@ -62,12 +62,17 @@ export class Resolver {
 
       /**
        * Interprets and converts terms in the given data string based on the interpreter and converter.
-       * @param file The file path of the file being processed.
-       * @param data The input data string to interpret and convert.
+       * @param file The file object of the file being processed.
        * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
        */
-      private async interpretAndConvert(file: string, data: string): Promise<string | undefined> {
-            let matches: RegExpMatchArray[] = Array.from(data.matchAll(interpreter!.getRegex()));
+      private async interpretAndConvert(file: matter.GrayMatterFile<string>, filePath: string): Promise<string | undefined> {
+            let matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(interpreter!.getRegex()));
+            if (file.matter) {
+                  // remove count of frontmatter matches from the front of the matches array
+                  let frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(interpreter!.getRegex()));
+                  matches.splice(0, frontmatter.length);
+            }
+            
 
             let converted = 0;
             let lastIndex = 0;
@@ -112,7 +117,7 @@ export class Resolver {
                         replacement = converter!.convert(entry, termProperties);
                         entry.fallback = false;
                         if (replacement === "") {
-                              report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', resulted in an empty string, check the converter`);
+                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', resulted in an empty string, check the converter`);
                         }
                   } else if (matchingEntries.length > 1) {
                         // Multiple matches found, display a warning
@@ -121,9 +126,9 @@ export class Resolver {
                               .filter(entry => !uniqueSources.has(entry.source) && uniqueSources.add(entry.source))
                               .map(entry => entry.source)
                               .join(', ');
-                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`);
+                        report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`);
                   } else {
-                        report.termHelp(file, data.substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry`);
+                        report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry`);
                   }
 
                   
@@ -145,11 +150,11 @@ export class Resolver {
                   if (replacement.length > 0) {
                         const startIndex = match.index! + lastIndex;
                         const matchLength = match[0].length;
-                        const textBeforeMatch = data.substring(0, startIndex);
-                        const textAfterMatch = data.substring(startIndex + matchLength);
+                        const textBeforeMatch = file.orig.toString().substring(0, startIndex);
+                        const textAfterMatch = file.orig.toString().substring(startIndex + matchLength);
                         
                         // Replace the matched term with the generated replacement in the data string
-                        data = `${textBeforeMatch}${replacement}${textAfterMatch}`;
+                        file.orig = `${textBeforeMatch}${replacement}${textAfterMatch}`;
 
                         // Update the lastIndex to account for the length difference between the match and replacement
                         lastIndex += replacement.length - matchLength;
@@ -160,7 +165,7 @@ export class Resolver {
                   }
             }
             if (converted > 0) {
-                  return data;
+                  return file.orig.toString();
             } else {
                   return undefined;
             }
@@ -181,9 +186,13 @@ export class Resolver {
             // Process each file
             for (let filePath of files) {
                   // Read the file content
-                  let data;
+                  let file;
                   try {
-                        data = fs.readFileSync(filePath, "utf8");
+                        // file = {
+                        //       ...matter(fs.readFileSync(filePath, "utf8")),
+                        //       filepath: filePath // Add the filepath property
+                        // } as matter.GrayMatterFile<string>;
+                        file = matter(fs.readFileSync(filePath, "utf8"));
                   } catch (err) {
                         console.log(`E009 Could not read file '${filePath}':`, err);
                         continue;
@@ -192,7 +201,7 @@ export class Resolver {
                   // Interpret and convert the file data
                   let convertedData;
                   try {
-                        convertedData = await this.interpretAndConvert(filePath, data);
+                        convertedData = await this.interpretAndConvert(file, filePath);
                   } catch (err) {
                         console.log(`E010 Could not interpret and convert file '${filePath}':`, err);
                         continue;

@@ -29,9 +29,9 @@
     "commander": "10.0.0",
     "figlet": "^1.6.0",
     "glob": "^10.2.6",
+    "gray-matter": "^4.0.3",
     "handlebars": "^4.7.7",
     "js-yaml": "^4.1.0",
-    "leven": "^4.0.0",
     "tslog": "^4.4.4"
   },
   "devDependencies": {
