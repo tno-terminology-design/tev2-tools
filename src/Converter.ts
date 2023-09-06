@@ -58,14 +58,14 @@ export class Converter {
 }
 
 function noRefsHelper(this: any, text: string, options: any) {
-      if (!text) {
+      if (Handlebars.Utils.isEmpty(text)) {
             return text;
       }
 
       let type = ['interpreter']
-      if (options.hash.type !== undefined) {
-            type = options.hash.type.split(',').forEach((element: string) => {
-                  element = element.trim();
+      if (!Handlebars.Utils.isEmpty(options.hash.type)) {
+            type = options.hash.type.split(',').map((element: string) => {
+                  return element.trim();
             });
       } else {
             // Default to interpreter if no type is specified
@@ -110,7 +110,7 @@ function noRefsHelper(this: any, text: string, options: any) {
 }
 
 function capFirstHelper(text: string) {
-      if (!text) {
+      if (Handlebars.Utils.isEmpty(text)) {
             return text;
       }
 
