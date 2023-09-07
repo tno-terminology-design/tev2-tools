@@ -63,6 +63,7 @@ export class Resolver {
       /**
        * Interprets and converts terms in the given data string based on the interpreter and converter.
        * @param file The file object of the file being processed.
+       * @param filePath The path of the file being processed.
        * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
        */
       private async interpretAndConvert(file: matter.GrayMatterFile<string>, filePath: string): Promise<string | undefined> {
@@ -77,7 +78,7 @@ export class Resolver {
             let converted = 0;
             let lastIndex = 0;
       
-            // Iterate over each match found in the data string
+            // Iterate over each match found in the file.orig string
             for (const match of matches) {
                   const termProperties: Map<string, string> = interpreter!.interpret(match);
                   
@@ -188,10 +189,6 @@ export class Resolver {
                   // Read the file content
                   let file;
                   try {
-                        // file = {
-                        //       ...matter(fs.readFileSync(filePath, "utf8")),
-                        //       filepath: filePath // Add the filepath property
-                        // } as matter.GrayMatterFile<string>;
                         file = matter(fs.readFileSync(filePath, "utf8"));
                   } catch (err) {
                         console.log(`E009 Could not read file '${filePath}':`, err);
