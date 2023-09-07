@@ -47,6 +47,7 @@ interface Terminology {
 
 export interface Entry {
       term: string;
+      altterms?: string[];
       vsntag: string;
       scopetag: string;
       locator: string;
@@ -190,35 +191,21 @@ export class Glossary {
                   for (const entry of mrgEntries) {
                         const alternatives = entry.formPhrases ? entry.formPhrases.split(",").map(t => t.trim()) : [];
             
-                        const modifiedAlternatives = [];
+                        // create a new set of alternatives that includes all possible macro replacements
+                        const modifiedAlternatives = new Set<string>();
             
                         for (const alternative of alternatives) {
                               const generatedAlternatives = applyMacroReplacements(alternative, regexMap);
-                              modifiedAlternatives.push(...generatedAlternatives);
-                        }
-            
-                        const glossaryEntry: Entry = {
-                              ...entry,
-                              altvsntags: mrg.terminology.altvsntags,
-                              source: filename,
-                        };
-            
-                        this.runtime.entries.push(glossaryEntry);
-                        const uniqueAlternatives = new Set();
-
-                        for (const alternative of modifiedAlternatives) {
-                              if (alternative === entry.term) {
-                                    continue;
-                              }
-
-                              // Check if the alternative is already in the set
-                              if (!uniqueAlternatives.has(alternative)) {
-                                    uniqueAlternatives.add(alternative); // Add it to the set
-                                    const altEntry: Entry = { ...glossaryEntry, term: alternative };
-                                    this.runtime.entries.push(altEntry);
+                              for (const generatedAlternative of generatedAlternatives) {
+                                    modifiedAlternatives.add(generatedAlternative);
                               }
                         }
+            
+                        entry.altvsntags = mrg.terminology.altvsntags;
+                        entry.source = filename;
+                        entry.altterms = Array.from(modifiedAlternatives);
 
+                        this.runtime.entries.push(entry);
                   }
             } catch (err) {
                   log.error(`E006 An error occurred while attempting to process the MRG at '${filename}':`, err);

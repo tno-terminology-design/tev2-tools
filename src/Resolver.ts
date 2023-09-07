@@ -103,7 +103,8 @@ export class Resolver {
 
                   // Find the matching entry in the runtime glossary based on the term, scopetag and vsntag
                   let matchingEntries = glossary.runtime.entries.filter(entry =>
-                        entry.term === termProperties.get("term")! &&
+                        (entry.term === termProperties.get("term")! || 
+                        entry.altterms?.includes(termProperties.get("term")!)) &&
                         entry.scopetag === termProperties.get("scopetag")! &&
                         (entry.vsntag === termProperties.get("vsntag")! ||
                         entry.altvsntags?.includes(termProperties.get("vsntag")!))
