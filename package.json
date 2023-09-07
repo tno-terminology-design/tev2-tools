@@ -1,6 +1,6 @@
 {
   "name": "@tno-terminology-design/trrt",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Term Reference Resolution Tool (TRRT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
