@@ -11,7 +11,7 @@ describe('Run TRRT on provided test files', () => {
     const trrtPath = path.resolve(__dirname, '../lib/Run.js');
     const contentPath = path.resolve(__dirname, 'content');
     const configFile = path.resolve(contentPath, 'config.yaml');
-    const testFile = 'terminology/specification.md';
+    const testFile = 'mockup.md';
     const inputFile = path.resolve(contentPath, testFile);
     const outputFile = path.resolve(__dirname, 'output/__tests__/content', testFile);
 

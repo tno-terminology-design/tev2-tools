@@ -6,4 +6,4 @@ converter: <a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{glossaryT
 
 # glob pattern strings for files to be processed
 input:
-  - __tests__/content/terminology/*.md
+  - __tests__/content/*.md
