@@ -176,9 +176,15 @@ export class Interpreter {
                     delete ctextYAML[key];
                 }
             });
+
+            // construct navurl from website, navpath, and ctext name
+            const navUrl = new URL(this.saf.scope.website);
+            navUrl.pathname = path.join(navUrl.pathname, path.join(this.saf.scope.navpath, path.parse(ctext).name));
+
+            // add properties to MRG Entry
             ctextYAML.scopetag = this.saf.scope.scopetag;
             ctextYAML.locator = ctext;
-            ctextYAML.navurl = path.join(this.saf.scope.website, this.saf.scope.navpath, path.parse(ctext).name);
+            ctextYAML.navurl = navUrl.href;
             ctextYAML.headingids = headingIds;
 
             cTextMap.push(ctextYAML);
