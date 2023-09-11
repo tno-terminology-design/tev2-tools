@@ -93,7 +93,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                 }
 
                 // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
-                mrgURL = path.join(saf.scope.scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`);
+                mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`);
                 writeFile(mrgURL, yaml.dump(mrg));
                 log.info(`    - Storing MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`);
                 
