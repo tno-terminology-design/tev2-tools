@@ -22,7 +22,7 @@ interface Scope {
 }
 
 interface Scopes {
-    scopetags: string[];
+    scopetag: string;
     scopedir: string;
 }
 
@@ -64,11 +64,13 @@ interface Entry {
 
 export class Interpreter {
     public scopedir: string;
+    public scopes!: Set<Scopes>;
     public saf!: SAF;
     public TuC!: Entry[];
 
     public constructor({ scopedir }: { scopedir: string }) {
         this.scopedir = scopedir;
+        this.scopes = new Set<Scopes>();
         this.TuC = [] as Entry[];
         this.saf = this.getSafMap(path.join(this.scopedir, 'saf.yaml'));
     }
@@ -204,6 +206,8 @@ export class Interpreter {
 
         let { action, items, scopetag, vsntag } = match.groups!;
 
+        // TODO: halt if no scopetag is specified?
+
         let entries = [] as Entry[];
         let mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
         
@@ -237,7 +241,13 @@ export class Interpreter {
                 return undefined;
             }
             if (entries.length > 0) {
+                // add entries to TuC
                 this.TuC.push(...entries);
+                // add scope to scopes set
+                this.scopes.add({
+                    scopetag: scopetag,
+                    scopedir: ''
+                });
             } else {
                 log.warn(`\tW001 No entries found for instruction: ${instruction}`);
             }
@@ -368,10 +378,9 @@ export class Interpreter {
             const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
 
             for (const entry of mrg.entries) {
-                // add vsntag, scopetag, and altvsntags from MRG to MRG entries
+                // add vsntag and scopetag from source MRG to MRG entries
                 entry.vsntag = terminology.vsntag;
                 entry.scopetag = terminology.scopetag;
-                entry.altvsntags = terminology.altvsntags
 
                 // Check for missing required properties in MRG entries
                 const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
@@ -380,7 +389,7 @@ export class Interpreter {
                     // Create a reference to the problematic entry using the first three property-value pairs
                     const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
 
-                    throw `\tE004 MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`;
+                    log.warn(`\tE004 MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`);
                 }
             }
         } catch (err) {

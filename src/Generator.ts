@@ -49,20 +49,32 @@ export class Generator {
     public generate(vsn: Version): void {
         let MRG = {} as MRG;
         let glossarydir = path.join(interpreter.scopedir, this.saf.scope.glossarydir);
+
+        // run interpreter to get TuC
+        interpreter.getTuCMap(vsn.termselcrit);
+
         // set relevant fields in the terminology section
         MRG.terminology = {
             scopetag: this.saf.scope.scopetag,
-            scopedir: this.saf.scope.scopedir, // using this.saf.scope.scopedir instead of the usual interpreter.scopedir here
+            scopedir: this.saf.scope.scopedir,
             curatedir: this.saf.scope.curatedir,
             vsntag: vsn.vsntag,
             altvsntags: vsn.altvsntags
         };
 
-        // set relevant fields in the scopes section
+        // set fields in the scopes section
         MRG.scopes = [];
+        interpreter.scopes.forEach(scope => {
+            // find the corresponding scope in the SAF's scope section
+            let SAFscope = this.saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
+            if (SAFscope) {
+                scope.scopedir = SAFscope.scopedir;
+            }
+            MRG.scopes.push(scope);
+        });
 
-        // add TuC entries to MRG entries
-        MRG.entries = interpreter.getTuCMap(vsn.termselcrit);
+        // add TuC entries to entries section
+        MRG.entries = interpreter.TuC;
 
         // Output the MRG to a file
         let mrgFile = `mrg.${MRG.terminology.scopetag}.${MRG.terminology.vsntag}.yaml`;
