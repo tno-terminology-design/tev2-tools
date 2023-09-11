@@ -6,7 +6,7 @@
 # ways in which people can contribute, raise issues, see what's going on, discuss, etc.
 #
 scope:
-  scopetag: tev2 # identifier that curators have determined for this terminology
+  scopetag: trrt # identifier that curators have determined for this terminology
   scopedir: https://github.com/tno-terminology-design/tev2-specifications/tree/master/docs  # URL of the scope-directory
   curatedir: terms # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
   glossarydir: glossaries # directory where all glossary files and GDFs are located. Full URL is `scopedir`/`glossarydir`
@@ -27,7 +27,7 @@ scope:
 # that live within them, e.g. to use/import their data.
 #
 scopes:  #
-- scopetag: essiflab # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
+- scopetag: termdsn # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
   scopedir: https://github.com/tno-terminology-design/tev2-specifications/tree/main/docs # URL of the scope-directory
 #
 # The third section specifies the versions that are actively maintained by the curators.
@@ -38,16 +38,4 @@ versions:
 - vsntag: terms # this version contains all terms that are curated within this scope
   altvsntags: [ latest ] # alternative verstiontags
   termselcrit:
-  - "*@tev2" # import all tev2 terms.
-- vsntag: test # this version MUST only be used for testing the MRG generator
-  altvsntags: # alternative verstiontags
-    - firstAltVsnTag
-    - secondAltVsnTag
-  termselcrit:
-    - "tags[management]@essif-lab" # import all terms from the mrg of `essif-lab:latest` that have grouptag `management`.
-    - "terms[party,community]@essif-lab:0.9.4" # import the terms `party` and `community` from the mrg of `essif-lab:0.9.4`.
-    - "-tags[terminology]" # remove all terms tagged with the grouptag `terminology`
-    - "*@tev2" # import all terms defined in the scope `tev2`
-  status: proposed
-  from: 20220312
-  to:
+  - "*@termdsn" # import all tev2 terms.

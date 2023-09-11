@@ -15,7 +15,13 @@ describe('Run TRRT on provided test files', () => {
     const inputFile = path.resolve(contentPath, testFile);
     const outputFile = path.resolve(__dirname, 'output/__tests__/content', testFile);
 
-    const trrtProcess = spawn('node', [trrtPath, '-c', configFile, path.join('__tests__/content', testFile)]);
+    const trrtProcess = spawn('node', [trrtPath, 
+      `-c ${configFile}`,
+      `-o ${__tests__/output}`,
+      `-s ${__tests__/content}`, 
+      path.join('__tests__/content', testFile)]
+    );
+    
     let output = '';
     let consoleOutput = '';
 
