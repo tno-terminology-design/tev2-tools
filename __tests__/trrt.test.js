@@ -16,12 +16,11 @@ describe('Run TRRT on provided test files', () => {
     const outputFile = path.resolve(__dirname, 'output/__tests__/content', testFile);
 
     const trrtProcess = spawn('node', [trrtPath, 
-      `-c ${configFile}`,
-      `-o ${__tests__/output}`,
-      `-s ${__tests__/content}`, 
-      path.join('__tests__/content', testFile)]
-    );
-    
+      '-c', configFile,
+      '-o', '__tests__/output',
+      '-s', '__tests__/content',
+      path.join('__tests__/content', testFile)
+    ]);
     let output = '';
     let consoleOutput = '';
 
@@ -35,6 +34,7 @@ describe('Run TRRT on provided test files', () => {
     });
 
     trrtProcess.on('close', (code) => {
+      console.log(consoleOutput)
       expect(code).to.equal(0);
 
       const termRegex = /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)/g;
