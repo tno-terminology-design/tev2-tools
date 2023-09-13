@@ -10,10 +10,14 @@ describe('Run MRG Import Tool on provided test files', () => {
   it('should verify expected MRG downloads and symlinks', (done) => {
     const toolPath = path.resolve(__dirname, '../lib/Run.js');
     const contentPath = path.resolve(__dirname, 'content');
-    const configFile = path.resolve(contentPath, 'config.yaml');
-    const glossarydir = path.resolve(contentPath, 'terminology');
+    const configFile = path.join(contentPath, 'config.yaml');
+    const glossarydir = path.join(contentPath, 'glossaries');
+    const scope = 'termdsn';
 
-    const toolProcess = spawn('node', [toolPath, '-c', configFile]);
+    const toolProcess = spawn('node', [toolPath,
+      '-c', configFile,
+      '-s', '__tests__/content'
+    ]);
     let output = '';
     let consoleOutput = '';
 
@@ -27,12 +31,12 @@ describe('Run MRG Import Tool on provided test files', () => {
     });
 
     toolProcess.on('close', async (code) => {
-      expect(code).to.equal(1);
-      expect(consoleOutput).to.contain(`Found 2 maintained MRG file(s) in import scope 'essiflab'`);
+      expect(code).to.equal(0);
+      expect(consoleOutput).to.contain(`maintained MRG file(s) in import scope '${scope}'`);
 
       try {
-        await fs.access(path.join(glossarydir, `mrg.essiflab.latest.yaml`));
-        await fs.access(path.join(glossarydir, `mrg.essiflab.main.yaml`));
+        await fs.access(path.join(glossarydir, `mrg.${scope}.terms.yaml`));
+        await fs.access(path.join(glossarydir, `mrg.${scope}.latest.yaml`));
 
         done();
       } catch (error) {
