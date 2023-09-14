@@ -1,16 +1,16 @@
 # Deployment
 
 ## MRG Import Example
-The [MRG Import Tool](@) is designed to be usable in both a command-line interface and a CI/CD pipeline. Features like the [configuration file](usage#configuration-file), make the execution of the tool easily maintainable, and [error reporting](error-reporting) is available to assist further in the importing [MRG](@)s.
+The [MRG Import Tool](@) is designed to be usable in both a command-line interface and a CI/CD pipeline. Features like the [configuration file](usage#configuration-file), make the execution of the tool easily maintainable, and [error reporting](error-reporting) is available to assist further in importing [MRG](@)s.
 
-The GitHub repository of the [MRG Import Tool](@), located [here](https://github.com/tno-terminology-design/mrg-import) acts as an example of the tool's deployment. Within the `.github/workflows/docs-deploy.yml` GitHub Actions Workflow file are the following lines of code. This code is located in the deploy job before the website is built, modifying the input files in runtime before they are used to build the Docusaurus site.
+The GitHub repository of the [MRG Import Tool](@), located [here](https://github.com/tno-terminology-design/mrg-import), acts as an example of the tool's deployment. Within the `.github/workflows/docs-deploy.yml` GitHub Actions Workflow file are the following lines of code. This code is located and run in the deploy job before the website is built, modifying the input files in runtime before they are used to build the Docusaurus site.
 
 ```yml
     # Terminology reference resolution
     - name: Install MRG Import Tool
-    run: npm install -g @tno-terminology-design/mrg-import
+      run: npm install -g @tno-terminology-design/mrg-import
     - name: Run MRG Import Tool
-    run: mrg-import --scopedir __tests__/content --onNotExist warn
+      run: mrg-import --scopedir __tests__/content --onNotExist warn
 ```
 
 This execution of the [MRG Import Tool](@) is run from the root of the repository. The tool reads the `saf.yaml` inside the supplied `scopedir` (`__tests__/content`). After which, the `scopes` section of the local [SAF](@) is used to find the `scopedir` of external scopes.

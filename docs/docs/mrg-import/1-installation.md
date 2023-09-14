@@ -26,4 +26,4 @@ Refer to [deployment](deployment) for an example of how the [MRG Import Tool](@)
     ```
     This should display the version number of the [MRG Import Tool](@), confirming that the installation was successful.
 
-**For usage and configuration of the tool please refer to the [configuration](configuration) section next.**
+**For usage and configuration of the tool please refer to the [usage](usage) section next.**

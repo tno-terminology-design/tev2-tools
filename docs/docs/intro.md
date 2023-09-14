@@ -5,9 +5,9 @@ The [MRG](@) Import Tool ([MRG importer](@)) ensures that the [scope](@) within 
 This documentation consists of the following items.
 
 - [Installation](mrg-import/installation): [prerequisites](mrg-import/installation#prerequisites), [quick installation](mrg-import/installation#quick-installation)
-- [Usage](usage): [parameters and options](mrg-import/usage#parameters-and-options), [(URL) Handling](mrg-import/usage#url-handling), [configuration file](mrg-import/usage#configuration-file)
+- [Usage](mrg-import/usage): [parameters and options](mrg-import/usage#parameters-and-options), [(URL) Handling](mrg-import/usage#url-handling), [configuration file](mrg-import/usage#configuration-file)
 - [Deployment](mrg-import/deployment): [examples](mrg-import/deployment#mrg-import-example), [deployment steps](mrg-import/deployment#executed-steps) 
-- [Error Reporting](@): [error messages](mrg-import/error-reporting#error-messages)
-- [Testing](@): [cloning](mrg-import/testing), [compiling](mrg-import/testing)
+- [Error Reporting](mrg-import/error-reporting): [error messages](mrg-import/error-reporting#error-messages)
+- [Testing](mrg-import/testing): [cloning](mrg-import/testing), [compiling](mrg-import/testing)
 
-The specifications of the tool are located [here](https://tno-terminology-design.github.io/tev2-specifications/docs/tev2/spec-tools/mrg-importer).
+The specifications of the tool are located [here](https://tno-terminology-design.github.io/tev2-specifications/docs/spec-tools/mrg-importer).
