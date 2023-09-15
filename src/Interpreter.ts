@@ -224,7 +224,16 @@ export class Interpreter {
                 const tagList = items.split(','); // Extract tag list
                 let mrgMap = this.getMrgMap(mrgFile);
                 if (mrgMap.entries) {
-                    entries = mrgMap.entries.filter(entry => entry.grouptags?.some(tag => tagList.includes(tag)));
+                    entries = mrgMap.entries.filter(entry => {
+                        if (entry.grouptags) {
+                            for (const tag of tagList) {
+                                if (entry.grouptags.includes(tag)) {
+                                    return true; // Include the entry
+                                }
+                            }
+                        }
+                        return false; // Exclude the entry
+                    });
                 }
             } else if (action === '*') {
                 // Process wildcard instruction
