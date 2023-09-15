@@ -80,6 +80,20 @@ export class Generator {
         let mrgFile = `mrg.${MRG.terminology.scopetag}.${MRG.terminology.vsntag}.yaml`;
         writeFile(path.join(glossarydir, mrgFile), yaml.dump(MRG, { forceQuotes: true }));
 
+        // if the version is the default version, create a symbolic link
+        if (this.saf.scope.defaultvsn === MRG.terminology.vsntag) {
+            let defaultmrgFile = `mrg.${MRG.terminology.scopetag}.yaml`;
+            let defaultmrgURL = path.join(glossarydir, defaultmrgFile);
+            log.info(`\tCreating symlink for default version '${vsn.vsntag}'`);
+            if (!fs.existsSync(defaultmrgURL)) {
+                fs.symlinkSync(mrgFile, defaultmrgURL);
+            } else {
+                // overwrite existing symlink
+                fs.unlinkSync(defaultmrgURL);
+                fs.symlinkSync(mrgFile, defaultmrgURL);
+            }
+        }
+
         // Create a symlink for every altvsntag
         vsn.altvsntags.forEach(altvsntag => {
             let altmrgFile = `mrg.${MRG.terminology.scopetag}.${altvsntag}.yaml`;
