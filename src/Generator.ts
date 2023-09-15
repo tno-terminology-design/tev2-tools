@@ -69,8 +69,8 @@ export class Generator {
             let SAFscope = this.saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
             if (SAFscope) {
                 scope.scopedir = SAFscope.scopedir;
+                MRG.scopes.push(scope);
             }
-            MRG.scopes.push(scope);
         });
 
         // add TuC entries to entries section
