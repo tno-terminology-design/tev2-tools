@@ -18,7 +18,7 @@ const program = new Command();
 
 program
     .name('mrgt')
-    .version('0.1.1')
+    .version('0.1.2')
     .usage('[ <paramlist> ]\n' +
     '- <paramlist> (optional) is a list of key-value pairs')
     .description("The CLI for the Machine Readable Glossary (Generation) Tool")
