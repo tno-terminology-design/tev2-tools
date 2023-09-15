@@ -2,7 +2,7 @@
 
 import { Interpreter } from './Interpreter.js';
 import { Converter } from './Converter.js';
-import { Glossary } from './Glossary.js';
+import { SAF } from './Glossary.js';
 import { Resolver } from './Resolver.js'
 import { Command } from 'commander';
 import { readFileSync } from 'fs';
@@ -15,7 +15,7 @@ import figlet from 'figlet';
 
 export let interpreter: Interpreter;
 export let converter: Converter;
-export let glossary: Glossary;
+export let saf: SAF;
 export let resolver: Resolver;
 const program = new Command();
 
@@ -72,7 +72,7 @@ async function main(): Promise<void> {
             // Create an interpreter, converter and glossary with the provided options
             converter = new Converter({ template: options.converter ?? "markdown"});
             interpreter = new Interpreter({ regex: options.interpreter ?? "basic"});
-            glossary = new Glossary({ scopedir: resolve(options.scopedir) });
+            saf = new SAF({ scopedir: resolve(options.scopedir) });
 
             // Create a resolver with the provided options
             resolver = new Resolver({
