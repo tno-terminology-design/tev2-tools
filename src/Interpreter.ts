@@ -99,6 +99,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
 
                 // if the version is the default version, create a symbolic link {mrg.{import-scopetag}.yaml}
                 if (version.vsntag === importSaf.scope.defaultvsn) {
+                    log.info(`    - Creating symbolic link for default version`);
                     let defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`);
                     if (!fs.existsSync(defaultmrgURL)) {
                         fs.symlinkSync(path.basename(mrgURL), defaultmrgURL);
