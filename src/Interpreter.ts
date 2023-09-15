@@ -96,6 +96,18 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                 mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`);
                 writeFile(mrgURL, yaml.dump(mrg, { forceQuotes: true }));
                 log.info(`    - Storing MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`);
+
+                // if the version is the default version, create a symbolic link {mrg.{import-scopetag}.yaml}
+                if (version.vsntag === importSaf.scope.defaultvsn) {
+                    let defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`);
+                    if (!fs.existsSync(defaultmrgURL)) {
+                        fs.symlinkSync(path.basename(mrgURL), defaultmrgURL);
+                    } else {
+                        // overwrite existing symbolic link
+                        fs.unlinkSync(defaultmrgURL);
+                        fs.symlinkSync(path.basename(mrgURL), defaultmrgURL);
+                    }
+                }
                 
                 // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
                 log.info(`    - Creating symbolic link for ${version.altvsntags.length} alternative version(s)`);
