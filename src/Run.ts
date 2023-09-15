@@ -21,7 +21,7 @@ const program = new Command();
 
 program
       .name('trrt')
-      .version('1.0.4')
+      .version('1.0.5')
       .usage('[ <paramlist> ] [ <globpattern> ]\n' +
       '- <paramlist> (optional) is a list of key-value pairs\n' +
       '- <globpattern> (optional) specifies a set of (input) files that are to be processed')
