@@ -129,7 +129,6 @@ export class Resolver {
                               entry = matchingEntries[0];
                               // Convert the term using the configured converter
                               replacement = converter!.convert(entry, termProperties);
-                              entry.fallback = false;
                               if (replacement === "") {
                                     report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', resulted in an empty string, check the converter`);
                               }
@@ -143,18 +142,6 @@ export class Resolver {
                               report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`);
                         } else {
                               report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry`);
-                        }
-
-                        
-                        if (replacement === "") {
-                              // No replacement was generated, use the @ term ref as a fallback if it exists in the scope and version
-                              entry = mrg.entries.find(entry =>
-                                    entry.term === `@`
-                              );
-                              if (entry) {
-                                    replacement = converter!.convert(entry, termProperties);
-                                    entry.fallback = true;
-                              }
                         }
 
                         // Only execute the replacement steps if the 'replacement' string is not empty

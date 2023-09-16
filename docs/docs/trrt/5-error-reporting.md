@@ -8,7 +8,7 @@ The list of messages below gives additional information about the messages repor
 When the process of resoluting completes, a resolution report is outputted which displays information about the tool's execution. In these cases, `TERM HELP` or `MRG HELP` is displayed as well. Below is a list of possible help messages that may be displayed.
 
 - ***TERM HELP Term ref '`match`' > '`termRef`', resulted in an empty string, check the converter***<br/>
-The supplied converter would result in a [term ref](@) being replaced by an empty string. For this reason, it will either not be replaced or be replaced by a fallback MRG entry. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
+The supplied converter would result in a [term ref](@) being replaced by an empty string. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).
 
 - ***TERM HELP Term ref '`match`' > '`termRef`', has multiple matching MRG entries in MRG `source`***<br/>
 The combination of `term`, `scopetag`, and `vsntag` resulted in multiple matching [MRG entries](@) located inside [MRG(s)](@) listed at the `source` placeholder. Placeholder `match` is the selection of the input file that has been matched by the [interpreter](customization#interpreter) to be a [term ref](@), placeholder `termRef` shows the `term`@`scopetag`:`vsntag` as it is being interpreted by the [TRRT](@).

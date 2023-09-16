@@ -96,7 +96,6 @@ The [TRRT](@) CLI outputs information about its execution to the console accordi
   Resolution Report:
         Number of files modified: 110
         Number of terms converted: 3224
-        Number of terms with fallback: 4
     Term Errors:
   TERM HELP    Term ref '[frontmatter](@)' > 'frontmatter@tev2:terms', could not be matched with an MRG entry:
    docs/terms/term-identifier.md:8

@@ -11,9 +11,6 @@ class Report {
       converted: Output<{ content: string }> = {
             items: []
       };
-      fallback: Output<{ content: string }> = {
-            items: []
-      };
       files: Output<{ content: string }> = {
             items: []
       };
@@ -28,11 +25,7 @@ class Report {
       }
 
       public termConverted(term: any) {
-            if (term.fallback) {
-                  this.fallback.items.push({ content: term });
-            } else {
-                  this.converted.items.push({ content: term });
-            }
+            this.converted.items.push({ content: term });
       }
 
       public fileWritten(file: string) {
@@ -43,11 +36,7 @@ class Report {
             console.log("\x1b[1;37m");
             console.log(" Resolution Report:");
             console.log("       \x1b[0mNumber of files modified: " + this.files.items.length);
-            console.log("       \x1b[0mNumber of terms converted: " + this.converted.items.length);
-            if (this.fallback.items.length > 0) {
-                  console.log("       \x1b[0mNumber of terms with fallback: " + this.fallback.items.length);
-            }
-            
+            console.log("       \x1b[0mNumber of terms converted: " + this.converted.items.length);          
 
             if (this.termErrors.items.length > 0) {
                   console.log("   \x1b[1;37mTerm Errors:\x1b[0m");
