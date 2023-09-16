@@ -52,7 +52,7 @@ class Report {
             if (this.termErrors.items.length > 0) {
                   console.log("   \x1b[1;37mTerm Errors:\x1b[0m");
       
-                  const uniqueTermHelpMessages = new Map<string, { file: string; line: number }[]>();
+                  let uniqueTermHelpMessages = new Map<string, { file: string; line: number }[]>();
       
                   for (const item of this.termErrors.items) {
                         const key = item.message;
@@ -63,6 +63,11 @@ class Report {
                               uniqueTermHelpMessages.set(key, [item]);
                         }
                   }
+
+                  // Sort the uniqueTermHelpMessages alphabetically
+                  const sortedEntries = Array.from(uniqueTermHelpMessages.entries());
+                  sortedEntries.sort((a, b) => a[0].localeCompare(b[0]));
+                  uniqueTermHelpMessages = new Map(sortedEntries);
       
                   for (const [key, value] of uniqueTermHelpMessages) {
                         console.log(`\x1b[1;31m${'TERM HELP'.padEnd(12)} \x1b[0m${key}:`);
