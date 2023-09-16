@@ -241,8 +241,7 @@ export class Interpreter {
                     // Add all curated texts from the scope to the terminology under construction
                     entries = this.getCtextEntries();
                 } else {
-                    // TODO: How do we determine the default version?
-                    mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
+                    mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ? vsntag + '.' : ''}yaml`);
                     entries = this.getMrgMap(mrgFile).entries;
                 }
             } else {
@@ -250,7 +249,8 @@ export class Interpreter {
                 return undefined;
             }
             if (entries.length > 0) {
-                // add entries to TuC
+                // add entries to TuC and overwrite existing entries with the same term
+                this.TuC = this.TuC.filter(entry => !entries.some(e => e.term === entry.term));
                 this.TuC.push(...entries);
                 // add scope to scopes set
                 this.scopes.add({
