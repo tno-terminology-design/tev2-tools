@@ -152,22 +152,6 @@ export class Interpreter {
             let [_, frontmatter, body] = ctextContent.split('---\n', 3);
 
             let ctextYAML = yaml.load(frontmatter) as Entry;
-            
-            // // TODO: Check if a synonym is referred to that should be used instead
-            // if (ctextYAML.synonymOf) {
-            //     // find the ctext in ctexts that matches the synonymOf
-            //     let synonymOfCtext = ctexts.find(_ => path.parse(ctextPath).name === ctextYAML.synonymOf!);
-
-            //     // if the synonymOfCtext exists, then load its properties as MRG Entry
-            //     if (synonymOfCtext) {
-            //         ctextPath = path.join(curatedir, ctext);
-            //         ctextContent = fs.readFileSync(ctextPath, 'utf8');
-
-            //         [_, frontmatter, body] = ctextContent.split('---\n', 3);
-
-            //         ctextYAML = yaml.load(frontmatter) as Entry;
-            //     }
-            // }
 
             // Extract heading IDs from markdown content
             let headingIds = this.extractHeadingIds(body);
@@ -179,9 +163,15 @@ export class Interpreter {
                 }
             });
 
-            // construct navurl from website, navpath, and ctext name
+            // construct navurl from website, navpath and ctext name, or bodyFile
             const navUrl = new URL(this.saf.scope.website);
-            navUrl.pathname = path.join(navUrl.pathname, path.join(this.saf.scope.navpath, path.parse(ctext).name));
+            if (ctextYAML.bodyFile) {
+                // If the bodyFile property is set, then use that to construct the navurl
+                let bodyFile = path.parse(ctextYAML.bodyFile);
+                navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
+            } else {
+                navUrl.pathname = path.join(navUrl.pathname, this.saf.scope.navpath, path.parse(ctext).name);
+            }
 
             // add properties to MRG Entry
             ctextYAML.scopetag = this.saf.scope.scopetag;
