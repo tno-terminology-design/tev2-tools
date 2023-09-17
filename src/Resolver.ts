@@ -121,16 +121,17 @@ export class Resolver {
                               entry.term === termProperties.get("term")! || 
                               entry.altterms?.includes(termProperties.get("term")!)
                         );
-                        const TermRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
+                        const termRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
 
                         let replacement = "";
                         let entry = undefined;
                         if (matchingEntries.length === 1) {
                               entry = matchingEntries[0];
+                              termProperties.set("term", entry.term);
                               // Convert the term using the configured converter
                               replacement = converter!.convert(entry, termProperties);
                               if (replacement === "") {
-                                    report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', resulted in an empty string, check the converter`);
+                                    report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`);
                               }
                         } else if (matchingEntries.length > 1) {
                               // Multiple matches found, display a warning
@@ -139,9 +140,9 @@ export class Resolver {
                                     .filter(entry => !uniqueSources.has(entry.source) && uniqueSources.add(entry.source))
                                     .map(entry => entry.source)
                                     .join(', ');
-                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`);
+                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`);
                         } else {
-                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${TermRef}', could not be matched with an MRG entry`);
+                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`);
                         }
 
                         // Only execute the replacement steps if the 'replacement' string is not empty
