@@ -57,4 +57,7 @@ input:
   - '__tests__/content/terminology/*.md'
 ```
 
-For more practical examples, visit [deployment](deployment) or continue reading in [customization](customization) for information about the [interpreter](customization#interpreter) and [converter](customization#converter).
+#### Master Configuration
+The tool only interprets keys from the configuration file that are part of the defined [parameters](#parameters-and-options). Using this knowledge, we are able to create one configuration file to control all of the terminology tools. The configuration file of the tev2-specifications repository can be found [here](https://github.com/tno-terminology-design/tev2-specifications/blob/main/docs/config.yaml). In addition to using the options in the general section, the [TRRT](@) interprets it's own section. In this section, the yaml [block style indicator](https://yaml-multiline.info/) `>-` (replace newlines with spaces), is used to provide better readability of the converter option. In addition, the `--force` flag is provided as `force: true`.
+
+For more practical examples, visit [deployment](deployment), or continue reading in [customization](customization) for information about the [interpreter](customization#interpreter) and [converter](customization#converter).
