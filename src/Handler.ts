@@ -18,7 +18,7 @@ export async function download(url: URL, localPath: string): Promise<void> {
   } else if (parsedUrl.source === 'gitlab.com') {
     rawUrl = new URL(path.join('https://gitlab.com', parsedUrl.owner, parsedUrl.name, 'raw', parsedUrl.ref, parsedUrl.filepath));
   } else {
-    throw new Error(`  - E007 Unsupported Git platform ${parsedUrl.source}`);
+    throw new Error(`  - E009 Unsupported Git platform ${parsedUrl.source}`);
   }
 
   log.info(`  - Requesting '${rawUrl}'`);
