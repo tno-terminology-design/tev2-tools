@@ -63,4 +63,7 @@ scopedir: __tests__/content
 onNotExist: throw
 ```
 
+#### Master Configuration
+The tool only interprets keys from the configuration file that are part of the defined [parameters](#parameters-and-options). Using this knowledge, we are able to create one configuration file to control all of the terminology tools. The configuration file of the tev2-specifications repository can be found [here](https://github.com/tno-terminology-design/tev2-specifications/blob/main/docs/config.yaml). In the file, no seperate configuration section is dedicated to the mrg-import tool as the general `scopedir` and `onNotExist` options are enough to execute the tool.
+
 For more practical examples, continue reading in [deployment](deployment).
