@@ -1,6 +1,6 @@
-import { interpreter } from "./Run.js";
+import { saf } from "./Run.js";
 import { log } from './Report.js';
-import { SAF, Version, MRG } from './Interpreter.js';
+import { TuC, Version } from './Interpreter.js';
 
 import fs = require("fs");
 import path = require('path');
@@ -8,11 +8,9 @@ import yaml = require('js-yaml');
 
 export class Generator {
     public vsntag: string;
-    saf: SAF;
 
     public constructor({ vsntag }: { vsntag: string }) {
         this.vsntag = vsntag;
-        this.saf = interpreter.saf;
     }
 
     public initialize(): void {
@@ -20,13 +18,13 @@ export class Generator {
 
         // Check if the vsntag exists in the SAF
         if (this.vsntag) {
-            const vsn = this.saf.versions.find(vsn => vsn.vsntag === this.vsntag);
+            const vsn = saf.versions.find(vsn => vsn.vsntag === this.vsntag);
             if (vsn) {
                 log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}'...`);
                 this.generate(vsn);
             } else {
                 // check altvsntags
-                const vsn = this.saf.versions.find(vsn => vsn.altvsntags.includes(this.vsntag));
+                const vsn = saf.versions.find(vsn => vsn.altvsntags.includes(this.vsntag));
 
                 if (vsn) {
                     log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}')...`);
@@ -39,7 +37,7 @@ export class Generator {
         } else {
             // If no vsntag was specified, process all versions
             log.info(`No vsntag was specified. Processing all versions...`);
-            this.saf.versions.forEach(vsn => {
+            saf.versions.forEach(vsn => {
                 log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}'...`);
                 this.generate(vsn);
             });
@@ -47,42 +45,43 @@ export class Generator {
     }
 
     public generate(vsn: Version): void {
-        let MRG = {} as MRG;
-        let glossarydir = path.join(interpreter.scopedir, this.saf.scope.glossarydir);
-
-        // run interpreter to get TuC
-        interpreter.getTuCMap(vsn.termselcrit);
+        let tuc = new TuC({ instructions: vsn.termselcrit });
+        let glossarydir = path.join(saf.scope.localscopedir, saf.scope.glossarydir);
 
         // set relevant fields in the terminology section
-        MRG.terminology = {
-            scopetag: this.saf.scope.scopetag,
-            scopedir: this.saf.scope.scopedir,
-            curatedir: this.saf.scope.curatedir,
+        tuc.terminology = {
+            scopetag: saf.scope.scopetag,
+            scopedir: saf.scope.scopedir,
+            curatedir: saf.scope.curatedir,
             vsntag: vsn.vsntag,
             altvsntags: vsn.altvsntags
         };
 
         // set fields in the scopes section
-        MRG.scopes = [];
-        interpreter.scopes.forEach(scope => {
+        tuc.scopes.forEach(scope => {
             // find the corresponding scope in the SAF's scope section
-            let SAFscope = this.saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
+            let SAFscope = saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
             if (SAFscope) {
                 scope.scopedir = SAFscope.scopedir;
-                MRG.scopes.push(scope);
+            } else {
+                tuc.scopes.delete(scope);
             }
         });
 
-        // add TuC entries to entries section
-        MRG.entries = interpreter.TuC;
+        // create the MRG using terminology, scopes and entries and sort the entries by term
+        let mrg = {
+            terminology: tuc.terminology,
+            scopes: Array.from(tuc.scopes),
+            entries: tuc.entries.sort((a, b) => a.term.localeCompare(b.term))
+        };
 
         // Output the MRG to a file
-        let mrgFile = `mrg.${MRG.terminology.scopetag}.${MRG.terminology.vsntag}.yaml`;
-        writeFile(path.join(glossarydir, mrgFile), yaml.dump(MRG, { forceQuotes: true }));
+        let mrgFile = `mrg.${tuc.terminology.scopetag}.${tuc.terminology.vsntag}.yaml`;
+        writeFile(path.join(glossarydir, mrgFile), yaml.dump(mrg, { forceQuotes: true }));
 
         // if the version is the default version, create a symbolic link
-        if (this.saf.scope.defaultvsn === MRG.terminology.vsntag) {
-            let defaultmrgFile = `mrg.${MRG.terminology.scopetag}.yaml`;
+        if (saf.scope.defaultvsn === tuc.terminology.vsntag) {
+            let defaultmrgFile = `mrg.${tuc.terminology.scopetag}.yaml`;
             let defaultmrgURL = path.join(glossarydir, defaultmrgFile);
             log.info(`\tCreating symlink for default version '${vsn.vsntag}'`);
             if (!fs.existsSync(defaultmrgURL)) {
@@ -96,7 +95,7 @@ export class Generator {
 
         // Create a symlink for every altvsntag
         vsn.altvsntags.forEach(altvsntag => {
-            let altmrgFile = `mrg.${MRG.terminology.scopetag}.${altvsntag}.yaml`;
+            let altmrgFile = `mrg.${tuc.terminology.scopetag}.${altvsntag}.yaml`;
             let altmrgURL = path.join(glossarydir, altmrgFile);
             log.info(`\tCreating symlink for altvsntag '${altvsntag}'`);
             if (!fs.existsSync(altmrgURL)) {

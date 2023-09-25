@@ -1,14 +1,9 @@
 import { log } from './Report.js';
+import { saf } from './Run.js';
 
 import fs = require("fs");
 import path = require('path');
 import yaml = require('js-yaml');
-
-export interface SAF {
-    scope: Scope;
-    scopes: Scopes[];
-    versions: Version[];
-}
 
 interface Scope {
     website: string;
@@ -18,7 +13,7 @@ interface Scope {
     curatedir: string;
     glossarydir: string;
     defaultvsn: string;
-    mrgfile: string;
+    localscopedir: string;
 }
 
 interface Scopes {
@@ -30,12 +25,6 @@ export interface Version {
     vsntag: string;
     altvsntags: string[];
     termselcrit: string[];
-}
-
-export interface MRG {
-    terminology: Terminology;
-    scopes: Scopes[];
-    entries: Entry[];
 }
 
 interface Terminology {
@@ -62,50 +51,17 @@ interface Entry {
     [key: string]: any;
 }
 
-export class Interpreter {
-    public scopedir: string;
-    public scopes!: Set<Scopes>;
-    public saf!: SAF;
-    public TuC!: Entry[];
+export class TuC {
+    public entries: Entry[] = [];
+    public scopes = new Set<Scopes>();
+    public terminology = {} as Terminology;
 
-    public constructor({ scopedir }: { scopedir: string }) {
-        this.scopedir = scopedir;
-        this.scopes = new Set<Scopes>();
-        this.TuC = [] as Entry[];
-        this.saf = this.getSafMap(path.join(this.scopedir, 'saf.yaml'));
-    }
+    static instances: TuC[] = [];
 
-    /**
-     * Retrieves the SAF (Scope Administration File) map.
-     * @returns A promise that resolves to the SAF map.
-     */
-    private getSafMap(safURL: string): SAF {
-        let saf = {} as SAF;
+    public constructor({ instructions }: { instructions: string[]}) {
+        this.getTuCMap(instructions);
 
-        try {
-            // Try to load the SAF map from the scopedir
-            saf = yaml.load(fs.readFileSync(safURL, 'utf8')) as SAF;
-
-            // Check for missing required properties in SAF
-            type ScopeProperty = keyof Scope;
-            const requiredProperties: ScopeProperty[] = ['scopetag', 'scopedir', 'curatedir', 'defaultvsn'];
-            const missingProperties = requiredProperties.filter(prop => !saf.scope[prop]);
-
-            if (missingProperties.length > 0) {
-                log.error(`\tE002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`);
-                process.exit(1);
-            }
-            // Check if there are existing versions
-            if (!saf.versions || saf.versions.length === 0) {
-                log.error(`\tE003 No versions found in SAF at '${safURL}'`);
-                process.exit(1);
-            }
-        } catch (err) {
-            log.error(`\tE004 An error occurred while attempting to load the SAF at '${safURL}':`, err);
-            process.exit(1);
-        }
-
-        return saf;
+        TuC.instances.push(this);
     }
 
     public getTuCMap(instructions: string[]): Entry[] {
@@ -130,13 +86,13 @@ export class Interpreter {
         rem.forEach(this.removeMrgEntry.bind(this));
         ren.forEach(this.renameMrgEntry.bind(this));        
     
-        return this.TuC;
+        return this.entries;
     }
     
 
     private getCtextEntries(): Entry[] {
         let cTextMap: Entry[] = [];
-        const curatedir = path.join(this.scopedir, this.saf.scope.curatedir);
+        const curatedir = path.join(saf.scope.localscopedir, saf.scope.curatedir);
 
         // Get all the curated texts from the curatedir
         let curatedirContent = fs.readdirSync(curatedir);
@@ -154,7 +110,7 @@ export class Interpreter {
             let ctextYAML = yaml.load(frontmatter) as Entry;
 
             // Extract heading IDs from markdown content
-            let headingIds = this.extractHeadingIds(body);
+            let headingIds = extractHeadingIds(body);
 
             // remove properties that match specific set of predetermined properties
             Object.keys(ctextYAML).forEach(key => {
@@ -164,17 +120,17 @@ export class Interpreter {
             });
 
             // construct navurl from website, navpath and ctext name, or bodyFile
-            const navUrl = new URL(this.saf.scope.website);
+            const navUrl = new URL(saf.scope.website);
             if (ctextYAML.bodyFile) {
                 // If the bodyFile property is set, then use that to construct the navurl
                 let bodyFile = path.parse(ctextYAML.bodyFile);
                 navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
             } else {
-                navUrl.pathname = path.join(navUrl.pathname, this.saf.scope.navpath, path.parse(ctext).name);
+                navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
             }
 
             // add properties to MRG Entry
-            ctextYAML.scopetag = this.saf.scope.scopetag;
+            ctextYAML.scopetag = saf.scope.scopetag;
             ctextYAML.locator = ctext;
             ctextYAML.navurl = navUrl.href;
             ctextYAML.headingids = headingIds;
@@ -199,20 +155,20 @@ export class Interpreter {
         // TODO: halt if no scopetag is specified?
 
         let entries = [] as Entry[];
-        let mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ?? this.saf.scope.defaultvsn}.yaml`);
+        let mrgFile = `mrg.${scopetag}.${vsntag ?? saf.scope.defaultvsn}.yaml`;
         
         try {
             if (action === 'terms') {
                 // Process terms instruction
                 const termList = items.split(','); // Extract term list
-                let mrgMap = this.getMrgMap(mrgFile);
+                let mrgMap = new MRG({ filename: mrgFile });
                 if (mrgMap.entries) {
                     entries = mrgMap.entries.filter(entry => termList.includes(entry.term));
                 }
             } else if (action === 'tags') {
                 // Process tags instruction
                 const tagList = items.split(','); // Extract tag list
-                let mrgMap = this.getMrgMap(mrgFile);
+                let mrgMap = new MRG({ filename: mrgFile });
                 if (mrgMap.entries) {
                     entries = mrgMap.entries.filter(entry => {
                         if (entry.grouptags) {
@@ -227,12 +183,12 @@ export class Interpreter {
                 }
             } else if (action === '*') {
                 // Process wildcard instruction
-                if (!scopetag || scopetag === this.saf.scope.scopetag) {
+                if (!scopetag || scopetag === saf.scope.scopetag) {
                     // Add all curated texts from the scope to the terminology under construction
                     entries = this.getCtextEntries();
                 } else {
-                    mrgFile = path.join(this.scopedir, this.saf.scope.glossarydir, `mrg.${scopetag}.${vsntag ? vsntag + '.' : ''}yaml`);
-                    entries = this.getMrgMap(mrgFile).entries;
+                    mrgFile = `mrg.${scopetag}.${vsntag ? vsntag + '.' : ''}yaml`;
+                    entries = new MRG({ filename: mrgFile }).entries;
                 }
             } else {
                 log.error(`\tE022 Invalid term selection criteria action: ${action}`);
@@ -240,8 +196,8 @@ export class Interpreter {
             }
             if (entries.length > 0) {
                 // add entries to TuC and overwrite existing entries with the same term
-                this.TuC = this.TuC.filter(entry => !entries.some(e => e.term === entry.term));
-                this.TuC.push(...entries);
+                this.entries = this.entries.filter(entry => !entries.some(e => e.term === entry.term));
+                this.entries.push(...entries);
                 // add scope to scopes set
                 this.scopes.add({
                     scopetag: scopetag,
@@ -271,7 +227,7 @@ export class Interpreter {
             // Process -tags instruction
             const tagList = items.split(','); // Extract tag list
             // Remove mrg entries from this.TuC with grouptags that match the tag list
-            this.TuC = this.TuC.filter(entry => {
+            this.entries = this.entries.filter(entry => {
                 if (entry.grouptags) {
                     for (const tag of tagList) {
                         if (entry.grouptags.includes(tag)) {
@@ -285,7 +241,7 @@ export class Interpreter {
             // Process -terms instruction
             const termList = items.split(','); // Extract term list
             // Remove mrg entries from this.TuC with term id's that match the term list
-            this.TuC = this.TuC.filter(entry => !termList.includes(entry.term));
+            this.entries = this.entries.filter(entry => !termList.includes(entry.term));
         } else {
             log.error(`\tE022 Invalid term selection criteria action: ${action}`);
             return undefined;
@@ -317,7 +273,7 @@ export class Interpreter {
         }
 
         // Find the entries with the term
-        const entries = this.TuC.filter(entry => entry.term === term);
+        const entries = this.entries.filter(entry => entry.term === term);
 
         if (entries.length > 0) {
             // Modify the entry based on the field modifiers
@@ -330,25 +286,26 @@ export class Interpreter {
             log.warn(`\tW001 No entries found for instruction: ${instruction}`);
         }
     }
+}
 
-    /**
-     * Extracts the heading IDs from the markdown content.
-     * @param content The markdown content.
-     * @returns An array of heading IDs.
-     */
-    private extractHeadingIds(content: string): string[] {
-        // Regular expression to match markdown headings
-        const headingRegex = /^#+\s+(.*)$/gm;
 
-        let matches;
-        let headingIds: string[] = [];
+export class MRG {
+    public filename: string;
+    public terminology: Terminology;
+    public scopes: Scopes[];
+    public entries: Entry[] = [];
 
-        while ((matches = headingRegex.exec(content)) !== null) {
-            let headingId = matches[1].replace(/\s+/g, '-').toLowerCase();
-            headingIds.push(headingId);
-        }
+    static instances: MRG[] = [];
 
-        return headingIds;
+    public constructor({ filename }: { filename: string }) {
+        const mrg = this.getMrgMap(path.join(saf.scope.localscopedir, saf.scope.glossarydir, filename));
+
+        this.filename = filename;
+        this.terminology = mrg.terminology;
+        this.scopes = mrg.scopes;
+        this.entries = mrg.entries;
+        
+        MRG.instances.push(this);
     }
 
     /**
@@ -397,4 +354,73 @@ export class Interpreter {
   
         return mrg;
     }
+}
+
+
+export class SAF {
+    public scope: Scope;
+    public scopes: Scopes[];
+    public versions: Version[];
+
+    public constructor({ scopedir }: { scopedir: string }) {
+        let saf = this.getSafMap(path.join(scopedir, 'saf.yaml'));
+
+        this.scope = saf.scope;
+        this.scope.localscopedir = scopedir;
+        this.scopes = saf.scopes;
+        this.versions = saf.versions;
+    }
+
+    /**
+     * Retrieves the SAF (Scope Administration File) map.
+     * @returns A promise that resolves to the SAF map.
+     */
+    private getSafMap(safURL: string): SAF {
+        let saf = {} as SAF;
+
+        try {
+            // Try to load the SAF map from the scopedir
+            saf = yaml.load(fs.readFileSync(safURL, 'utf8')) as SAF;
+
+            // Check for missing required properties in SAF
+            type ScopeProperty = keyof Scope;
+            const requiredProperties: ScopeProperty[] = ['scopetag', 'scopedir', 'curatedir', 'defaultvsn'];
+            const missingProperties = requiredProperties.filter(prop => !saf.scope[prop]);
+
+            if (missingProperties.length > 0) {
+                log.error(`\tE002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`);
+                process.exit(1);
+            }
+            // Check if there are existing versions
+            if (!saf.versions || saf.versions.length === 0) {
+                log.error(`\tE003 No versions found in SAF at '${safURL}'`);
+                process.exit(1);
+            }
+        } catch (err) {
+            log.error(`\tE004 An error occurred while attempting to load the SAF at '${safURL}':`, err);
+            process.exit(1);
+        }
+
+        return saf;
+    }
+}
+
+/**
+ * Extracts the heading IDs from the markdown content.
+ * @param content The markdown content.
+ * @returns An array of heading IDs.
+ */
+function extractHeadingIds(content: string): string[] {
+    // Regular expression to match markdown headings
+    const headingRegex = /^#+\s+(.*)$/gm;
+
+    let matches;
+    let headingIds: string[] = [];
+
+    while ((matches = headingRegex.exec(content)) !== null) {
+        let headingId = matches[1].replace(/\s+/g, '-').toLowerCase();
+        headingIds.push(headingId);
+    }
+
+    return headingIds;
 }

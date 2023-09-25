@@ -4,14 +4,14 @@ import { Command } from 'commander';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { log } from './Report.js';
-import { Interpreter } from './Interpreter.js';
+import { SAF } from './Interpreter.js';
 import { Generator } from './Generator.js';
 
 import yaml from 'js-yaml';
 import chalk from 'chalk';
 import figlet from 'figlet';
 
-export let interpreter: Interpreter;
+export let saf: SAF;
 export let generator: Generator;
 export let onNotExist: string = 'throw';
 const program = new Command();
@@ -76,8 +76,7 @@ async function main(): Promise<void> {
         }
     }
     
-    // Create an interpreter with the provided scopedir
-    interpreter = new Interpreter({ scopedir: options.scopedir });
+    saf = new SAF({ scopedir: options.scopedir });
     generator = new Generator({ vsntag: options.vsntag });
         
     // Resolve terms
