@@ -55,6 +55,7 @@ export class TuC {
     public entries: Entry[] = [];
     public scopes = new Set<Scopes>();
     public terminology = {} as Terminology;
+    public synonymOfField = false;
 
     static instances: TuC[] = [];
 
@@ -109,9 +110,6 @@ export class TuC {
 
             let ctextYAML = yaml.load(frontmatter) as Entry;
 
-            // Extract heading IDs from markdown content
-            let headingIds = extractHeadingIds(body);
-
             // remove properties that match specific set of predetermined properties
             Object.keys(ctextYAML).forEach(key => {
                 if (['scopetag', 'locator', 'navurl', 'headingids'].includes(key.toLowerCase())) {
@@ -119,21 +117,28 @@ export class TuC {
                 }
             });
 
-            // construct navurl from website, navpath and ctext name, or bodyFile
-            const navUrl = new URL(saf.scope.website);
-            if (ctextYAML.bodyFile) {
-                // If the bodyFile property is set, then use that to construct the navurl
-                let bodyFile = path.parse(ctextYAML.bodyFile);
-                navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
-            } else {
-                navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
-            }
+            // Extract heading IDs from markdown content
+            let headingIds = extractHeadingIds(body);
 
-            // add properties to MRG Entry
-            ctextYAML.scopetag = saf.scope.scopetag;
-            ctextYAML.locator = ctext;
-            ctextYAML.navurl = navUrl.href;
-            ctextYAML.headingids = headingIds;
+            if (ctextYAML.synonymOf) {
+                this.synonymOfField = true;
+            } else {
+                // construct navurl from website, navpath and ctext name, or bodyFile
+                const navUrl = new URL(saf.scope.website);
+                if (ctextYAML.bodyFile) {
+                    // If the bodyFile property is set, then use that to construct the navurl
+                    let bodyFile = path.parse(ctextYAML.bodyFile);
+                    navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
+                } else {
+                    navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
+                }
+
+                // add properties to MRG Entry
+                ctextYAML.scopetag = saf.scope.scopetag;
+                ctextYAML.locator = ctext;
+                ctextYAML.navurl = navUrl.href;
+                ctextYAML.headingids = headingIds;
+            }
 
             cTextMap.push(ctextYAML);
         });
@@ -341,7 +346,7 @@ export class MRG {
                 // Check for missing required properties in MRG entries
                 const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
 
-                if (missingProperties.length > 0) {
+                if (missingProperties.length > 0 && !entry.synonymOf) {
                     // Create a reference to the problematic entry using the first three property-value pairs
                     const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
 

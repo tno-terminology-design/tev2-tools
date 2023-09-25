@@ -1,6 +1,6 @@
 import { saf } from "./Run.js";
 import { log } from './Report.js';
-import { TuC, Version } from './Interpreter.js';
+import { MRG, TuC, Version } from './Interpreter.js';
 
 import fs = require("fs");
 import path = require('path');
@@ -42,6 +42,35 @@ export class Generator {
                 this.generate(vsn);
             });
         }
+
+        // // iterate over TuC instances where synonymOfField is true
+        // TuC.instances.forEach(tuc => {
+        //     if (tuc.synonymOfField) {
+        //         log.trace(`Handling synonymOf use in scope ${tuc.terminology.scopetag}`)
+        //         // find the entries that have the synonymOf property set
+        //         let entries = tuc.entries.filter(entry => entry.synonymOf);
+        //         entries.forEach(entry => {
+        //             // wrangle the synonymOf field using a regex
+        //             let properties = entry.synonymOf!.match(/(?:(?<term>[a-z0-9_-]+))(?:(?:@(?:(?<scopetag>[a-z0-9_-]+)))?(?::(?<vsntag>[a-z0-9_-]+))?)/);
+        //             if (properties?.groups) {
+        //                 let mrgfile = `mrg.${properties.groups.scopetag ?? saf.scope.scopetag}.${properties.groups.vsntag ?? saf.scope.defaultvsn}.yaml`;
+        //                 // if the mrgfile exists as a MRG.instance.filename, use that instance
+        //                 let mrg = MRG.instances.find(mrg => mrg.filename === mrgfile) ?? new MRG({ filename: mrgfile });
+
+        //                 // find the entry in the MRG
+        //                 let entrymatch = mrg.entries.find(entry => entry.term === properties!.groups!.term);
+        //                 if (entrymatch) {
+        //                     // copy all entry's properties to the current entry
+        //                     entry = Object.assign(entry, entrymatch);
+        //                     // Output the MRG to a file
+        //                     writeFile(path.join(saf.scope.localscopedir, saf.scope.glossarydir, mrgfile), yaml.dump(mrg, { forceQuotes: true }));  
+        //                 } else {
+        //                     log.warn(`\tEntry '${properties!.groups!.term}' not found in MRG '${mrgfile}'`);
+        //                 }
+        //             }
+        //         });             
+        //     }
+        // });
     }
 
     public generate(vsn: Version): void {
