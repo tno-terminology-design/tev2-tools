@@ -56,11 +56,34 @@ export class TuC {
     public scopes = new Set<Scopes>();
     public terminology = {} as Terminology;
     public synonymOfField = false;
+    public filename: string;
 
     static instances: TuC[] = [];
 
-    public constructor({ instructions }: { instructions: string[]}) {
-        this.getTuCMap(instructions);
+    public constructor({ vsn }: { vsn: Version}) {
+        this.getTuCMap(vsn.termselcrit);
+
+        // set relevant fields in the terminology section
+        this.terminology = {
+            scopetag: saf.scope.scopetag,
+            scopedir: saf.scope.scopedir,
+            curatedir: saf.scope.curatedir,
+            vsntag: vsn.vsntag,
+            altvsntags: vsn.altvsntags
+        };
+        
+        this.filename = `mrg.${this.terminology.scopetag}.${this.terminology.vsntag}.yaml`;
+
+        // set fields in the scopes section
+        this.scopes.forEach(scope => {
+            // find the corresponding scope in the SAF's scope section
+            let SAFscope = saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
+            if (SAFscope) {
+                scope.scopedir = SAFscope.scopedir;
+            } else {
+                this.scopes.delete(scope);
+            }
+        });
 
         TuC.instances.push(this);
     }
@@ -89,7 +112,17 @@ export class TuC {
     
         return this.entries;
     }
-    
+
+    public output(): MRG {
+        // create the MRG using terminology, scopes and entries and sort the entries by term
+        let mrg = {
+            terminology: this.terminology,
+            scopes: Array.from(this.scopes),
+            entries: this.entries.sort((a, b) => a.term.localeCompare(b.term))
+        };
+
+        return mrg as MRG;
+    }
 
     private getCtextEntries(): Entry[] {
         let cTextMap: Entry[] = [];
@@ -122,23 +155,22 @@ export class TuC {
 
             if (ctextYAML.synonymOf) {
                 this.synonymOfField = true;
-            } else {
-                // construct navurl from website, navpath and ctext name, or bodyFile
-                const navUrl = new URL(saf.scope.website);
-                if (ctextYAML.bodyFile) {
-                    // If the bodyFile property is set, then use that to construct the navurl
-                    let bodyFile = path.parse(ctextYAML.bodyFile);
-                    navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
-                } else {
-                    navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
-                }
-
-                // add properties to MRG Entry
-                ctextYAML.scopetag = saf.scope.scopetag;
-                ctextYAML.locator = ctext;
-                ctextYAML.navurl = navUrl.href;
-                ctextYAML.headingids = headingIds;
             }
+            // construct navurl from website, navpath and ctext name, or bodyFile
+            const navUrl = new URL(saf.scope.website);
+            if (ctextYAML.bodyFile) {
+                // If the bodyFile property is set, then use that to construct the navurl
+                let bodyFile = path.parse(ctextYAML.bodyFile);
+                navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
+            } else {
+                navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
+            }
+
+            // add properties to MRG Entry
+            ctextYAML.scopetag = saf.scope.scopetag;
+            ctextYAML.locator = ctext;
+            ctextYAML.navurl = navUrl.href;
+            ctextYAML.headingids = headingIds;
 
             cTextMap.push(ctextYAML);
         });
@@ -334,24 +366,6 @@ export class MRG {
             if (missingProperties.length > 0) {
                 log.error(`\tE003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
                 process.exit(1);
-            }
-
-            const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
-
-            for (const entry of mrg.entries) {
-                // add vsntag and scopetag from source MRG to MRG entries
-                entry.vsntag = terminology.vsntag;
-                entry.scopetag = terminology.scopetag;
-
-                // Check for missing required properties in MRG entries
-                const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
-
-                if (missingProperties.length > 0 && !entry.synonymOf) {
-                    // Create a reference to the problematic entry using the first three property-value pairs
-                    const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
-
-                    log.warn(`\tE004 MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`);
-                }
             }
         } catch (err) {
             throw `\tE005 An error occurred while attempting to load the MRG at '${mrgURL}': ${err}`;

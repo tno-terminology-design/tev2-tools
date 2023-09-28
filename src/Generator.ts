@@ -43,13 +43,12 @@ export class Generator {
             });
         }
 
-        // // iterate over TuC instances where synonymOfField is true
+        // iterate over TuC instances where synonymOfField is true
         // TuC.instances.forEach(tuc => {
         //     if (tuc.synonymOfField) {
-        //         log.trace(`Handling synonymOf use in scope ${tuc.terminology.scopetag}`)
+        //         log.trace(`Handling synonymOf use in version '${tuc.terminology.vsntag}' `)
         //         // find the entries that have the synonymOf property set
-        //         let entries = tuc.entries.filter(entry => entry.synonymOf);
-        //         entries.forEach(entry => {
+        //         tuc.entries.filter(entry => entry.synonymOf).forEach((entry, index) => {
         //             // wrangle the synonymOf field using a regex
         //             let properties = entry.synonymOf!.match(/(?:(?<term>[a-z0-9_-]+))(?:(?:@(?:(?<scopetag>[a-z0-9_-]+)))?(?::(?<vsntag>[a-z0-9_-]+))?)/);
         //             if (properties?.groups) {
@@ -61,52 +60,30 @@ export class Generator {
         //                 let entrymatch = mrg.entries.find(entry => entry.term === properties!.groups!.term);
         //                 if (entrymatch) {
         //                     // copy all entry's properties to the current entry
-        //                     entry = Object.assign(entry, entrymatch);
+        //                     Object.keys(entrymatch).forEach(key => {
+        //                         if (['scopetag', 'locator', 'navurl', 'headingids'].includes(key.toLowerCase())) {
+        //                             delete entrymatch![key];
+        //                         }
+        //                     });
+        //                     tuc.entries[index] = { ...entry, ...entrymatch }
         //                     // Output the MRG to a file
-        //                     writeFile(path.join(saf.scope.localscopedir, saf.scope.glossarydir, mrgfile), yaml.dump(mrg, { forceQuotes: true }));  
+        //                     writeFile(path.join(saf.scope.localscopedir, saf.scope.glossarydir, tuc.filename), yaml.dump(tuc.output(), { forceQuotes: true }));
         //                 } else {
         //                     log.warn(`\tEntry '${properties!.groups!.term}' not found in MRG '${mrgfile}'`);
         //                 }
         //             }
-        //         });             
+        //         });
         //     }
         // });
     }
 
     public generate(vsn: Version): void {
-        let tuc = new TuC({ instructions: vsn.termselcrit });
+        let tuc = new TuC({ vsn: vsn });
         let glossarydir = path.join(saf.scope.localscopedir, saf.scope.glossarydir);
-
-        // set relevant fields in the terminology section
-        tuc.terminology = {
-            scopetag: saf.scope.scopetag,
-            scopedir: saf.scope.scopedir,
-            curatedir: saf.scope.curatedir,
-            vsntag: vsn.vsntag,
-            altvsntags: vsn.altvsntags
-        };
-
-        // set fields in the scopes section
-        tuc.scopes.forEach(scope => {
-            // find the corresponding scope in the SAF's scope section
-            let SAFscope = saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
-            if (SAFscope) {
-                scope.scopedir = SAFscope.scopedir;
-            } else {
-                tuc.scopes.delete(scope);
-            }
-        });
-
-        // create the MRG using terminology, scopes and entries and sort the entries by term
-        let mrg = {
-            terminology: tuc.terminology,
-            scopes: Array.from(tuc.scopes),
-            entries: tuc.entries.sort((a, b) => a.term.localeCompare(b.term))
-        };
 
         // Output the MRG to a file
         let mrgFile = `mrg.${tuc.terminology.scopetag}.${tuc.terminology.vsntag}.yaml`;
-        writeFile(path.join(glossarydir, mrgFile), yaml.dump(mrg, { forceQuotes: true }));
+        writeFile(path.join(glossarydir, mrgFile), yaml.dump(tuc.output(), { forceQuotes: true }));
 
         // if the version is the default version, create a symbolic link
         if (saf.scope.defaultvsn === tuc.terminology.vsntag) {
