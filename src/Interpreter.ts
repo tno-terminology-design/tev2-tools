@@ -59,6 +59,7 @@ export class TuC {
     public filename: string;
 
     static instances: TuC[] = [];
+    static cTextMap: Entry[] = [];
 
     public constructor({ vsn }: { vsn: Version}) {
         this.getTuCMap(vsn.termselcrit);
@@ -125,7 +126,10 @@ export class TuC {
     }
 
     private getCtextEntries(): Entry[] {
-        let cTextMap: Entry[] = [];
+        // return cTextMap if it already exists
+        if (TuC.cTextMap.length > 0) {
+            return TuC.cTextMap;
+        }
         const curatedir = path.join(saf.scope.localscopedir, saf.scope.curatedir);
 
         // Get all the curated texts from the curatedir
@@ -172,9 +176,9 @@ export class TuC {
             ctextYAML.navurl = navUrl.href;
             ctextYAML.headingids = headingIds;
 
-            cTextMap.push(ctextYAML);
+            TuC.cTextMap.push(ctextYAML);
         });
-        return cTextMap;
+        return TuC.cTextMap;
     }
 
     private addMrgEntry(instruction: string): void {
