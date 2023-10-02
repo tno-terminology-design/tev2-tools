@@ -5,6 +5,13 @@ import fs from 'fs';
 import axios from 'axios';
 import gitUrlParse from 'git-url-parse';
 
+/**
+ * Downloads a file from a Git repository.
+ * @param url - The Git URL.
+ * @param localPath - The local path to save the file to.
+ * @returns A promise that resolves when the file has been downloaded.
+ * @throws An error if the Git URL is invalid or the platform is not supported.
+ */
 export async function download(url: URL, localPath: string): Promise<void> {
   const parsedUrl = gitUrlParse(url.href);
   if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.filepath) {

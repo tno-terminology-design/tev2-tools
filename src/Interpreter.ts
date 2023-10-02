@@ -64,8 +64,12 @@ interface Entry {
     [key: string]: any;
 }
 
-// Read SAF from current scopedir
+/**
+ * Initializes the MRG Importer.
+ * @param scopedir The scopedir of the scope from which the MRG Importer is called.
+ */
 export async function initialize({ scopedir }: { scopedir: string }) {
+    // read the SAF of the 'own' scope
     const env = new Interpreter({ scopedir: scopedir });
     const saf = await env.saf;
 
@@ -134,6 +138,10 @@ export async function initialize({ scopedir }: { scopedir: string }) {
     }
 }
 
+/**
+ * The Interpreter class, which handles the MRG and SAF objects.
+ * @param scopedir The scopedir of the scope from which the MRG Importer is called.
+ */
 export class Interpreter {
     public scopedir: string;
     public saf!: Promise<SAF>;
@@ -146,6 +154,7 @@ export class Interpreter {
 
     /**
      * Retrieves the SAF (Scope Administration File) map.
+     * @param safURL The URL of the SAF map.
      * @returns A promise that resolves to the SAF map.
      */
     private async getSafMap(safURL: string): Promise<SAF> {
@@ -199,6 +208,7 @@ export class Interpreter {
 
     /**
      * Retrieves the MRG (Machine Readable Glossary) map.
+     * @param mrgURL The URL of the MRG map.
      * @returns A promise that resolves to the MRG map.
      */
     public async getMrgMap(mrgURL: string): Promise<MRG> {
