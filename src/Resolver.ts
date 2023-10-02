@@ -7,6 +7,15 @@ import matter from 'gray-matter';
 import fs = require("fs");
 import path = require('path');
 
+/**
+ * The Resolver class handles the resolution of term references in files.
+ * This resolution happens according to a string that is supplied in `globPattern`.
+ * A file is resolved by calling the `resolve` method with the corresponding file path.
+ * If the resolution was successful, the resolved file is written to the output path.
+ * The `force` parameter is used to overwrite existing files.
+ * The `outputPath` parameter is used to specify the output path.
+ * The `globPattern` parameter is be used to specify the glob pattern.
+ */
 export class Resolver {
       private outputPath: string;
       private globPattern: string;
@@ -67,8 +76,10 @@ export class Resolver {
        * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
        */
       private async interpretAndConvert(file: matter.GrayMatterFile<string>, filePath: string): Promise<string | undefined> {
+            // Get the matches of the regex in the file.orig string
             let matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(interpreter!.getRegex()));
             if (file.matter) {
+                  // If the file has frontmatter, get the matches of the regex in the frontmatter string
                   // remove count of frontmatter matches from the front of the matches array
                   let frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(interpreter!.getRegex()));
                   matches.splice(0, frontmatter.length);
@@ -172,7 +183,8 @@ export class Resolver {
       }
 
       /**
-       * Resolves and converts files in the specified input path.
+       * Calles interpretAndConvert() on files based on `this.globPattern`.
+       * @returns A Promise that resolves to true if the resolution was successful.
        */
       public async resolve(): Promise<boolean> {
             // Log information about the interpreter, converter and the files being read

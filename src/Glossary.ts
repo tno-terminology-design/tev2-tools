@@ -48,6 +48,11 @@ export interface Entry {
       [key: string]: any;
 }
 
+/**
+ * The MRG class handles the retrieval and processing of an MRG (Machine Readable Glossary).
+ * An MRG is retrieved based on the `filename` and processed into an MRG object.
+ * The MRG object with its MRG entries can then be used to populate the runtime glossary.
+ */
 export class MRG {
       public filename: string;
       public terminology: Terminology;
@@ -70,18 +75,19 @@ export class MRG {
       }
 
       /**
-       * Retrieves the MRG (Machine Readable Glossary) map.
-       * @returns A promise that resolves to the MRG map.
+       * Reads the MRG at `mrgURL` and maps it as an MRG object.
+       * @param mrgURL - The full path of the MRG to be retrieved.
+       * @returns - The MRG as an MRG object.
        */
       public getMrgMap(mrgURL: string): MRG {
             let mrg = {} as MRG;
       
             try {
-                  // Try to load the MRG map from the `mrgURL`
+                  // try to load the MRG map from the `mrgURL`
                   const mrgfile = fs.readFileSync(mrgURL, 'utf8');
                   mrg = yaml.load(mrgfile) as MRG;
 
-                  // Check for missing required properties in MRG terminology
+                  // check for missing required properties in MRG terminology
                   type TerminologyProperty = keyof Terminology;
                   const requiredProperties: TerminologyProperty[] = ['scopetag', 'scopedir', 'curatedir', 'vsntag'];
                   const terminology = mrg.terminology;
@@ -100,11 +106,11 @@ export class MRG {
                         entry.scopetag = terminology.scopetag;
                         entry.altvsntags = terminology.altvsntags
 
-                        // Check for missing required properties in MRG entries
+                        // check for missing required properties in MRG entries
                         const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
       
                         if (missingProperties.length > 0) {
-                              // Create a reference to the problematic entry using the first three property-value pairs
+                              // create a reference to the problematic entry using the first three property-value pairs
                               const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
 
                               const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`;
@@ -161,6 +167,10 @@ export class MRG {
       }
 }
 
+/**
+ * The SAF class handles the retrieval and processing of a SAF (Scope Administration File).
+ * A SAF is retrieved based on the `scopedir` and processed into a SAF object.
+ */
 export class SAF {
       public scope: Scope;
       public scopes: Scopes[];
@@ -176,17 +186,18 @@ export class SAF {
       }
 
       /**
-       * Retrieves the SAF (Scope Administration File) map.
-       * @returns A promise that resolves to the SAF map.
+       * Reads the SAF at `safURL` and maps it as a SAF object.
+       * @param safURL - The full path of the SAF to be retrieved.
+       * @returns - The SAF as a SAF object.
        */
       private getSafMap(safURL: string): SAF {
             let saf = {} as SAF;
 
             try {
-                  // Try to load the SAF map from the scopedir
+                  // try to load the SAF map from the scopedir
                   saf = yaml.load(fs.readFileSync(safURL, 'utf8')) as SAF;
 
-                  // Check for missing required properties in SAF
+                  // check for missing required properties in SAF
                   type ScopeProperty = keyof Scope;
                   const requiredProperties: ScopeProperty[] = ['scopetag', 'scopedir', 'curatedir', 'defaultvsn'];
                   const missingProperties = requiredProperties.filter(prop => !saf.scope[prop]);
@@ -212,20 +223,24 @@ export class SAF {
  * @returns An array of strings with all possible alternatives after macro replacements.
  */
 function applyMacroReplacements(input: string, regexMap: { [key: string]: string[] }): string[] {
+      // check if the input contains a macro
       const match = input.match(/\{(\w+)}/);
-  
+
+      // if no macro is found, return the input as is
       if (!match) {
             return [input];
       }
-  
+
       const macroKey = match[1];
       const replacements = regexMap[`{${macroKey}}`] || [];
   
+      // split the input into prefix and suffix at the macro
       const prefix = input.substring(0, match.index);
       const suffix = input.substring(match.index! + match[0].length);
   
       const result: string[] = [];
   
+      // recursively apply macro replacements and use recursion to handle multiple macros
       for (const replacement of replacements) {
             const newAlternative = prefix + replacement + suffix;
             result.push(...applyMacroReplacements(newAlternative, regexMap));

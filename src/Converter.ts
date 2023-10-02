@@ -5,25 +5,32 @@ import { Entry } from './Glossary.js';
 
 type AnyObject = { [key: string]: any };
 
-
+/**
+ * The Converter class handles the conversion of a glossary entry to a specific format.
+ * This conversion happens according to a string that is supplied in `template`.
+ * An entry is converted by calling the `convert` method with the corresponding entry and a matching term.
+ * Helper functions are registered with Handlebars to allow for more complex conversions.
+ */
 export class Converter {
       private type: string;
       private template: string;
 
       public constructor({ template }: { template: any }) {
+            // map of default templates for each type
             const map: { [key: string]: string } = {
                   html: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>',
                   essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>',
                   markdown: '[{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})',
             };
 
+            // register helper functions with Handlebars
             Handlebars.registerHelper('noRefs', noRefsHelper);
             Handlebars.registerHelper('capFirst', capFirstHelper);
             Handlebars.registerHelper('ifValue', ifValueHelper);
 
             let key = template.toLowerCase();
             let exist = map.hasOwnProperty(key);
-            // Check if the template parameter is a key in the defaults map
+            // check if the template parameter is a key in the defaults map
             if (exist) {
                   this.type = key;
                   this.template = map[key];
@@ -57,25 +64,31 @@ export class Converter {
       }
 }
 
+/**
+ * Helper function to remove references or links from a string (according to the specified type)
+ * @param text - The string to be processed
+ * @param options - The options to be used in the processing
+ * @returns The processed string
+ */
 function noRefsHelper(this: any, text: string, options: any) {
+      // handle empty strings
       if (Handlebars.Utils.isEmpty(text)) {
             return text;
       }
 
+      // default to interpreter if no type is specified
       let type = ['interpreter']
+      // Split the option hash string of `type` into an array of types
       if (!Handlebars.Utils.isEmpty(options.hash.type)) {
             type = options.hash.type.split(',').map((element: string) => {
                   return element.trim();
             });
-      } else {
-            // Default to interpreter if no type is specified
-            options.hash.type = 'interpreter';
       }
 
       let regex: RegExp;
 
       type.forEach((element: string) => {
-            // switch on element to determine which interpreter to use
+            // switch on element of type to determine which regex to use
             switch (element.toLowerCase()) {
                   case 'interpreter':
                         regex = interpreter!.getRegex();
@@ -94,7 +107,7 @@ function noRefsHelper(this: any, text: string, options: any) {
             let matches = Array.from(text.matchAll(regex)) as RegExpMatchArray[];
 
             if (matches.length > 0) {
-                  // Iterate over each match found in the text string
+                  // iterate over each match found in the text string
                   for (const match of matches) {
                         const termProperties: Map<string, string> = interpreter!.interpret(match);
             
@@ -109,12 +122,17 @@ function noRefsHelper(this: any, text: string, options: any) {
       return text;
 }
 
+/**
+ * Helper function to capitalize the first letter of every word in a string
+ * @param text - The string to be capitalized
+ * @returns The capitalized string
+ */
 function capFirstHelper(text: string) {
       if (Handlebars.Utils.isEmpty(text)) {
             return text;
       }
 
-      // The first character of every word separated by spaces will be capitalized
+      // the first character of every word separated by spaces will be capitalized
       const words = text.split(' ');
       const capitalizedWords = words.map((word) =>
             word.charAt(0).toUpperCase() + word.slice(1)
@@ -122,6 +140,12 @@ function capFirstHelper(text: string) {
       return capitalizedWords.join(' ');
 }
 
+/**
+ * Helper function to compare two values in a Handlebars `ifValue` block
+ * @param conditional - The first value to compare
+ * @param options - The second value to compare
+ * @returns The result of the comparison
+ */
 function ifValueHelper(this: any, conditional: any, options: any) {
       if (conditional == options.hash.equals) {
             return options.fn(this);
@@ -130,7 +154,12 @@ function ifValueHelper(this: any, conditional: any, options: any) {
       }
 };
 
-// Helper function to evaluate expressions inside properties
+/**
+ * Helper function to evaluate Handlebars expressions inside MRG Entry properties
+ * @param input - The string to be evaluated
+ * @param data - The data to be used in the evaluation
+ * @returns The evaluated string
+ */
 function evaluateExpressions(input: string, data: AnyObject): string {
       const template = Handlebars.compile(input, {noEscape: true, compat: true});
       return template(data);

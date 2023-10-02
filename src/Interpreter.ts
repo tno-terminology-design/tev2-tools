@@ -1,5 +1,11 @@
 import { log } from './Report.js';
 
+/**
+ * The Interpreter class handles the interpretation of a term reference.
+ * This interpretation happens according to a string that is supplied in `regex`.
+ * A term is interpreted by calling the `interpret` method with the corresponding match.
+ * The `interpret` method returns a map of the term properties.
+ */
 export class Interpreter {
       private type: string;
       private regex: RegExp;

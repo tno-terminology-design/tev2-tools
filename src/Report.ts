@@ -4,6 +4,10 @@ interface Output<T> {
       items: T[];
 }
 
+/**
+ * The Report class handles the reporting of errors and warnings.
+ * It also handles the reporting of the number of files modified and terms converted.
+ */
 class Report {
       termErrors: Output<{ file: string; line: number; message: string }> = {
             items: []
