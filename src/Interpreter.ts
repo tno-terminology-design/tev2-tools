@@ -55,11 +55,12 @@ export class TuC {
     public entries: Entry[] = [];
     public scopes = new Set<Scopes>();
     public terminology = {} as Terminology;
-    public synonymOfField = false;
     public filename: string;
+    public cText = false;
 
     static instances: TuC[] = [];
     static cTextMap: Entry[] = [];
+    static synonymOf: Entry[] = [];
 
     public constructor({ vsn }: { vsn: Version}) {
         this.getTuCMap(vsn.termselcrit);
@@ -126,6 +127,8 @@ export class TuC {
     }
 
     private getCtextEntries(): Entry[] {
+        // signal use of curated texts
+        this.cText = true;
         // return cTextMap if it already exists
         if (TuC.cTextMap.length > 0) {
             return TuC.cTextMap;
@@ -157,9 +160,6 @@ export class TuC {
             // Extract heading IDs from markdown content
             let headingIds = extractHeadingIds(body);
 
-            if (ctextYAML.synonymOf) {
-                this.synonymOfField = true;
-            }
             // construct navurl from website, navpath and ctext name, or bodyFile
             const navUrl = new URL(saf.scope.website);
             if (ctextYAML.bodyFile) {
@@ -176,6 +176,9 @@ export class TuC {
             ctextYAML.navurl = navUrl.href;
             ctextYAML.headingids = headingIds;
 
+            if (ctextYAML.synonymOf) {
+                TuC.synonymOf.push(ctextYAML);
+            }
             TuC.cTextMap.push(ctextYAML);
         });
         return TuC.cTextMap;
