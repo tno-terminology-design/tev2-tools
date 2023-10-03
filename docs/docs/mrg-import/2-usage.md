@@ -41,11 +41,19 @@ The `<action>` parameter can take the following values.
 
 ### (URL) Handling
 
-The use of URL's are very important within the [MRG importer](@). Where possible, URL's that the tool uses are used as parsed URL's so they can be clicked on inside the console output. As of right now, HTTP requests for obtaining files from import scopes do not support authentication. The download function is able to determine the 'raw' URL from a normal URL through the use of the [git-url-parse](https://www.npmjs.com/package/git-url-parse) package, after which the raw URL contents are requested through the [axios](https://www.npmjs.com/package/axios) HTTP client.
+The use of URL's are very important within the [MRG importer](@). Where possible, URL's that the tool uses are used as parsed URL's so they can be clicked on inside the console output. As of right now, HTTP requests for obtaining files from import scopes do not support authentication. The download function is able to determine the 'raw' URL from a normal Git URL through the use of the [git-url-parse](https://www.npmjs.com/package/git-url-parse) package, after which the raw URL contents are requested through the [axios](https://www.npmjs.com/package/axios) HTTP client.
 
 The conversion of normal URL's to raw URL's is currently supported for the following platforms.
 - [GitHub](https://github.com/) (no authentication)
 - [GitLab](https://gitlab.com/) (no authentication)
+
+If an unsupported platform is used, no conversion is done and the tool assumes a URL points to a raw file.
+
+```yaml title="Example conversion"
+https://github.com/essif-lab/framework/tree/master/docs/saf.yaml
+# to
+https://raw.githubusercontent.com/essif-lab/framework/master/docs/saf.yaml
+```
 
 
 ### Configuration File

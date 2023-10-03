@@ -6,26 +6,29 @@ import axios from 'axios';
 import gitUrlParse from 'git-url-parse';
 
 /**
- * Downloads a file from a Git repository.
- * @param url - The Git URL.
+ * Downloads a file from a Git repository or raw url.
+ * @param url - The Git URL or raw url.
  * @param localPath - The local path to save the file to.
  * @returns A promise that resolves when the file has been downloaded.
- * @throws An error if the Git URL is invalid or the platform is not supported.
  */
 export async function download(url: URL, localPath: string): Promise<void> {
   const parsedUrl = gitUrlParse(url.href);
-  if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.filepath) {
-    throw new Error('  - Invalid Git URL');
-  }
 
   // Determine the raw URL based on the Git hosting platform
   let rawUrl: URL;
   if (parsedUrl.source === 'github.com') {
+    if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.pathname) {
+      throw new Error(`  - Please check to make sure the Git URL points to a valid raw file: ${url.href}`);
+    }
     rawUrl = new URL(path.join('https://raw.githubusercontent.com', parsedUrl.owner, parsedUrl.name, parsedUrl.ref, parsedUrl.filepath));
   } else if (parsedUrl.source === 'gitlab.com') {
+    if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.pathname) {
+      throw new Error(`  - Please check to make sure the Git URL points to a valid raw file: ${url.href}`);
+    }
     rawUrl = new URL(path.join('https://gitlab.com', parsedUrl.owner, parsedUrl.name, 'raw', parsedUrl.ref, parsedUrl.filepath));
   } else {
-    throw new Error(`  - E009 Unsupported Git platform ${parsedUrl.source}`);
+    // assume the URL is a raw URL
+    rawUrl = url;
   }
 
   log.info(`  - Requesting '${rawUrl}'`);
