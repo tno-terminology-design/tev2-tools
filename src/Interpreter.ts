@@ -3,7 +3,6 @@
 import { log, onNotExistError } from './Report.js';
 import { download, writeFile } from './Handler.js';
 
-import { URL } from 'url';
 import os from 'os';
 import fs = require("fs");
 import path = require('path');
