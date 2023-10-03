@@ -127,7 +127,7 @@ export class Generator {
         }
 
         // Create a symlink for every altvsntag
-        vsn.altvsntags.forEach(altvsntag => {
+        vsn.altvsntags?.forEach(altvsntag => {
             let altmrgFile = `mrg.${tuc.terminology.scopetag}.${altvsntag}.yaml`;
             let altmrgURL = path.join(glossarydir, altmrgFile);
             log.info(`\tCreating symlink for altvsntag '${altvsntag}'`);
