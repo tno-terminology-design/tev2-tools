@@ -73,6 +73,10 @@ export async function initialize({ scopedir }: { scopedir: string }) {
     const env = new Interpreter({ scopedir: scopedir });
     const saf = await env.saf;
 
+    if (!saf.scopes) {
+        log.warn(`No import scopes found in SAF at '${path.join(scopedir, 'saf.yaml')}'`);
+        return;
+    }
     // for each scope in the scopes-section of the 'own' SAF
     log.info(`Found ${saf.scopes.length} import scope(s) in scopedir '${saf.scope.scopedir}'`);
     for (const scope of saf.scopes) {
@@ -80,6 +84,11 @@ export async function initialize({ scopedir }: { scopedir: string }) {
         // read the SAF of the import scope
         const importEnv = new Interpreter({ scopedir: scope.scopedir });
         const importSaf = await importEnv.saf;
+
+        if (!importSaf.versions) {
+            log.warn(`No maintained MRG files found in import scope '${scope.scopetag}'`);
+            continue;
+        }
 
         // for each MRG file (version) in the import scope
         log.info(`Found ${importSaf.versions.length} maintained MRG file(s) in import scope '${scope.scopetag}'`);
@@ -114,6 +123,10 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                     }
                 }
                 
+                if (!version.altvsntags) {
+                    continue;
+                }
+
                 // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
                 log.info(`    - Creating symbolic link for ${version.altvsntags.length} alternative version(s)`);
                 for (const altvsntag of version.altvsntags) {
@@ -127,12 +140,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                     }
                 }
             } catch (err) {
-                if (err instanceof AxiosError && err.response) {
-                    onNotExistError(err);
-                } else {
-                    // Handle other errors if needed
-                    onNotExistError(err);
-                }
+                onNotExistError(err);
             }
         }
     }
@@ -243,20 +251,6 @@ export class Interpreter {
 
             if (missingProperties.length > 0) {
                 throw new Error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`);
-            }
-
-            const requiredEntryProperties = ['term', 'scopetag', 'locator', 'glossaryText'];
-
-            for (const entry of (await mrg).entries) {
-                const missingProperties = requiredEntryProperties.filter(prop => !entry[prop]);
-
-                if (missingProperties.length > 0) {
-                    // Create a reference to the problematic entry using the first three property-value pairs
-                    const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ');
-
-                    const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`;
-                    log.warn(errorMessage);
-                }
             }
         } catch (err) {
             throw err;
