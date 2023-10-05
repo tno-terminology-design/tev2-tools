@@ -37,7 +37,10 @@ export class Generator {
         } else {
             // If no vsntag was specified, process all versions
             log.info(`No vsntag was specified. Processing all versions...`);
-            saf.versions.forEach(vsn => {
+            if (saf.versions?.length === 0) {
+                throw new Error(`No versions were found in the SAF`);
+            }
+            saf.versions?.forEach(vsn => {
                 log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}'...`);
                 this.generate(vsn);
             });
@@ -48,7 +51,7 @@ export class Generator {
             log.info(`\x1b[1;37mProcessing synonymOf entries...`);
         }
         let mrgfileWarnings: string[];
-        TuC.synonymOf.forEach((synonymOf, index) => {
+        TuC.synonymOf?.forEach((synonymOf, index) => {
             // wrangle the synonymOf field using a regex
             let properties = synonymOf.synonymOf!.match(/(?:(?<term>[a-z0-9_-]+))(?:(?:@(?:(?<scopetag>[a-z0-9_-]+)))?(?::(?<vsntag>[a-z0-9_-]+))?)/);
             if (properties?.groups) {
@@ -85,9 +88,9 @@ export class Generator {
         });
 
         // Handle synonymOf entries if they exist in TuC.entries
-        TuC.instances.filter(i => i.cText).forEach(tuc => {
+        TuC.instances.filter(i => i.cText)?.forEach(tuc => {
             // find matches in TuC.entries for each TuC.synonymOf
-            TuC.synonymOf.forEach(synonymOf => {
+            TuC.synonymOf?.forEach(synonymOf => {
                 let index = tuc.entries.findIndex(entry => {
                     // see if every field in entry matches the corresponding field in synonymOf
                     return Object.keys(entry).every(key => {

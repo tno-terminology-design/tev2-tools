@@ -77,7 +77,7 @@ export class TuC {
         this.filename = `mrg.${this.terminology.scopetag}.${this.terminology.vsntag}.yaml`;
 
         // set fields in the scopes section
-        this.scopes.forEach(scope => {
+        this.scopes?.forEach(scope => {
             // find the corresponding scope in the SAF's scope section
             let SAFscope = saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
             if (SAFscope) {
@@ -95,7 +95,7 @@ export class TuC {
         const rem: string[] = [];
         const ren: string[] = [];
 
-        instructions.forEach(instruction => {
+        instructions?.forEach(instruction => {
             if (instruction.startsWith('-')) {
                 // Queue removal
                 rem.push(instruction.slice(1)); // Remove the leading '-'
@@ -142,7 +142,7 @@ export class TuC {
         let ctexts = curatedirContent.filter(ctext => ctext.endsWith('.md'));
 
         // load properties of curated texts as MRG Entry
-        ctexts.forEach(ctext => {
+        ctexts?.forEach(ctext => {
             let ctextPath = path.join(curatedir, ctext);
             let ctextContent = fs.readFileSync(ctextPath, 'utf8');
 
