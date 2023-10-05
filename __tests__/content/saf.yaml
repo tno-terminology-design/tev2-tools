@@ -37,5 +37,5 @@ scopes:  #
 versions:
 - vsntag: terms # this version contains all terms that are curated within this scope
   altvsntags: [ latest ] # alternative verstiontags
-  termselcrit:
+  termselection:
   - "*@termdsn" # import all tev2 terms.
