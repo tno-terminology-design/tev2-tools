@@ -115,8 +115,8 @@ export class Generator {
         let mrgFile = `mrg.${tuc.terminology.scopetag}.${tuc.terminology.vsntag}.yaml`;
         writeFile(path.join(glossarydir, mrgFile), yaml.dump(tuc.output(), { forceQuotes: true }));
 
-        // if the version is the default version, create a symbolic link
-        if (saf.scope.defaultvsn === tuc.terminology.vsntag) {
+        // if the vsntag or any of the altvsntags is the default version, create a symbolic link
+        if (saf.scope.defaultvsn === tuc.terminology.vsntag  || tuc.terminology.altvsntags?.includes(saf.scope.defaultvsn)) {
             let defaultmrgFile = `mrg.${tuc.terminology.scopetag}.yaml`;
             let defaultmrgURL = path.join(glossarydir, defaultmrgFile);
             log.info(`\tCreating symlink for default version '${vsn.vsntag}'`);
