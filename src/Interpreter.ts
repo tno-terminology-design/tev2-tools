@@ -62,8 +62,8 @@ export class TuC {
     static cTextMap: Entry[] = [];
     static synonymOf: Entry[] = [];
 
-    public constructor({ vstermselection Version}) {
-        this.getTuCMap(vsn.termselcrit);
+    public constructor({ vsn }: { vsn: Version }) {
+        this.getTuCMap(vsn.termselection);
 
         // set relevant fields in the terminology section
         this.terminology = {
