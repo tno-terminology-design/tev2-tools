@@ -39,13 +39,13 @@ scopes:  #
 versions:
 - vsntag: terms # this version contains all terms that are curated within this scope
   altvsntags: [ latest ] # alternative verstiontags
-  termselcrit:
+  termselection:
   - "*@tev2" # import all tev2 terms.
 - vsntag: test # this version MUST only be used for testing the MRG generator
   altvsntags: # alternative verstiontags
     - firstAltVsnTag
     - secondAltVsnTag
-  termselcrit:
+  termselection:
     - "tags[management]@essif-lab" # import all terms from the mrg of `essif-lab:latest` that have grouptag `management`.
     - "termids[party,community]@essif-lab:0.9.4" # import the terms `party` and `community` from the mrg of `essif-lab:0.9.4`.
     - "-tags[terminology]" # remove all terms tagged with the grouptag `terminology`
