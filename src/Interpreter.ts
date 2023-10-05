@@ -157,18 +157,19 @@ export class TuC {
                 }
             });
 
-            // Extract heading IDs from markdown content
-            let headingIds = extractHeadingIds(body);
-
             // construct navurl from website, navpath and ctext name, or bodyFile
             const navUrl = new URL(saf.scope.website);
             if (ctextYAML.bodyFile) {
                 // If the bodyFile property is set, then use that to construct the navurl
                 let bodyFile = path.parse(ctextYAML.bodyFile);
                 navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
+                [_, _, body] = fs.readFileSync(path.join(curatedir, ctextYAML.bodyFile), 'utf8').split('---\n', 3);
             } else {
                 navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
             }
+
+            // Extract heading IDs from markdown content
+            let headingIds = extractHeadingIds(body);
 
             // add properties to MRG Entry
             ctextYAML.scopetag = saf.scope.scopetag;
