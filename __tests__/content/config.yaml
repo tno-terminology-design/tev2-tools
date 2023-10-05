@@ -17,6 +17,7 @@ converter: >-       # Type of converter, either: a mustache template, "http", or
   <a
   href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}"
   title="{{#if hoverText}}{{hoverText}}{{else}}{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}"
+  target="_self"
   >{{showtext}}</a>
 force: true         # toggle overwriting of existing files
 input:              # glob pattern strings for files to be processed by the TRRT
