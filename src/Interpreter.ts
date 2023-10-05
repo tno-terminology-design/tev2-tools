@@ -24,7 +24,7 @@ interface Scopes {
 export interface Version {
     vsntag: string;
     altvsntags: string[];
-    termselcrit: string[];
+    termselection: string[];
 }
 
 interface Terminology {
@@ -62,7 +62,7 @@ export class TuC {
     static cTextMap: Entry[] = [];
     static synonymOf: Entry[] = [];
 
-    public constructor({ vsn }: { vsn: Version}) {
+    public constructor({ vstermselection Version}) {
         this.getTuCMap(vsn.termselcrit);
 
         // set relevant fields in the terminology section
