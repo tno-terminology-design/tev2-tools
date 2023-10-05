@@ -163,7 +163,7 @@ export class TuC {
                 // If the bodyFile property is set, then use that to construct the navurl
                 let bodyFile = path.parse(ctextYAML.bodyFile);
                 navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
-                [_, _, body] = fs.readFileSync(path.join(curatedir, ctextYAML.bodyFile), 'utf8').split('---\n', 3);
+                [_, _, body] = fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), 'utf8').split('---\n', 3);
             } else {
                 navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
             }
