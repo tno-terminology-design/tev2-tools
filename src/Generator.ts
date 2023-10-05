@@ -130,6 +130,9 @@ export class Generator {
         }
 
         // Create a symlink for every altvsntag
+        if (typeof vsn.altvsntags === 'string') {
+            vsn.altvsntags = [vsn.altvsntags];
+        }
         vsn.altvsntags?.forEach(altvsntag => {
             let altmrgFile = `mrg.${tuc.terminology.scopetag}.${altvsntag}.yaml`;
             let altmrgURL = path.join(glossarydir, altmrgFile);
