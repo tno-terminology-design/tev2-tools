@@ -39,10 +39,10 @@ scopes:  #
 #
 versions:
 - vsntag: terms # this version includes only the terms that are actually curated in this scope
-  termselcrit:
+  termselection:
   - "*@trrt" # import all terms curated in this scope
 - vsntag: v0.1
   altvsntags: [ latest ]
-  termselcrit:
+  termselection:
   - "*@tev2:ctexts" # import all terms curated by essif-lab
   - "*@trrt" # import all terms curated in this scope, possibly overwriting essif-lab terms
