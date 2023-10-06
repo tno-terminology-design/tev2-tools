@@ -32,7 +32,7 @@ describe('Run MRG Import Tool on provided test files', () => {
 
     toolProcess.on('close', async (code) => {
       expect(code).to.equal(0);
-      expect(consoleOutput).to.contain(`maintained MRG file(s) in import scope '${scope}'`);
+      expect(consoleOutput).to.contain(`maintained MRG files in import scope '${scope}'`);
 
       try {
         await fs.access(path.join(glossarydir, `mrg.${scope}.terms.yaml`));
