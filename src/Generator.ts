@@ -126,7 +126,7 @@ export class Generator {
         if (saf.scope.defaultvsn === tuc.terminology.vsntag  || tuc.terminology.altvsntags?.includes(saf.scope.defaultvsn)) {
             let defaultmrgFile = `mrg.${tuc.terminology.scopetag}.yaml`;
             let defaultmrgURL = path.join(glossarydir, defaultmrgFile);
-            log.info(`\tCreating symlink for default version '${vsn.vsntag}'`);
+            log.info(`\tCreating symlink for default version`);
             if (!fs.existsSync(defaultmrgURL)) {
                 fs.symlinkSync(mrgFile, defaultmrgURL);
             } else {

@@ -99,7 +99,7 @@ export class TuC {
             if (instruction.startsWith('-')) {
                 // Queue removal
                 rem.push(instruction.slice(1)); // Remove the leading '-'
-            } else if (instruction.startsWith('rename')) {
+            } else if (instruction.startsWith('rename ')) {
                 // Queue rename
                 ren.push(instruction.slice(7)); // Remove the leading 'rename '
             } else {
@@ -163,7 +163,13 @@ export class TuC {
                 // If the bodyFile property is set, then use that to construct the navurl
                 let bodyFile = path.parse(ctextYAML.bodyFile);
                 navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
-                [_, _, body] = fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), 'utf8').split('---\n', 3);
+                try {
+                    [_, _, body] = fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), 'utf8').split('---\n', 3);
+                } catch (err) {
+                    if (err instanceof Error) {
+                        log.error(`\tAn error occurred while attempting to load the bodyFile '${ctextYAML.bodyFile}':`, err.message);
+                    }
+                }
             } else {
                 navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
             }
@@ -186,8 +192,7 @@ export class TuC {
     }
 
     private addMrgEntry(instruction: string): void {
-        log.trace(`\t\x1b[1;37mAdd: ${instruction}`);
-        const regex = /^(?<action>.+?)(?:\[(?<items>.+?)\])?(?:@(?<scopetag>.+?))?(?::(?<vsntag>.+))?$/;
+        const regex = /^(?<key>[^\[@]+)(?:\[(?<values>.+?)?\])?(?:(?<identifier>@)(?<scopetag>[a-z0-9_-]+?)?)?(?::(?<vsntag>.+)?)?$/;
         const match = instruction.replace(/\s/g, '').match(regex);
 
         if (!match) {
@@ -195,49 +200,41 @@ export class TuC {
             return undefined;
         }
 
-        let { action, items, scopetag, vsntag } = match.groups!;
-
-        // TODO: halt if no scopetag is specified?
-
-        let entries = [] as Entry[];
-        let mrgFile = `mrg.${scopetag}.${vsntag ?? saf.scope.defaultvsn}.yaml`;
+        let { key, values, identifier, scopetag, vsntag } = match.groups!;
+        let entries: Entry[];
         
         try {
-            if (action === 'terms') {
-                // Process terms instruction
-                const termList = items.split(','); // Extract term list
-                let mrgMap = new MRG({ filename: mrgFile });
-                if (mrgMap.entries) {
-                    entries = mrgMap.entries.filter(entry => termList.includes(entry.term));
-                }
-            } else if (action === 'tags') {
-                // Process tags instruction
-                const tagList = items.split(','); // Extract tag list
-                let mrgMap = new MRG({ filename: mrgFile });
-                if (mrgMap.entries) {
-                    entries = mrgMap.entries.filter(entry => {
-                        if (entry.grouptags) {
-                            for (const tag of tagList) {
-                                if (entry.grouptags.includes(tag)) {
-                                    return true; // Include the entry
-                                }
+            if (!identifier) {
+                // add all terms for which there are curated texts in the current scope
+                entries = this.getCtextEntries();
+            } else {
+                // add all terms in the MRG for either the current or the specified scope and version
+                let mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ?? saf.scope.defaultvsn}.yaml`;
+                let mrgMap = MRG.instances.find(mrg => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
+                entries = mrgMap.entries;
+            }
+            
+            if (key !== '*') {
+                entries = entries.filter(entry => {
+                    // if the entry has a field with the same name as the key
+                    if (entry[key] !== undefined) {
+                        // and both the values list and key entry property is empty
+                        if (!values && (entry[key] === '' || entry[key] === null)) {
+                            return true;
+                        } else if (!entry[key]) {
+                            return false;
+                        }
+                        // or the value of that field is in the values list
+                        for (const value of values.split(',')) {
+                            if (entry[key].includes(value)) {
+                                // then include the entry
+                                return true;
                             }
                         }
-                        return false; // Exclude the entry
-                    });
-                }
-            } else if (action === '*') {
-                // Process wildcard instruction
-                if (!scopetag || scopetag === saf.scope.scopetag) {
-                    // Add all curated texts from the scope to the terminology under construction
-                    entries = this.getCtextEntries();
-                } else {
-                    mrgFile = `mrg.${scopetag}.${vsntag ? vsntag + '.' : ''}yaml`;
-                    entries = new MRG({ filename: mrgFile }).entries;
-                }
-            } else {
-                log.error(`\tE022 Invalid term selection criteria action: ${action}`);
-                return undefined;
+                    }
+                    // else, exclude the entry
+                    return false;
+                });
             }
             if (entries.length > 0) {
                 // add entries to TuC and overwrite existing entries with the same term
@@ -248,17 +245,20 @@ export class TuC {
                     scopetag: scopetag,
                     scopedir: ''
                 });
+                log.trace(`\tAdded ${entries.length} entr${entries.length > 1 ? 'ies' : 'y'}: \t${instruction}`);
             } else {
-                log.warn(`\tW001 No entries found for instruction: ${instruction}`);
+                log.warn(`\tAdded 0 entries: \t${instruction}`);
             }
         } catch (err) {
-            log.error(err);
+            if (err instanceof Error) {
+                log.error(`\tInstruction caused an error: \t${instruction}`);
+                log.error(`\t${err.message}`)
+            }
         }
     }
 
     private removeMrgEntry(instruction: string): void {
-        log.trace(`\t\x1b[1;37mRemove: ${instruction}`);
-        const regex = /^(?<action>.+?)(?:\[(?<items>.+?)\])?$/;
+        const regex = /^(?<key>[^\[]+)(?:\[(?<values>.+?)?\])?$/;
         const match = instruction.replace(/\s/g, '').match(regex);
 
         if (!match) {
@@ -266,71 +266,92 @@ export class TuC {
             return undefined;
         }
 
-        const { action, items } = match.groups!;
+        const { key, values } = match.groups!;
+        let removeCount = 0;
 
-        if (action === 'tags') {
-            // Process -tags instruction
-            const tagList = items.split(','); // Extract tag list
-            // Remove mrg entries from this.TuC with grouptags that match the tag list
+        try {            
             this.entries = this.entries.filter(entry => {
-                if (entry.grouptags) {
-                    for (const tag of tagList) {
-                        if (entry.grouptags.includes(tag)) {
-                            return false; // Exclude the entry
+                // if the entry has a field with the same name as the key
+                if (entry[key] !== undefined) {
+                    // and both the values list and key entry property is empty
+                    if (!values && (entry[key] === '' || entry[key] === null)) {
+                        removeCount++;
+                        return false;
+                    } else if (!entry[key]) {
+                        return true;
+                    }
+                    // or the value of that field is in the value list
+                    for (const value of values.split(',')) {
+                        if (entry[key].includes(value)) {
+                            removeCount++;
+                            // then exclude the entry
+                            return false;
                         }
                     }
                 }
-                return true; // Keep the entry
+                // else, keep the entry
+                return true;
             });
-        } else if (action === 'terms') {
-            // Process -terms instruction
-            const termList = items.split(','); // Extract term list
-            // Remove mrg entries from this.TuC with term id's that match the term list
-            this.entries = this.entries.filter(entry => !termList.includes(entry.term));
-        } else {
-            log.error(`\tE022 Invalid term selection criteria action: ${action}`);
-            return undefined;
+
+            // log warning if no entries were removed
+            if (removeCount === 0) {
+                log.warn(`\tRemove 0 entries: \t-${instruction}`)
+            } else {
+                log.trace(`\tRemoved ${removeCount} entr${removeCount > 1 ? 'ies' : 'y'}: \t${instruction}`);
+            }
+        } catch (err) {
+            log.error(err);
         }
     }
 
     private renameMrgEntry(instruction: string): void {
-        log.trace(`\t\x1b[1;37mRename: ${instruction}`);
-        const parts = instruction.split(/[\s,\[\]]+/); // Split instruction into parts
-        const term = parts.shift(); // Extract the term
-        
+        const regex = /^(?<term>[^\[]+)(?:\[(?<fieldmodifierlist>.+?)?\])?$/;
+        const match = instruction.match(regex);
+    
+        if (!match) {
+            log.error(`\tE021 Invalid instruction: ${instruction}`);
+            return undefined;
+        }
+    
+        const { term, fieldmodifierlist } = match.groups!; // Extract the term and the field modifier list
         const fieldModifiers: { [key: string]: any } = {}; // Initialize an object for field modifiers
-
-        if (parts.length === 1) {
-            // If there is only one part, then it is a basic rename
-            fieldModifiers.term = parts[0];
-        } else if (parts.length > 1) {
-            // If there are multiple parts, then it is a rename with field modifiers
-            // Loop through the parts to extract field modifiers
-            let key = null;
-            for (const part of parts) {
-                if (part.endsWith(':')) {
-                    key = part.slice(0, -1); // Remove the trailing colon
-                } else if (key !== null) {
-                    fieldModifiers[key] = part; // Assign value to the current key
-                    key = null; // Reset the key
+    
+        try {
+            if (fieldmodifierlist) {
+                // Use a regular expression to capture the key-value pairs inside square brackets
+                const keyValueRegex = /\s*([^:]+)\s*:\s*("[^"]+"|[^,]+)\s*/g;
+                let keyValueMatch;
+        
+                // Extract the key-value pairs from the field modifier list
+                while ((keyValueMatch = keyValueRegex.exec(fieldmodifierlist))) {
+                    const key = keyValueMatch[1].trim(); // Remove leading and trailing whitespace
+                    const value = keyValueMatch[2].trim().replace(/^"(.*)"$/, '$1'); // Remove double quotes if present
+                    fieldModifiers[key] = value;
                 }
             }
-        }
-
-        // Find the entries with the term
-        const entries = this.entries.filter(entry => entry.term === term);
-
-        if (entries.length > 0) {
-            // Modify the entry based on the field modifiers
-            for (const entry of entries) {
-                for (const [key, value] of Object.entries(fieldModifiers)) {
-                    entry![key] = value;
+        
+            // Find the entries with the term
+            const entries = this.entries.filter(entry => entry.term === term);
+            let renameCount = 0;
+        
+            if (entries?.length > 0) {
+                // Modify the entry based on the field modifiers
+                for (const entry of entries) {
+                    for (const [key, value] of Object.entries(fieldModifiers)) {
+                        entry[key] = value;
+                        renameCount++;
+                    }
                 }
             }
-        } else {
-            log.warn(`\tW001 No entries found for instruction: ${instruction}`);
+            if (renameCount === 0) {
+                log.warn(`\tRenamed 0 entries: \t${instruction}`);
+            } else {
+                log.trace(`\tRenamed ${renameCount} entr${renameCount > 1 ? 'ies' : 'y'}: \t${instruction}`);
+            }
+        } catch (err) {
+            log.error(err);
         }
-    }
+    }    
 }
 
 
@@ -376,7 +397,10 @@ export class MRG {
                 process.exit(1);
             }
         } catch (err) {
-            throw `\tE005 An error occurred while attempting to load the MRG at '${mrgURL}': ${err}`;
+            if (err instanceof Error) {
+                err.message = `E005 An error occurred while attempting to load the MRG at '${mrgURL}': ${err}`;
+            }
+            throw err;
         }
   
         return mrg;
