@@ -128,11 +128,11 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                 }
 
                 // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
-                log.info(`    - Creating symbolic link${version.altvsntags.length > 1 ? 's' : ''} for ${version.altvsntags.length} alternative version${version.altvsntags.length > 1 ? 's' : ''}`);
                 // if altvsntags is a string, convert it to an array
                 if (typeof(version.altvsntags) === 'string') {
                     version.altvsntags = [version.altvsntags];
                 }
+                log.info(`    - Creating symbolic link${version.altvsntags.length > 1 ? 's' : ''} for ${version.altvsntags.length} alternative version${version.altvsntags.length > 1 ? 's' : ''}`);
                 for (const altvsntag of version.altvsntags) {
                     let altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`);
                     if (!fs.existsSync(altmrgURL)) {
