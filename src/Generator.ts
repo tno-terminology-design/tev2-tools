@@ -53,7 +53,7 @@ export class Generator {
         let mrgfileWarnings: string[];
         TuC.synonymOf?.forEach((synonymOf, index) => {
             // wrangle the synonymOf field using a regex
-            let properties = synonymOf.synonymOf!.match(/(?:(?<term>[a-z0-9_-]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>[a-z0-9_-]+))?)/);
+            let properties = synonymOf.synonymOf!.match(/(?:(?<term>[a-z0-9_-]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/);
             if (properties?.groups) {
                 let entrymatch: Entry | undefined;
                 // if no identifier (@) is specified, refer to the ctextmap
