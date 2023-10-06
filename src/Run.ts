@@ -15,7 +15,7 @@ export let onNotExist: string = 'throw';
 
 program
     .name('mrg-import')
-    .version('0.1.2')
+    .version('0.1.3')
     .usage('[ <paramlist> ]\n' +
     '- <paramlist> (optional) is a list of key-value pairs')
     .description("The CLI for the MRG Import Tool")
