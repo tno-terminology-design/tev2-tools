@@ -123,7 +123,6 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                     }
                 }
                 
-                log.debug(typeof(version.altvsntags));
                 if (!version.altvsntags) {
                     continue;
                 }
