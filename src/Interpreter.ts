@@ -77,7 +77,8 @@ export async function initialize({ scopedir }: { scopedir: string }) {
         return;
     }
     // for each scope in the scopes-section of the 'own' SAF
-    log.info(`Found ${saf.scopes.length} import scope(s) in scopedir '${saf.scope.scopedir}'`);
+    // if saf.scopes.length > 0 then log.info with import scopes instead of scope
+    log.info(`\x1b[1;37mFound ${saf.scopes.length} import scope${saf.scopes.length > 1 ? 's' : ''} in scopedir '${saf.scope.scopedir}'`);
     for (const scope of saf.scopes) {
         log.info(`  - Handling import scope '${scope.scopetag}'`);
         // read the SAF of the import scope
@@ -90,7 +91,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
         }
 
         // for each MRG file (version) in the import scope
-        log.info(`Found ${importSaf.versions.length} maintained MRG file(s) in import scope '${scope.scopetag}'`);
+        log.info(`\x1b[1;37mFound ${importSaf.versions.length} maintained MRG file${importSaf.versions.length > 1 ? 's' : ''} in import scope '${scope.scopetag}'`);
         for (const version of importSaf.versions) {
             try {
                 // get MRG Map {import-scopedir}/{import-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
@@ -127,7 +128,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                 }
 
                 // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
-                log.info(`    - Creating symbolic link for ${version.altvsntags.length} alternative version(s)`);
+                log.info(`    - Creating symbolic link for ${version.altvsntags.length} alternative version${version.altvsntags.length > 1 ? 's' : ''}`);
                 for (const altvsntag of version.altvsntags) {
                     let altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`);
                     if (!fs.existsSync(altmrgURL)) {
