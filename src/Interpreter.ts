@@ -35,7 +35,7 @@ interface Terminology {
     altvsntags: string[];
 }
 
-interface Entry {
+export interface Entry {
     term: string;
     vsntag: string;
     scopetag: string;
