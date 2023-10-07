@@ -63,7 +63,11 @@ export class TuC {
     static synonymOf: Entry[] = [];
 
     public constructor({ vsn }: { vsn: Version }) {
-        this.getTuCMap(vsn.termselection);
+        if (!vsn.termselection) {
+            log.warn(`\tNo 'termselection' items found for '${vsn.vsntag}'`);
+        } else {
+            this.getTuCMap(vsn.termselection);
+        }
 
         // set relevant fields in the terminology section
         this.terminology = {
