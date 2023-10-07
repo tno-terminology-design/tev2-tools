@@ -162,13 +162,16 @@ Resulting in the following [renderable ref](@) Markdown that, when rendered, res
 The HTML converter can be used by setting '`html`', or the template string below, as the value of `converter`. Similar to the Markdown converter, the original `showtext` of the [term ref](@) properties is used in addition to the `navurl` [MRG entry](@) property with the `trait` [term ref](@) property, leading with a `#`-character, being added if it is available.
 
 ```hbs title="HTML Mustache template"
- <a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>
+ <a
+ href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}"
+ target="_self">{{showtext}}</a>
 ```
 
-Resulting in the following [renderable ref](@) HTML `<a>` tag that defines a hyperlink to the `navurl`.
+Resulting in the following [renderable ref](@) HTML `<a>` tag that defines a hyperlink to the `navurl`.<br/>
+Note: the attribute `target="_self"` is used to overwrite settings which may be applied by a text rendering platform. For example: [Docusaurus](https://docusaurus.io/docs) automatically adds the `target="_blank" rel="noopener noreferrer"` attributes to all outbound links, which causes a new tab to open on click.
 
 ```html
- <a href="terms/curator.md#examples">Curators</a>
+ <a href="terms/curator.md#examples" target="_self">Curators</a>
 ```
 
 </TabItem>
