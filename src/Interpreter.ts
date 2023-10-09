@@ -106,7 +106,7 @@ export class TuC {
                 // Execute addition or selection
                 this.addMrgEntry(instruction);
             }
-        });
+        });      
     
         return this.entries;
     }
@@ -205,10 +205,12 @@ export class TuC {
                 entries = this.getCtextEntries();
             } else {
                 // add all terms in the MRG for either the current or the specified scope and version
-                let mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ? "." + vsntag : ""}yaml`;
+                let mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`;
                 let mrgMap = MRG.instances.find(mrg => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
                 entries = mrgMap.entries;
             }
+
+            const valuelist = values?.split(',').map(v => v.trim());
             
             if (key !== '*') {
                 entries = entries.filter(entry => {
@@ -216,15 +218,21 @@ export class TuC {
                     if (entry[key] !== undefined) {
                         // and both the values list and key entry property is empty
                         if (!values && (entry[key] === '' || entry[key] === null)) {
-                            return true;
-                        } else if (!entry[key]) {
-                            return false;
+                            log.debug(`\t${entry.term} has an empty ${key} field`)
+                            return true;    // then include the entry
+                        } else if (!entry[key]) {   // if the entry[key] is undefined
+                            return false;   // then exclude the entry
                         }
                         // or the value of that field is in the values list
-                        for (const value of values.split(',')) {
-                            if (entry[key].includes(value)) {
-                                // then include the entry
-                                return true;
+                        for (const value of valuelist) {
+                            if (typeof entry[key] === 'string') {   // if the entry[key] is a string
+                                if (entry[key] === value) {
+                                    return true;    // then include the entry
+                                }
+                            } else {
+                                if (entry[key].includes(value)) {   // if the entry[key] is an array
+                                    return true;    // then include the entry
+                                }
                             }
                         }
                     }
@@ -232,6 +240,7 @@ export class TuC {
                     return false;
                 });
             }
+            instruction = `${key}${valuelist ? '[' + valuelist?.join(', ') + ']' : ''}${identifier ? '@' + scopetag + (vsntag ? ':' + vsntag : '') : ''}`;
             if (entries.length > 0) {
                 // add entries to TuC and overwrite existing entries with the same term
                 this.entries = this.entries.filter(entry => !entries.some(e => e.term === entry.term));
@@ -266,7 +275,7 @@ export class TuC {
         let removeCount = 0;
         const valuelist = values?.split(',').map(v => v.trim());
 
-        try {            
+        try {
             this.entries = this.entries.filter(entry => {
                 // if the entry has a field with the same name as the key
                 if (entry[key] !== undefined) {
@@ -286,7 +295,7 @@ export class TuC {
                             }
                         } else {
                             if (entry[key].includes(value)) {   // if the entry[key] is an array
-                            removeCount++;
+                                removeCount++;
                                 return true;    // then exclude the entry
                             }
                         }
