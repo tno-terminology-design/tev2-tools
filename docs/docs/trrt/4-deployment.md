@@ -27,7 +27,6 @@ The standard converters of the [TRRT](@) do not fit the needs of your community.
 <term-info
 	definition="A mishmash is a confused mess of different things."
 	img="img/mismash.png"
-  target="_self"
 	more-info="docs/terms/mishmash.html">mishmash
 </term-info>
 ```
@@ -40,7 +39,7 @@ output: .
 scopedir: .
 interpreter: 'basic' # `alt` or `basic` are also valid
 # highlight-next-line
-converter: '<term-info definition="{{glossaryText}}" img="img/{{term}}.png" target="_self" more-info="{{navurl}}">{{showtext}}</term-info>' # `http`, `essif` or `markdown` are also valid
+converter: '<term-info definition="{{glossaryText}}" img="img/{{term}}.png" more-info="{{navurl}}">{{showtext}}</term-info>' # `http`, `essif` or `markdown` are also valid
 
 # glob pattern strings for files to be processed
 input:

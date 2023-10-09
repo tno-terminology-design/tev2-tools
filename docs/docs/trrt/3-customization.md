@@ -164,14 +164,13 @@ The HTML converter can be used by setting '`html`', or the template string below
 ```hbs title="HTML Mustache template"
  <a
  href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}"
- target="_self">{{showtext}}</a>
+ >{{showtext}}</a>
 ```
 
 Resulting in the following [renderable ref](@) HTML `<a>` tag that defines a hyperlink to the `navurl`.<br/>
-Note: the attribute `target="_self"` is used to overwrite settings which may be applied by a text rendering platform. For example: [Docusaurus](https://docusaurus.io/docs) automatically adds the `target="_blank" rel="noopener noreferrer"` attributes to all outbound links, which causes a new tab to open on click.
 
 ```html
- <a href="terms/curator.md#examples" target="_self">Curators</a>
+ <a href="terms/curator.md#examples">Curators</a>
 ```
 
 </TabItem>
@@ -184,7 +183,6 @@ The `glossaryText` property in the [MRG entry](@) is unformatted currently; usin
 ```hbs title="eSSIF Mustache template"
  <a
  href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}"
- target="_self"
  title="{{capFirst term}}: {{noRefs glossaryText}}">{{showtext}}</a>
 ```
 
@@ -194,13 +192,11 @@ The above converter will result in the `title` html element being filled with th
  "Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives."
 ```
 
-Resulting in the following [renderable ref](@) HTML `<a>` tag (multiline example for better readability) that defines a hyperlink to the `navurl` and can display a text on **<u title="Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives.">hover</u>**.<br/>
-Note: the attribute `target="_self"` is used to overwrite settings which may be applied by a text rendering platform. For example: [Docusaurus](https://docusaurus.io/docs) automatically adds the `target="_blank" rel="noopener noreferrer"` attributes to all outbound links, which causes a new tab to open on click.
+Resulting in the following [renderable ref](@) HTML `<a>` tag (multiline example for better readability) that defines a hyperlink to the `navurl` and can display a text on **<u title="Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives.">hover</u>**.
 
 ```html
 <a
 href="terms/curator.md#examples" 
-target="_self"
 title="Curator: a person responsible for Curating the Terminologies within a Scope, to ensure shared understanding among a Community working together on a particular set of objectives."
 >Curators</a>
 ```

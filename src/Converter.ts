@@ -18,8 +18,8 @@ export class Converter {
       public constructor({ template }: { template: any }) {
             // map of default templates for each type
             const map: { [key: string]: string } = {
-                  html: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" target="_self">{{showtext}}</a>',
-                  essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}" target="_self">{{showtext}}</a>',
+                  html: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>',
+                  essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>',
                   markdown: '[{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})',
             };
 
