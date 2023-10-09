@@ -97,11 +97,6 @@ export class Resolver {
                         termProperties.set("scopetag", saf.scope.scopetag);
                   }
 
-                  // If the term has an empty vsntag and the scopetag is the same as the SAF's scopetag, set it to the defaultvsn of the SAF
-                  if (termProperties.get("scopetag") === saf.scope.scopetag && !termProperties.get("vsntag")) {
-                        termProperties.set("vsntag", saf.scope.defaultvsn);
-                  }
-
                   const mrgFile = termProperties.get("vsntag")
                         ? `mrg.${termProperties.get("scopetag")}.${termProperties.get("vsntag")}.yaml`
                         : `mrg.${termProperties.get("scopetag")}.yaml`;
@@ -122,9 +117,14 @@ export class Resolver {
                   }
 
                   if (mrg.entries.length > 0) {
+                        let termRef = '';
                         // if the term has an empty vsntag, set it to the vsntag of the MRG
                         if (!termProperties.get("vsntag")) {
                               termProperties.set("vsntag", mrg.terminology.vsntag);
+                              termRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:default' `
+                                    + `> '${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
+                        } else {
+                              `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
                         }
 
                         // Find the matching entry in mrg.entries based on the term
@@ -132,7 +132,6 @@ export class Resolver {
                               entry.term === termProperties.get("term")! || 
                               entry.altterms?.includes(termProperties.get("term")!)
                         );
-                        const termRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
 
                         let replacement = "";
                         let entry = undefined;
@@ -142,7 +141,8 @@ export class Resolver {
                               // Convert the term using the configured converter
                               replacement = converter!.convert(entry, termProperties);
                               if (replacement === "") {
-                                    report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`);
+                                    let message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`;
+                                    report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message);
                               }
                         } else if (matchingEntries.length > 1) {
                               // Multiple matches found, display a warning
@@ -151,9 +151,11 @@ export class Resolver {
                                     .filter(entry => !uniqueSources.has(entry.source) && uniqueSources.add(entry.source))
                                     .map(entry => entry.source)
                                     .join(', ');
-                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`);
+                              let message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`;
+                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message);
                         } else {
-                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`);
+                              let message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
+                              report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message);
                         }
 
                         // Only execute the replacement steps if the 'replacement' string is not empty
