@@ -98,7 +98,7 @@ export class TuC {
         instructions?.forEach(instruction => {
             if (instruction.startsWith('-')) {
                 // Execute removal
-                this.addMrgEntry(instruction.slice(1)); // Remove the leading '-'
+                this.removeMrgEntry(instruction.slice(1)); // Remove the leading '-'
             } else if (instruction.startsWith('rename ')) {
                 // Execute rename
                 this.renameMrgEntry(instruction.slice(7)); // Remove the leading 'rename '
@@ -291,7 +291,7 @@ export class TuC {
 
             // log warning if no entries were removed
             if (removeCount === 0) {
-                log.warn(`\tRemove 0 entries: \t-${instruction}`)
+                log.warn(`\tRemoved 0 entries: \t-${instruction}`)
             } else {
                 log.trace(`\tRemoved ${removeCount} entr${removeCount > 1 ? 'ies' : 'y'}: \t${instruction}`);
             }
