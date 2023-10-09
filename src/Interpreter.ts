@@ -95,26 +95,18 @@ export class TuC {
     }
 
     public getTuCMap(instructions: string[]): Entry[] {
-        const add: string[] = [];
-        const rem: string[] = [];
-        const ren: string[] = [];
-
         instructions?.forEach(instruction => {
             if (instruction.startsWith('-')) {
-                // Queue removal
-                rem.push(instruction.slice(1)); // Remove the leading '-'
+                // Execute removal
+                this.addMrgEntry(instruction.slice(1)); // Remove the leading '-'
             } else if (instruction.startsWith('rename ')) {
-                // Queue rename
-                ren.push(instruction.slice(7)); // Remove the leading 'rename '
+                // Execute rename
+                this.renameMrgEntry(instruction.slice(7)); // Remove the leading 'rename '
             } else {
-                // Queue addition or selection
-                add.push(instruction);
+                // Execute addition or selection
+                this.addMrgEntry(instruction);
             }
         });
-    
-        add.forEach(this.addMrgEntry.bind(this));
-        rem.forEach(this.removeMrgEntry.bind(this));
-        ren.forEach(this.renameMrgEntry.bind(this));        
     
         return this.entries;
     }
