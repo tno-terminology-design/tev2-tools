@@ -264,6 +264,7 @@ export class TuC {
 
         const { key, values } = match.groups!;
         let removeCount = 0;
+        const valuelist = values?.split(',').map(v => v.trim());
 
         try {            
             this.entries = this.entries.filter(entry => {
@@ -277,11 +278,17 @@ export class TuC {
                         return true;
                     }
                     // or the value of that field is in the value list
-                    for (const value of values.split(',')) {
-                        if (entry[key].includes(value)) {
+                    for (const value of valuelist) {
+                        if (typeof entry[key] === 'string') {   // if the entry[key] is a string
+                            if (entry[key] === value) {
+                                removeCount++;
+                                return false;    // then exclude the entry
+                            }
+                        } else {
+                            if (entry[key].includes(value)) {   // if the entry[key] is an array
                             removeCount++;
-                            // then exclude the entry
-                            return false;
+                                return true;    // then exclude the entry
+                            }
                         }
                     }
                 }
@@ -290,13 +297,17 @@ export class TuC {
             });
 
             // log warning if no entries were removed
+            instruction = `${key}[${valuelist?.join(', ')}]`;
             if (removeCount === 0) {
                 log.warn(`\tRemoved 0 entries: \t-${instruction}`)
             } else {
-                log.trace(`\tRemoved ${removeCount} entr${removeCount > 1 ? 'ies' : 'y'}: \t${instruction}`);
+                log.trace(`\tRemoved ${removeCount} entr${removeCount > 1 ? 'ies' : 'y'}: \t-${instruction}`);
             }
         } catch (err) {
-            log.error(err);
+            if (err instanceof Error) {
+                log.error(`\tInstruction caused an error: \t-${instruction}`);
+                log.error(`\t${err.message}`)
+            }
         }
     }
 
