@@ -309,20 +309,25 @@ export class TuC {
             return undefined;
         }
     
-        const { term, fieldmodifierlist } = match.groups!; // Extract the term and the field modifier list
+        let { term, fieldmodifierlist } = match.groups!; // Extract the term and the field modifier list
+        term = term.trim(); // Remove leading and trailing whitespace
         const fieldModifiers: { [key: string]: any } = {}; // Initialize an object for field modifiers
+        let modifierString: string[] = [];
     
         try {
             if (fieldmodifierlist) {
-                // Use a regular expression to capture the key-value pairs inside square brackets
-                const keyValueRegex = /\s*([^:]+)\s*:\s*("[^"]+"|[^,]+)\s*/g;
+                // Use a regular expression to capture the key-value pairs in the fieldmodifierlist
+                const keyValueRegex = /[\s,]*([^:]+)\s*:\s*((["'`])(.*?)\3|[^,]+)\s*/g;
                 let keyValueMatch;
         
                 // Extract the key-value pairs from the field modifier list
                 while ((keyValueMatch = keyValueRegex.exec(fieldmodifierlist))) {
-                    const key = keyValueMatch[1].trim(); // Remove leading and trailing whitespace
-                    const value = keyValueMatch[2].trim().replace(/^"(.*)"$/, '$1'); // Remove double quotes if present
+                    // remove leading and trailing whitespace
+                    const key = keyValueMatch[1];
+                    const value = keyValueMatch[4] ?? keyValueMatch[2];
                     fieldModifiers[key] = value;
+                    modifierString.push(`${key}: ${value}`);
+                    log.debug(`\t${key}: ${value}`);
                 }
             }
         
@@ -333,19 +338,25 @@ export class TuC {
             if (entries?.length > 0) {
                 // Modify the entry based on the field modifiers
                 for (const entry of entries) {
+                    let mod = false;
                     for (const [key, value] of Object.entries(fieldModifiers)) {
                         entry[key] = value;
-                        renameCount++;
+                        mod = true;
                     }
+                    mod && renameCount++;
                 }
             }
+            instruction = `rename ${term} [${modifierString?.join(', ')}]`;
             if (renameCount === 0) {
                 log.warn(`\tRenamed 0 entries: \t${instruction}`);
             } else {
                 log.trace(`\tRenamed ${renameCount} entr${renameCount > 1 ? 'ies' : 'y'}: \t${instruction}`);
             }
         } catch (err) {
-            log.error(err);
+            if (err instanceof Error) {
+                log.error(`\tInstruction caused an error: \t${instruction}`);
+                log.error(`\t${err.message}`)
+            }
         }
     }    
 }
