@@ -213,7 +213,7 @@ export class TuC {
                 entries = this.getCtextEntries();
             } else {
                 // add all terms in the MRG for either the current or the specified scope and version
-                let mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ?? saf.scope.defaultvsn}.yaml`;
+                let mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ? "." + vsntag : ""}yaml`;
                 let mrgMap = MRG.instances.find(mrg => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
                 entries = mrgMap.entries;
             }
