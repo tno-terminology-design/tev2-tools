@@ -126,7 +126,7 @@ export class Generator {
         if (saf.scope.defaultvsn === tuc.terminology.vsntag  || tuc.terminology.altvsntags?.includes(saf.scope.defaultvsn)) {
             let defaultmrgFile = `mrg.${tuc.terminology.scopetag}.yaml`;
             let defaultmrgURL = path.join(glossarydir, defaultmrgFile);
-            log.info(`\tCreating symlink for default version`);
+            log.info(`\tCreating symbolic link for default version '${path.basename(defaultmrgURL)}' > '${mrgFile}'`);
             if (!fs.existsSync(defaultmrgURL)) {
                 fs.symlinkSync(mrgFile, defaultmrgURL);
             } else {
@@ -143,7 +143,7 @@ export class Generator {
         vsn.altvsntags?.forEach(altvsntag => {
             let altmrgFile = `mrg.${tuc.terminology.scopetag}.${altvsntag}.yaml`;
             let altmrgURL = path.join(glossarydir, altmrgFile);
-            log.info(`\tCreating symlink for altvsntag '${altvsntag}'`);
+            log.info(`\tCreating symbolic link '${path.basename(altmrgURL)}' > '${mrgFile}'`)
             if (!fs.existsSync(altmrgURL)) {
                 fs.symlinkSync(mrgFile, altmrgURL);
             } else {
