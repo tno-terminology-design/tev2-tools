@@ -112,8 +112,8 @@ export async function initialize({ scopedir }: { scopedir: string }) {
 
                 // if the version is the default version, create a symbolic link {mrg.{import-scopetag}.yaml}
                 if (version.vsntag === importSaf.scope.defaultvsn) {
-                    log.info(`    - Creating symbolic link for default version`);
                     let defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`);
+                    log.info(`    - Creating symbolic link for default version '${path.basename(defaultmrgURL)}' > '${path.basename(mrgURL)}'`);
                     if (!fs.existsSync(defaultmrgURL)) {
                         fs.symlinkSync(path.basename(mrgURL), defaultmrgURL);
                     } else {
@@ -132,9 +132,9 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                 if (typeof(version.altvsntags) === 'string') {
                     version.altvsntags = [version.altvsntags];
                 }
-                log.info(`    - Creating symbolic link${version.altvsntags.length > 1 ? 's' : ''} for ${version.altvsntags.length} alternative version${version.altvsntags.length > 1 ? 's' : ''}`);
                 for (const altvsntag of version.altvsntags) {
                     let altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`);
+                    log.info(`    - Creating symbolic link '${path.basename(altmrgURL)}' > '${path.basename(mrgURL)}'`)
                     if (!fs.existsSync(altmrgURL)) {
                         fs.symlinkSync(path.basename(mrgURL), altmrgURL);
                     } else {
