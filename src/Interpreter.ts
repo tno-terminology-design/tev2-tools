@@ -218,7 +218,6 @@ export class TuC {
                     if (entry[key] !== undefined) {
                         // and both the values list and key entry property is empty
                         if (!values && (entry[key] === '' || entry[key] === null)) {
-                            log.debug(`\t${entry.term} has an empty ${key} field`)
                             return true;    // then include the entry
                         } else if (!entry[key]) {   // if the entry[key] is undefined
                             return false;   // then exclude the entry
@@ -347,7 +346,6 @@ export class TuC {
                     const value = keyValueMatch[4] ?? keyValueMatch[2];
                     fieldModifiers[key] = value;
                     modifierString.push(`${key}: ${value}`);
-                    log.debug(`\t${key}: ${value}`);
                 }
             }
         
