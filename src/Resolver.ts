@@ -124,7 +124,7 @@ export class Resolver {
                               termRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:default' `
                                     + `> '${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
                         } else {
-                              `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
+                              termRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
                         }
 
                         // Find the matching entry in mrg.entries based on the term
