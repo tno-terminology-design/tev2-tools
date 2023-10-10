@@ -81,7 +81,15 @@ export class TuC {
         this.filename = `mrg.${this.terminology.scopetag}.${this.terminology.vsntag}.yaml`;
 
         // set fields in the scopes section
-        this.scopes?.forEach(scope => {
+        for (const scope of this.scopes) {
+            // Check if a scope with the same scopetag already exists in this.scopes
+            const existingScope = [...this.scopes].filter(s => s.scopetag === scope.scopetag);
+            
+            if (existingScope?.length > 1) {
+                // If an existing scope is found, delete it
+                this.scopes.delete(scope);
+                continue;
+            }
             // find the corresponding scope in the SAF's scope section
             let SAFscope = saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
             if (SAFscope) {
@@ -89,7 +97,7 @@ export class TuC {
             } else {
                 this.scopes.delete(scope);
             }
-        });
+        };
 
         TuC.instances.push(this);
     }
