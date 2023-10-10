@@ -20,14 +20,14 @@ export class Generator {
         if (this.vsntag) {
             const vsn = saf.versions.find(vsn => vsn.vsntag === this.vsntag);
             if (vsn) {
-                log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}'...`);
+                log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml)...`);
                 this.generate(vsn);
             } else {
                 // check altvsntags
                 const vsn = saf.versions.find(vsn => vsn.altvsntags.includes(this.vsntag));
 
                 if (vsn) {
-                    log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}')...`);
+                    log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}') (mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml)...`);
                     this.generate(vsn);
                 } else {
                     // TODO Run onnotexist? Seems strange to do as there is no other vsntag to process
@@ -41,7 +41,7 @@ export class Generator {
                 throw new Error(`No versions were found in the SAF`);
             }
             saf.versions?.forEach(vsn => {
-                log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}'...`);
+                log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml)...`);
                 this.generate(vsn);
             });
         }
