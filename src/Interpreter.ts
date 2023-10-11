@@ -14,6 +14,7 @@ interface Scope {
     glossarydir: string;
     defaultvsn: string;
     localscopedir: string;
+    bodyFileID?: string;
 }
 
 interface Scopes {
@@ -163,19 +164,29 @@ export class TuC {
 
             // construct navurl from website, navpath and ctext name, or bodyFile
             const navUrl = new URL(saf.scope.website);
+            const pathname = navUrl.pathname;
             if (ctextYAML.bodyFile) {
                 // If the bodyFile property is set, then use that to construct the navurl
                 let bodyFile = path.parse(ctextYAML.bodyFile);
-                navUrl.pathname = path.join(navUrl.pathname, bodyFile.dir, bodyFile.name);
+                navUrl.pathname = path.join(pathname, bodyFile.dir, bodyFile.name);
+                log.debug(navUrl.href)
                 try {
-                    [_, _, body] = fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), 'utf8').split('---\n', 3);
+                    [_, frontmatter, body] = fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), 'utf8').split('---\n', 3);
+                    // load properties of bodyFile
+                    let bodyYAML = yaml.load(frontmatter) as Entry;
+                    // if the bodyFile has a `bodyFileID` property, then use that to construct the navurl
+                    if (saf.scope.bodyFileID) {
+                        if (bodyYAML[saf.scope.bodyFileID]) {
+                            navUrl.pathname = path.join(pathname, bodyFile.dir, path.parse(bodyYAML[saf.scope.bodyFileID]).name);
+                        }
+                    }
                 } catch (err) {
                     if (err instanceof Error) {
                         log.error(`\tAn error occurred while attempting to load the bodyFile '${ctextYAML.bodyFile}':`, err.message);
                     }
                 }
             } else {
-                navUrl.pathname = path.join(navUrl.pathname, saf.scope.navpath, path.parse(ctext).name);
+                navUrl.pathname = path.join(pathname, saf.scope.navpath, path.parse(ctext).name);
             }
 
             // Extract heading IDs from markdown content
