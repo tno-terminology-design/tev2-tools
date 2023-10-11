@@ -1,6 +1,7 @@
 import { log } from './Report.js';
 import { saf } from './Run.js';
 
+import matter from 'gray-matter';
 import fs = require("fs");
 import path = require('path');
 import yaml = require('js-yaml');

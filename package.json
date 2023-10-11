@@ -28,6 +28,7 @@
     "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
+    "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
     "tslog": "^4.9.1"
   },
