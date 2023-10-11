@@ -160,9 +160,10 @@ export class TuC {
         ctexts?.forEach(ctext => {
             let ctextPath = ctext;
             ctext = path.relative(curatedir, ctext);
-            let ctextContent = fs.readFileSync(ctextPath, 'utf8');
 
-            let [_, frontmatter, body] = ctextContent.split('---\n', 3);
+            const ctextFile = matter(fs.readFileSync(ctextPath, 'utf8'));
+            let frontmatter = ctextFile.matter;
+            let body = ctextFile.content;
 
             let ctextYAML = yaml.load(frontmatter) as Entry;
 
@@ -178,16 +179,18 @@ export class TuC {
             const pathname = navUrl.pathname;
             if (ctextYAML.bodyFile) {
                 // If the bodyFile property is set, then use that to construct the navurl
-                let bodyFile = path.parse(ctextYAML.bodyFile);
-                navUrl.pathname = path.join(pathname, bodyFile.dir, bodyFile.name);
+                let bodyFilePath = path.parse(ctextYAML.bodyFile);
+                navUrl.pathname = path.join(pathname, bodyFilePath.dir, bodyFilePath.name);
                 try {
-                    [_, frontmatter, body] = fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), 'utf8').split('---\n', 3);
+                    const bodyFile = matter(fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), 'utf8'));
+                    body = bodyFile.content;
+
                     // load properties of bodyFile
-                    let bodyYAML = yaml.load(frontmatter) as Entry;
+                    let bodyYAML = yaml.load(bodyFile.matter) as Entry;
                     // if the bodyFile has a `bodyFileID` property, then use that to construct the navurl
                     if (saf.scope.bodyFileID) {
                         if (bodyYAML[saf.scope.bodyFileID]) {
-                            navUrl.pathname = path.join(pathname, bodyFile.dir, path.parse(bodyYAML[saf.scope.bodyFileID]).name);
+                            navUrl.pathname = path.join(pathname, bodyFilePath.dir, path.parse(bodyYAML[saf.scope.bodyFileID]).name);
                         }
                     }
                 } catch (err) {
