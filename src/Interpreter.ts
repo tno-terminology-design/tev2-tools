@@ -216,16 +216,19 @@ export class TuC {
 
         let { key, values, identifier, scopetag, vsntag } = match.groups!;
         let entries: Entry[];
+        let source = ``;
         
         try {
             if (!identifier) {
                 // add all terms for which there are curated texts in the current scope
                 entries = this.getCtextEntries();
+                source = `curated texts`
             } else {
                 // add all terms in the MRG for either the current or the specified scope and version
                 let mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`;
                 let mrgMap = MRG.instances.find(mrg => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
                 entries = mrgMap.entries;
+                source = `'${mrgFile}'`;
             }
 
             const valuelist = values?.split(',').map(v => v.trim());
@@ -267,9 +270,9 @@ export class TuC {
                     scopetag: scopetag,
                     scopedir: ''
                 });
-                log.trace(`\tAdded ${entries.length} entr${entries.length > 1 ? 'ies' : 'y'}: \t${instruction}`);
+                log.trace(`\tAdded ${entries.length} entr${entries.length > 1 ? 'ies' : 'y'} from ${source}: \t${instruction}`);
             } else {
-                log.warn(`\tAdded 0 entries: \t${instruction}`);
+                log.warn(`\tAdded 0 entries from ${source}: \t${instruction}`);
             }
         } catch (err) {
             if (err instanceof Error) {
