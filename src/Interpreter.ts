@@ -140,15 +140,25 @@ export class TuC {
         }
         const curatedir = path.join(saf.scope.localscopedir, saf.scope.curatedir);
 
-        // Get all the curated texts from the curatedir
-        let curatedirContent = fs.readdirSync(curatedir);
+        // Get all the curated texts from the curatedir and their subdirectories
+        let curatedirContent = [];
+        const walkSync = (dir: string, filelist: string[] = []) => {
+            fs.readdirSync(dir).forEach(file => {
+                filelist = fs.statSync(path.join(dir, file)).isDirectory()
+                    ? walkSync(path.join(dir, file), filelist)
+                    : filelist.concat(path.join(dir, file));
+            });
+            return filelist;
+        }
+        curatedirContent = walkSync(curatedir);
 
         // Interpret all the curated texts and store them in the terminology under construction
         let ctexts = curatedirContent.filter(ctext => ctext.endsWith('.md'));
 
         // load properties of curated texts as MRG Entry
         ctexts?.forEach(ctext => {
-            let ctextPath = path.join(curatedir, ctext);
+            let ctextPath = ctext;
+            ctext = path.relative(curatedir, ctext);
             let ctextContent = fs.readFileSync(ctextPath, 'utf8');
 
             let [_, frontmatter, body] = ctextContent.split('---\n', 3);
@@ -185,7 +195,7 @@ export class TuC {
                     }
                 }
             } else {
-                navUrl.pathname = path.join(pathname, saf.scope.navpath, path.parse(ctext).name);
+                navUrl.pathname = path.join(pathname, saf.scope.navpath, path.parse(ctext).dir, path.parse(ctext).name);
             }
 
             // Extract heading IDs from markdown content
