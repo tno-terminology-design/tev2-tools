@@ -269,3 +269,16 @@ This helper with identifier `ifValue` allows for equality checking by comparing 
  {{#ifValue termType equals="concept"}}Artifact is a concept{{/ifValue}}
  {{#ifValue termType equals="image"}}Artifact is an image{{/ifValue}}
 ```
+
+#### `localize`
+This helper with identifier `localize` attempts to interpret the value it was given as a URL and compares it to the `website` value within the [SAF](@). If both the `host` values (e.g., tno-terminology-design.github.io) match, the `pathname` of the URL is returned. If the given value cannot be interpreted as a URL, or the `host` values do not match, the input value is returned. This can be useful in situations where external links (URL's pointing to a website other than the current `host`) are handled differently from internal links.
+
+```hbs title="localize example"
+ {{localize navurl}}
+ <!-- using the localize helper, converts -->
+ https://tno-terminology-design.github.io/tev2-specifications/docs/terms/author
+ <!-- into -->
+ /tev2-specifications/docs/terms/author
+ <!-- assuming that the `host` value of the URL matches the SAF website's `host` value -->
+```
+
