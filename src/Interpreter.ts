@@ -162,10 +162,9 @@ export class TuC {
             ctext = path.relative(curatedir, ctext);
 
             const ctextFile = matter(fs.readFileSync(ctextPath, 'utf8'));
-            let frontmatter = ctextFile.matter;
             let body = ctextFile.content;
 
-            let ctextYAML = yaml.load(frontmatter) as Entry;
+            let ctextYAML = ctextFile.data as Entry;
 
             // remove properties that match specific set of predetermined properties
             Object.keys(ctextYAML).forEach(key => {
@@ -185,12 +184,10 @@ export class TuC {
                     const bodyFile = matter(fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), 'utf8'));
                     body = bodyFile.content;
 
-                    // load properties of bodyFile
-                    let bodyYAML = yaml.load(bodyFile.matter) as Entry;
                     // if the bodyFile has a `bodyFileID` property, then use that to construct the navurl
                     if (saf.scope.bodyFileID) {
-                        if (bodyYAML[saf.scope.bodyFileID]) {
-                            navUrl.pathname = path.join(pathname, bodyFilePath.dir, path.parse(bodyYAML[saf.scope.bodyFileID]).name);
+                        if (bodyFile.data[saf.scope.bodyFileID]) {
+                            navUrl.pathname = path.join(pathname, bodyFilePath.dir, path.parse(bodyFile.data[saf.scope.bodyFileID]).name);
                         }
                     }
                 } catch (err) {
