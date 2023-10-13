@@ -98,7 +98,7 @@ export class MRG {
                         process.exit(1);
                   }
 
-                  const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator', 'glossaryText'];
+                  const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator'];
       
                   for (const entry of mrg.entries) {
                         // add vsntag, scopetag, and altvsntags from MRG to MRG entries

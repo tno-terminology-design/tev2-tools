@@ -2,6 +2,7 @@ import Handlebars from 'handlebars';
 import { log } from './Report.js';
 import { interpreter } from './Run.js'
 import { Entry } from './Glossary.js';
+import { saf } from './Run.js';
 
 type AnyObject = { [key: string]: any };
 
@@ -27,6 +28,7 @@ export class Converter {
             Handlebars.registerHelper('noRefs', noRefsHelper);
             Handlebars.registerHelper('capFirst', capFirstHelper);
             Handlebars.registerHelper('ifValue', ifValueHelper);
+            Handlebars.registerHelper('localize', localizeHelper);
 
             let key = template.toLowerCase();
             let exist = map.hasOwnProperty(key);
@@ -153,6 +155,25 @@ function ifValueHelper(this: any, conditional: any, options: any) {
             return options.inverse(this);
       }
 };
+
+/**
+ * Helper function to localize URLs (remove the host and protocol)
+ * If the host of the parsed `url` is the same as website's, then the localized path is created
+ * @param url - The URL to be processed
+ */
+function localizeHelper(url: string) {
+      try {
+            const parsedURL = new URL(url);
+            const parsedWebsite = new URL(saf.scope.website);
+            if (parsedURL.host === parsedWebsite.host) {
+                  url = parsedURL.pathname;
+            }
+      } catch (error) {
+            // do nothing
+      } finally {
+            return url;
+      }
+}
 
 /**
  * Helper function to evaluate Handlebars expressions inside MRG Entry properties

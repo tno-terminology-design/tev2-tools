@@ -162,10 +162,12 @@ Resulting in the following [renderable ref](@) Markdown that, when rendered, res
 The HTML converter can be used by setting '`html`', or the template string below, as the value of `converter`. Similar to the Markdown converter, the original `showtext` of the [term ref](@) properties is used in addition to the `navurl` [MRG entry](@) property with the `trait` [term ref](@) property, leading with a `#`-character, being added if it is available.
 
 ```hbs title="HTML Mustache template"
- <a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>
+ <a
+ href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}"
+ >{{showtext}}</a>
 ```
 
-Resulting in the following [renderable ref](@) HTML `<a>` tag that defines a hyperlink to the `navurl`.
+Resulting in the following [renderable ref](@) HTML `<a>` tag that defines a hyperlink to the `navurl`.<br/>
 
 ```html
  <a href="terms/curator.md#examples">Curators</a>
@@ -267,3 +269,16 @@ This helper with identifier `ifValue` allows for equality checking by comparing 
  {{#ifValue termType equals="concept"}}Artifact is a concept{{/ifValue}}
  {{#ifValue termType equals="image"}}Artifact is an image{{/ifValue}}
 ```
+
+#### `localize`
+This helper with identifier `localize` attempts to interpret the value it was given as a URL and compares it to the `website` value within the [SAF](@). If both the `host` values (e.g., tno-terminology-design.github.io) match, the `pathname` of the URL is returned. If the given value cannot be interpreted as a URL, or the `host` values do not match, the input value is returned. This can be useful in situations where external links (URL's pointing to a website other than the current `host`) are handled differently from internal links.
+
+```hbs title="localize example"
+ {{localize navurl}}
+ <!-- using the localize helper, converts -->
+ https://tno-terminology-design.github.io/tev2-specifications/docs/terms/author
+ <!-- into -->
+ /tev2-specifications/docs/terms/author
+ <!-- assuming that the `host` value of the URL matches the SAF website's `host` value -->
+```
+
