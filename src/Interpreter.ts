@@ -228,7 +228,10 @@ export class TuC {
         let { key, values, identifier, scopetag, vsntag } = match.groups!;
         let entries: Entry[];
         let source = ``;
-        
+
+        const valuelist = values?.split(',').map(v => v.trim());
+        instruction = `${key}${key !== '*' ? '[' + valuelist?.join(', ') + ']' : ''}${identifier ? '@' + scopetag + (vsntag ? ':' + vsntag : '') : ''}`;
+
         try {
             if (!identifier) {
                 // add all terms for which there are curated texts in the current scope
@@ -242,11 +245,8 @@ export class TuC {
                 let mrgMap = MRG.instances.find(mrg => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
                 entries = mrgMap.entries;
             }
-
-            const valuelist = values?.split(',').map(v => v.trim());
             
             if (key !== '*') {
-                instruction = `${key}[${valuelist ? valuelist.join(', ') : ''}]${identifier ? '@' + scopetag + (vsntag ? ':' + vsntag : '') : ''}`;
                 entries = entries.filter(entry => {
                     // if the entry has a field with the same name as the key
                     if (entry[key] !== undefined) {
