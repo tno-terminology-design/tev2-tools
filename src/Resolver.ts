@@ -146,12 +146,7 @@ export class Resolver {
                               }
                         } else if (matchingEntries.length > 1) {
                               // Multiple matches found, display a warning
-                              const uniqueSources = new Set();
-                              const source = matchingEntries
-                                    .filter(entry => !uniqueSources.has(entry.source) && uniqueSources.add(entry.source))
-                                    .map(entry => entry.source)
-                                    .join(', ');
-                              let message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in MRG '${path.basename(source)}'`;
+                              let message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrgFile}'`;
                               report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message);
                         } else {
                               let message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
