@@ -7,6 +7,7 @@ The way to achieve this in a particular repo is as follows.
 2. Edit `docusaurus.config.js` and make sure the following lines are at the beginning of that file:
 
 ~~~ json
+const terminology_design = require('./footer-links/terminology-design.json');
 const manuals = require('./footer-links/manuals.json');
 const specifications = require('./footer-links/specifications.json');
 const repositories = require('./footer-links/repositories.json');
@@ -19,6 +20,7 @@ const copyright = require('./footer-links/copyright.json');
     footer: {
       ...
       links: [
+        { title: terminology_design.title, items: terminology_design.items },
         { title: manuals.title, items: manuals.items },
         { title: specifications.title, items: specifications.items, },
         { title: repositories.title, items: repositories.items },
