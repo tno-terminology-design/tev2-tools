@@ -221,7 +221,7 @@ export class TuC {
         const match = instruction.replace(/\s/g, '').match(regex);
 
         if (!match) {
-            log.error(`\tE021 Invalid instruction: ${instruction}`);
+            log.error(`\tE021 Invalid instruction: '${instruction}'`);
             return undefined;
         }
 
@@ -232,26 +232,28 @@ export class TuC {
         try {
             if (!identifier) {
                 // add all terms for which there are curated texts in the current scope
-                entries = this.getCtextEntries();
                 source = `curated texts`
+                entries = this.getCtextEntries();
             } else {
                 // add all terms in the MRG for either the current or the specified scope and version
                 let mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`;
+                source = `'${mrgFile}'`;
+
                 let mrgMap = MRG.instances.find(mrg => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
                 entries = mrgMap.entries;
-                source = `'${mrgFile}'`;
             }
 
             const valuelist = values?.split(',').map(v => v.trim());
             
             if (key !== '*') {
+                instruction = `${key}[${valuelist ? valuelist.join(', ') : ''}]${identifier ? '@' + scopetag + (vsntag ? ':' + vsntag : '') : ''}`;
                 entries = entries.filter(entry => {
                     // if the entry has a field with the same name as the key
                     if (entry[key] !== undefined) {
                         // and both the values list and key entry property is empty
                         if (!values && (entry[key] === '' || entry[key] === null)) {
                             return true;    // then include the entry
-                        } else if (!entry[key]) {   // if the entry[key] is undefined
+                        } else if (!values) {   // if the values list is empty
                             return false;   // then exclude the entry
                         }
                         // or the value of that field is in the values list
@@ -261,7 +263,7 @@ export class TuC {
                                     return true;    // then include the entry
                                 }
                             } else {
-                                if (entry[key].includes(value)) {   // if the entry[key] is an array
+                                if (entry[key]?.includes(value)) {   // if the entry[key] is an array
                                     return true;    // then include the entry
                                 }
                             }
@@ -271,7 +273,9 @@ export class TuC {
                     return false;
                 });
             }
-            instruction = `${key}${valuelist ? '[' + valuelist?.join(', ') + ']' : ''}${identifier ? '@' + scopetag + (vsntag ? ':' + vsntag : '') : ''}`;
+
+            log.info(`\tTermselection (${source}): \t'${instruction}'`);
+
             if (entries.length > 0) {
                 // add entries to TuC and overwrite existing entries with the same term
                 this.entries = this.entries.filter(entry => !entries.some(e => e.term === entry.term));
@@ -281,14 +285,27 @@ export class TuC {
                     scopetag: scopetag,
                     scopedir: ''
                 });
-                log.trace(`\tAdded ${entries.length} entr${entries.length > 1 ? 'ies' : 'y'} from ${source}: \t${instruction}`);
+
+                if (key !== '*') {
+                    log.trace(`\t\tAdded ${entries.length} entr${entries.length > 1 ? 'ies' : 'y'}: ${entries.map(entry => entry.term).join(', ')}`)
+
+                    //  Report valueList items that did not match any entries
+                    if (valuelist) {
+                        const unmatchedValues = valuelist.filter(value => !entries.some(entry => entry[key] === value));
+                        if (unmatchedValues.length > 0) {
+                            log.warn(`\t\tCould not match: ${key}[${unmatchedValues.join(', ')}]`);
+                        }
+                    }
+                } else {
+                    log.trace(`\t\tAdded ${entries.length} entr${entries.length > 1 ? 'ies' : 'y'} from curated texts`);
+                }
             } else {
-                log.warn(`\tAdded 0 entries from ${source}: \t${instruction}`);
+                log.warn(`\t\tSelection matched 0 entries`);
             }
         } catch (err) {
             if (err instanceof Error) {
-                log.error(`\tInstruction caused an error: \t${instruction}`);
-                log.error(`\t${err.message}`)
+                log.info(`\tTermselection (${source}): \t'${instruction}'`);
+                log.error(`\t\tInstruction caused an error: ${err.message}`);
             }
         }
     }
@@ -298,13 +315,14 @@ export class TuC {
         const match = instruction.replace(/\s/g, '').match(regex);
 
         if (!match) {
-            log.error(`\tE021 Invalid instruction: ${instruction}`);
+            log.error(`\tE021 Invalid instruction: '-${instruction}'`);
             return undefined;
         }
 
         const { key, values } = match.groups!;
-        let removeCount = 0;
+        let removed: Entry[] = [];
         const valuelist = values?.split(',').map(v => v.trim());
+        instruction = `-${key}[${valuelist ? valuelist.join(', ') : ''}]`;
 
         try {
             this.entries = this.entries.filter(entry => {
@@ -312,21 +330,21 @@ export class TuC {
                 if (entry[key] !== undefined) {
                     // and both the values list and key entry property is empty
                     if (!values && (entry[key] === '' || entry[key] === null)) {
-                        removeCount++;
+                        removed.push(entry);
                         return false;
-                    } else if (!entry[key]) {
+                    } else if (!values) {
                         return true;
                     }
                     // or the value of that field is in the value list
                     for (const value of valuelist) {
                         if (typeof entry[key] === 'string') {   // if the entry[key] is a string
                             if (entry[key] === value) {
-                                removeCount++;
+                                removed.push(entry);
                                 return false;    // then exclude the entry
                             }
                         } else {
                             if (entry[key].includes(value)) {   // if the entry[key] is an array
-                                removeCount++;
+                                removed.push(entry);
                                 return true;    // then exclude the entry
                             }
                         }
@@ -336,17 +354,23 @@ export class TuC {
                 return true;
             });
 
-            // log warning if no entries were removed
-            instruction = `${key}[${valuelist?.join(', ')}]`;
-            if (removeCount === 0) {
-                log.warn(`\tRemoved 0 entries: \t-${instruction}`)
+            log.info(`\tTermselection (provisional): \t'${instruction}'`)
+            if (removed.length === 0) {    // log warning if no entries were removed
+                log.warn(`\t\tSelection matched 0 terms`)
             } else {
-                log.trace(`\tRemoved ${removeCount} entr${removeCount > 1 ? 'ies' : 'y'}: \t-${instruction}`);
+                log.trace(`\t\tRemoved ${removed.length} entr${removed.length > 1 ? 'ies' : 'y'}: ${removed.map(entry => entry.term).join(', ')}`);
+                // report valueList items that did not match any entries
+                if (valuelist ) {
+                    const unmatchedValues = valuelist.filter(value => !removed.some(entry => entry[key] === value));
+                    if (unmatchedValues.length > 0) {
+                        log.warn(`\t\tCould not match: -${key}[${unmatchedValues.join(', ')}]`);
+                    }
+                }
             }
         } catch (err) {
             if (err instanceof Error) {
-                log.error(`\tInstruction caused an error: \t-${instruction}`);
-                log.error(`\t${err.message}`)
+                log.info(`\tTermselection (provisional): \t'${instruction}'`)
+                log.error(`\t\tInstruction caused an error: ${err.message}`);
             }
         }
     }
@@ -356,7 +380,7 @@ export class TuC {
         const match = instruction.match(regex);
     
         if (!match) {
-            log.error(`\tE021 Invalid instruction: ${instruction}`);
+            log.error(`\tE021 Invalid instruction: 'rename ${instruction}'`);
             return undefined;
         }
     
@@ -379,33 +403,33 @@ export class TuC {
                     fieldModifiers[key] = value;
                     modifierString.push(`${key}: ${value}`);
                 }
+                instruction = `rename ${term} [${modifierString?.join(', ')}]`;
             }
         
             // Find the entries with the term
             const entries = this.entries.filter(entry => entry.term === term);
-            let renameCount = 0;
+            let renamed: String[] = [];
         
             if (entries?.length > 0) {
                 // Modify the entry based on the field modifiers
                 for (const entry of entries) {
-                    let mod = false;
+                    renamed.push(entry.term);
                     for (const [key, value] of Object.entries(fieldModifiers)) {
                         entry[key] = value;
-                        mod = true;
                     }
-                    mod && renameCount++;
                 }
             }
-            instruction = `rename ${term} [${modifierString?.join(', ')}]`;
-            if (renameCount === 0) {
-                log.warn(`\tRenamed 0 entries: \t${instruction}`);
+
+            log.info(`\tTermselection (provisional): \t'${instruction}'`);
+            if (renamed.length === 0) {
+                log.warn(`\t\tSelection matched 0 entries`);
             } else {
-                log.trace(`\tRenamed ${renameCount} entr${renameCount > 1 ? 'ies' : 'y'}: \t${instruction}`);
+                log.trace(`\t\tRenamed ${renamed.length} entr${renamed.length > 1 ? 'ies' : 'y'}: ${renamed.join(', ')}`);
             }
         } catch (err) {
             if (err instanceof Error) {
-                log.error(`\tInstruction caused an error: \t${instruction}`);
-                log.error(`\t${err.message}`)
+                log.info(`\tTermselection (provisional): \t'${instruction}'`);
+                log.error(`\t\tInstruction caused an error: ${err.message}`);
             }
         }
     }    
