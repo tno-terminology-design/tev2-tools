@@ -297,7 +297,7 @@ export class TuC {
                         }
                     }
                 } else {
-                    log.trace(`\t\tAdded ${entries.length} entr${entries.length > 1 ? 'ies' : 'y'} from curated texts`);
+                    log.trace(`\t\tAdded ${entries.length} entr${entries.length > 1 ? 'ies' : 'y'} from ${source}`);
                 }
             } else {
                 log.warn(`\t\tSelection matched 0 entries`);
