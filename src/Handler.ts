@@ -18,12 +18,12 @@ export async function download(url: URL, localPath: string): Promise<void> {
   let rawUrl: URL;
   if (parsedUrl.source === 'github.com') {
     if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.pathname) {
-      throw new Error(`  - Please check to make sure the Git URL points to a valid raw file: ${url.href}`);
+      throw new Error(`\tPlease check to make sure the Git URL points to a valid raw file: ${url.href}`);
     }
     rawUrl = new URL(path.join('https://raw.githubusercontent.com', parsedUrl.owner, parsedUrl.name, parsedUrl.ref, parsedUrl.filepath));
   } else if (parsedUrl.source === 'gitlab.com') {
     if (!parsedUrl.owner || !parsedUrl.name || !parsedUrl.pathname) {
-      throw new Error(`  - Please check to make sure the Git URL points to a valid raw file: ${url.href}`);
+      throw new Error(`\tPlease check to make sure the Git URL points to a valid raw file: ${url.href}`);
     }
     rawUrl = new URL(path.join('https://gitlab.com', parsedUrl.owner, parsedUrl.name, 'raw', parsedUrl.ref, parsedUrl.filepath));
   } else {
@@ -31,7 +31,7 @@ export async function download(url: URL, localPath: string): Promise<void> {
     rawUrl = url;
   }
 
-  log.info(`  - Requesting '${rawUrl}'`);
+  log.trace(`\tRequesting '${rawUrl}'`);
   const response = await axios.get(rawUrl.href, { responseType: 'arraybuffer' });
   writeFile(localPath, response.data);
 }
@@ -52,7 +52,7 @@ export function writeFile(fullPath: string, data: string, force: boolean = true)
         try {
             fs.mkdirSync(dirPath, { recursive: true });
         } catch (err) {
-            log.error(`  - E007 Error creating directory '${dirPath}':`, err);
+            log.error(`\tE007 Error creating directory '${dirPath}':`, err);
             return; // Stop further execution if directory creation failed
         }
     } else if (!force && fs.existsSync(path.join(dirPath, file))) {
@@ -62,6 +62,6 @@ export function writeFile(fullPath: string, data: string, force: boolean = true)
     try {
         fs.writeFileSync(path.join(dirPath, file), data);
     } catch (err) {
-        log.error(`  - E008 Error writing file '${path.join(dirPath, file)}':`, err);
+        log.error(`\tE008 Error writing file '${path.join(dirPath, file)}':`, err);
     }
 }

@@ -80,7 +80,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
     // if saf.scopes.length > 0 then log.info with import scopes instead of scope
     log.info(`\x1b[1;37mFound ${saf.scopes.length} import scope${saf.scopes.length > 1 ? 's' : ''} in scopedir '${saf.scope.scopedir}'`);
     for (const scope of saf.scopes) {
-        log.info(`  - Handling import scope '${scope.scopetag}'`);
+        log.info(`\tHandling import scope '${scope.scopetag}'`);
         // read the SAF of the import scope
         const importEnv = new Interpreter({ scopedir: scope.scopedir });
         const importSaf = await importEnv.saf;
@@ -108,12 +108,16 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                 // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
                 mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`);
                 writeFile(mrgURL, yaml.dump(mrg, { forceQuotes: true }));
-                log.info(`    - Storing MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`);
+                log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`);
+
+                if (version.altvsntags || version.vsntag === importSaf.scope.defaultvsn) {
+                    log.info(`\tCreating symbolic link(s)...`);
+                }
 
                 // if the version is the default version, create a symbolic link {mrg.{import-scopetag}.yaml}
-                if (version.vsntag === importSaf.scope.defaultvsn) {
+                if (version.vsntag === importSaf.scope.defaultvsn || version.altvsntags?.includes(importSaf.scope.defaultvsn)) {
                     let defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`);
-                    log.info(`    - Creating symbolic link for default version '${path.basename(defaultmrgURL)}' > '${path.basename(mrgURL)}'`);
+                    log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default) > '${path.basename(mrgURL)}'`);
                     if (!fs.existsSync(defaultmrgURL)) {
                         fs.symlinkSync(path.basename(mrgURL), defaultmrgURL);
                     } else {
@@ -122,19 +126,15 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                         fs.symlinkSync(path.basename(mrgURL), defaultmrgURL);
                     }
                 }
-                
-                if (!version.altvsntags) {
-                    continue;
-                }
 
-                // create a symbolic link {mrg.{import-scopetag}.{import-altvsntag}.yaml} for every {import-altvsntags}
-                // if altvsntags is a string, convert it to an array
-                if (typeof(version.altvsntags) === 'string') {
+                // Create a symlink for every altvsntag
+                if (typeof version.altvsntags  === 'string') {
                     version.altvsntags = [version.altvsntags];
                 }
-                for (const altvsntag of version.altvsntags) {
-                    let altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`);
-                    log.info(`    - Creating symbolic link '${path.basename(altmrgURL)}' > '${path.basename(mrgURL)}'`)
+                version.altvsntags?.forEach(altvsntag => {
+                    let altmrgFile = `mrg.${scope.scopetag}.${altvsntag}.yaml`;
+                    let altmrgURL = path.join(path.dirname(mrgURL), altmrgFile);
+                    log.trace(`\t\t'${path.basename(altmrgURL)}' > '${path.basename(mrgURL)}'`)
                     if (!fs.existsSync(altmrgURL)) {
                         fs.symlinkSync(path.basename(mrgURL), altmrgURL);
                     } else {
@@ -142,7 +142,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
                         fs.unlinkSync(altmrgURL);
                         fs.symlinkSync(path.basename(mrgURL), altmrgURL);
                     }
-                }
+                });
             } catch (err) {
                 onNotExistError(err);
             }
