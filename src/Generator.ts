@@ -122,7 +122,7 @@ export class Generator {
         let mrgFile = `mrg.${tuc.terminology.scopetag}.${tuc.terminology.vsntag}.yaml`;
         writeFile(path.join(glossarydir, mrgFile), yaml.dump(tuc.output(), { forceQuotes: true }));
 
-        if (vsn.altvsntags || saf.scope.defaultvsn === tuc.terminology.vsntag || tuc.terminology.altvsntags?.includes(saf.scope.defaultvsn)) {
+        if (vsn.altvsntags || saf.scope.defaultvsn === tuc.terminology.vsntag) {
             log.info(`\tCreating symbolic link(s)...`);
         }
 
