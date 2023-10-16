@@ -23,8 +23,8 @@ program
   .name('trrt')
   .version('1.0.7')
   .usage('[ <paramlist> ] [ <globpattern> ]\n' +
-      '- <paramlist> (optional) is a list of key-value pairs\n' +
-      '- <globpattern> (optional) specifies a set of (input) files that are to be processed')
+    '- <paramlist> (optional) is a list of key-value pairs\n' +
+    '- <globpattern> (optional) specifies a set of (input) files that are to be processed')
   .description('The CLI for the Term Reference Resolution Tool')
   .option('-c, --config <path>', 'Path (including the filename) of the tool\'s (YAML) configuration file')
   .option('-o, --output <dir>', '(Root) directory for output files to be written')
@@ -64,7 +64,7 @@ async function main (): Promise<void> {
   // Check if required options are provided
   if (options.output == null || options.scopedir == null || options.input == null) {
     program.addHelpText('after', '\nRequired options are missing\n' +
-            'Provide at least the following options: output <path>, scopedir <path> and input <globpattern>\n')
+      'Provide at least the following options: output <path>, scopedir <path> and input <globpattern>\n')
     program.help()
     process.exit(1)
   } else {

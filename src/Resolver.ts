@@ -37,11 +37,11 @@ export class Resolver {
   }
 
   /**
-       * Creates directory tree and writes data to a file.
-       * @param fullPath - The full file path.
-       * @param data - The data to write.
-       * @param force - Whether to overwrite existing files.
-       */
+   * Creates directory tree and writes data to a file.
+   * @param fullPath - The full file path.
+   * @param data - The data to write.
+   * @param force - Whether to overwrite existing files.
+   */
   private writeFile (fullPath: string, data: string, force: boolean = false): void {
     const dirPath = path.dirname(fullPath)
     const file = path.basename(fullPath)
@@ -70,11 +70,11 @@ export class Resolver {
   }
 
   /**
-       * Interprets and converts terms in the given data string based on the interpreter and converter.
-       * @param file The file object of the file being processed.
-       * @param filePath The path of the file being processed.
-       * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
-       */
+   * Interprets and converts terms in the given data string based on the interpreter and converter.
+   * @param file The file object of the file being processed.
+   * @param filePath The path of the file being processed.
+   * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
+   */
   private async interpretAndConvert (file: matter.GrayMatterFile<string>, filePath: string): Promise<string | undefined> {
     // Get the matches of the regex in the file.orig string
     const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(interpreter.getRegex()))
@@ -175,9 +175,9 @@ export class Resolver {
   }
 
   /**
-       * Calles interpretAndConvert() on files based on `this.globPattern`.
-       * @returns A Promise that resolves to true if the resolution was successful.
-       */
+   * Calles interpretAndConvert() on files based on `this.globPattern`.
+   * @returns A Promise that resolves to true if the resolution was successful.
+   */
   public async resolve (): Promise<boolean> {
     // Log information about the interpreter, converter and the files being read
     log.info(`Reading files using pattern string '${this.globPattern}'`)

@@ -51,9 +51,9 @@ export class Interpreter {
 
     return {
       showtext: match.groups.showtext,
-      id: match.groups.id ?? match.groups.showtext.toLowerCase().replace(/['()]+/g, '').replace(/[^a-z0-9_-]+/g, '-'),
+      id: match.groups.id?.length > 0 ? match.groups.id : match.groups.showtext.toLowerCase().replace(/['()]+/g, '').replace(/[^a-z0-9_-]+/g, '-'),
       trait: match.groups.trait,
-      scopetag: match.groups.scopetag ?? saf.scope.scopetag,
+      scopetag: match.groups.scopetag?.length > 0 ? match.groups.scopetag : saf.scope.scopetag,
       vsntag: match.groups.vsntag
     }
   }

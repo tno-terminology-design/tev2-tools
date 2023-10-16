@@ -67,7 +67,7 @@ export class MRG {
     this.filename = filename
     this.terminology = mrg.terminology
     this.scopes = mrg.scopes
-    if (mrg.entries) {
+    if (mrg.entries.length > 0) {
       this.entries = this.populate(mrg)
     }
 
@@ -75,10 +75,10 @@ export class MRG {
   }
 
   /**
-       * Reads the MRG at `mrgURL` and maps it as an MRG object.
-       * @param mrgURL - The full path of the MRG to be retrieved.
-       * @returns - The MRG as an MRG object.
-       */
+   * Reads the MRG at `mrgURL` and maps it as an MRG object.
+   * @param mrgURL - The full path of the MRG to be retrieved.
+   * @returns - The MRG as an MRG object.
+   */
   public getMrgMap (mrgURL: string): MRG {
     let mrg = {} as MRG
 
@@ -87,50 +87,52 @@ export class MRG {
       const mrgfile = fs.readFileSync(mrgURL, 'utf8')
       mrg = yaml.load(mrgfile) as MRG
 
-                  // check for missing required properties in MRG terminology
-                  type TerminologyProperty = keyof Terminology
-                  const requiredProperties: TerminologyProperty[] = ['scopetag', 'scopedir', 'curatedir', 'vsntag']
-                  const terminology = mrg.terminology
-                  const missingProperties = requiredProperties.filter(prop => !terminology[prop])
+      // check for missing required properties in MRG terminology
+      type TerminologyProperty = keyof Terminology
+      const requiredProperties: TerminologyProperty[] = ['scopetag', 'scopedir', 'curatedir', 'vsntag']
+      const terminology = mrg.terminology
+      const missingProperties = requiredProperties.filter(prop => terminology[prop] == null)
 
-                  if (missingProperties.length > 0) {
-                    log.error(`E003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
-                    process.exit(1)
-                  }
+      if (missingProperties.length > 0) {
+        log.error(`E003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
+        process.exit(1)
+      }
 
-                  const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator']
+      const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator']
 
-                  for (const entry of mrg.entries) {
-                    // add vsntag, scopetag, and altvsntags from MRG to MRG entries
-                    entry.vsntag = terminology.vsntag
-                    entry.scopetag = terminology.scopetag
-                    entry.altvsntags = terminology.altvsntags
+      for (const entry of mrg.entries) {
+        // add vsntag, scopetag, and altvsntags from MRG to MRG entries
+        entry.vsntag = terminology.vsntag
+        entry.scopetag = terminology.scopetag
+        entry.altvsntags = terminology.altvsntags
 
-                    // check for missing required properties in MRG entries
-                    const missingProperties = requiredEntryProperties.filter(prop => !entry[prop])
+        // check for missing required properties in MRG entries
+        const missingProperties = requiredEntryProperties.filter(prop => entry[prop] == null)
 
-                    if (missingProperties.length > 0) {
-                      // create a reference to the problematic entry using the first three property-value pairs
-                      const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ')
+        if (missingProperties.length > 0) {
+          // create a reference to the problematic entry using the first three property-value pairs
+          const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ')
 
-                      const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`
-                      report.mrgHelp(mrgURL, -1, errorMessage)
-                    }
-                  }
+          const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`
+          report.mrgHelp(mrgURL, -1, errorMessage)
+        }
+      }
     } catch (err) {
-      const errorMessage = `E005 An error occurred while attempting to load an MRG: ${err}`
-      report.mrgHelp(mrgURL, -1, errorMessage)
+      if (err instanceof Error) {
+        const errorMessage = `E005 An error occurred while attempting to load an MRG: ${err.message}`
+        report.mrgHelp(mrgURL, -1, errorMessage)
+      }
     }
 
     return mrg
   }
 
   /**
-       * Populates the runtime glossary by processing MRG entries.
-       * @param mrg - The MRG (Machine Readable Glossary) map.
-       * @param filename - The filename of the MRG being processed.
-       * @returns A promise that resolves to the populated runtime glossary.
-       */
+   * Populates the runtime glossary by processing MRG entries.
+   * @param mrg - The MRG (Machine Readable Glossary) map.
+   * @param filename - The filename of the MRG being processed.
+   * @returns A promise that resolves to the populated runtime glossary.
+   */
   public populate (mrg: MRG): Entry[] {
     const entries: Entry[] = []
     try {
@@ -141,7 +143,7 @@ export class MRG {
       }
 
       for (const entry of mrg.entries) {
-        const alternatives = entry.formPhrases ? entry.formPhrases.split(',').map(t => t.trim()) : []
+        const alternatives = entry.formPhrases != null ? entry.formPhrases.split(',').map(t => t.trim()) : []
 
         // create a new set of alternatives that includes all possible macro replacements
         const modifiedAlternatives = new Set<string>()
@@ -161,9 +163,8 @@ export class MRG {
     } catch (err) {
       log.error(`E006 An error occurred while attempting to process the MRG at '${mrg.filename}':`, err)
       throw err
-    } finally {
-      return entries
     }
+    return entries
   }
 }
 
@@ -186,10 +187,10 @@ export class SAF {
   }
 
   /**
-       * Reads the SAF at `safURL` and maps it as a SAF object.
-       * @param safURL - The full path of the SAF to be retrieved.
-       * @returns - The SAF as a SAF object.
-       */
+   * Reads the SAF at `safURL` and maps it as a SAF object.
+   * @param safURL - The full path of the SAF to be retrieved.
+   * @returns - The SAF as a SAF object.
+   */
   private getSafMap (safURL: string): SAF {
     let saf = {} as SAF
 
@@ -197,15 +198,15 @@ export class SAF {
       // try to load the SAF map from the scopedir
       saf = yaml.load(fs.readFileSync(safURL, 'utf8')) as SAF
 
-                  // check for missing required properties in SAF
-                  type ScopeProperty = keyof Scope
-                  const requiredProperties: ScopeProperty[] = ['scopetag', 'scopedir', 'curatedir', 'defaultvsn']
-                  const missingProperties = requiredProperties.filter(prop => !saf.scope[prop])
+      // check for missing required properties in SAF
+      type ScopeProperty = keyof Scope
+      const requiredProperties: ScopeProperty[] = ['scopetag', 'scopedir', 'curatedir', 'defaultvsn']
+      const missingProperties = requiredProperties.filter(prop => saf.scope[prop] == null)
 
-                  if (missingProperties.length > 0) {
-                    log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
-                    process.exit(1)
-                  }
+      if (missingProperties.length > 0) {
+        log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
+        process.exit(1)
+      }
     } catch (err) {
       log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err)
       process.exit(1)
@@ -226,16 +227,16 @@ function applyMacroReplacements (input: string, regexMap: Record<string, string[
   const match = input.match(/\{(\w+)}/)
 
   // if no macro is found, return the input as is
-  if (!match) {
+  if (match == null) {
     return [input]
   }
 
   const macroKey = match[1]
-  const replacements = regexMap[`{${macroKey}}`] || []
+  const replacements = regexMap[`{${macroKey}}`] ?? []
 
   // split the input into prefix and suffix at the macro
   const prefix = input.substring(0, match.index)
-  const suffix = input.substring(match.index! + match[0].length)
+  const suffix = input.substring(match.index != null ? match.index + match[0].length : match[0].length)
 
   const result: string[] = []
 
