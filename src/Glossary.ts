@@ -5,7 +5,7 @@ import fs = require("fs");
 import path = require('path');
 import yaml = require('js-yaml');
 
-interface Scope {
+type Scope = {
       website: string;
       scopetag: string;
       scopedir: string;
@@ -15,18 +15,18 @@ interface Scope {
       mrgfile: string;
 }
 
-interface Scopes {
+type Scopes = {
       scopetags: string[];
       scopedir: string;
 }
 
-interface Version {
+type Version = {
       vsntag: string;
       mrgfile: string;
       altvsntags: string[];
 }
 
-interface Terminology {
+type Terminology = {
       scopetag: string;
       scopedir: string;
       curatedir: string;
@@ -34,7 +34,7 @@ interface Terminology {
       altvsntags: string[];
 }
 
-export interface Entry {
+export type Entry = {
       term: string;
       altterms?: string[];
       vsntag: string;

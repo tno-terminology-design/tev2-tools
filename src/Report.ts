@@ -1,6 +1,6 @@
 import { Logger } from 'tslog';
 
-interface Output<T> {
+type Output<T> = {
       items: T[];
 }
 

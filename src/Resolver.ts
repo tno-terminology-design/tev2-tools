@@ -2,6 +2,7 @@ import { interpreter, converter, saf } from './Run.js'
 import { report, log } from './Report.js';
 import { glob } from 'glob';
 import { MRG } from './Glossary.js';
+import { Term } from './Interpreter.js';
 
 import matter from 'gray-matter';
 import fs = require("fs");
@@ -90,16 +91,11 @@ export class Resolver {
       
             // Iterate over each match found in the file.orig string
             for (const match of matches) {
-                  const termProperties: Map<string, string> = interpreter!.interpret(match);
-                  
-                  // If the term has an empty scopetag, set it to the scopetag of the SAF
-                  if (!termProperties.get("scopetag")) {
-                        termProperties.set("scopetag", saf.scope.scopetag);
-                  }
+                  const term: Term = interpreter!.interpret(match, saf);
 
-                  const mrgFile = termProperties.get("vsntag")
-                        ? `mrg.${termProperties.get("scopetag")}.${termProperties.get("vsntag")}.yaml`
-                        : `mrg.${termProperties.get("scopetag")}.yaml`;
+                  const mrgFile = term.vsntag
+                        ? `mrg.${term.scopetag}.${term.vsntag}.yaml`
+                        : `mrg.${term.scopetag}.yaml`;
 
                   let mrg: MRG | undefined = undefined;
 
@@ -119,27 +115,27 @@ export class Resolver {
                   if (mrg.entries.length > 0) {
                         let termRef = '';
                         // if the term has an empty vsntag, set it to the vsntag of the MRG
-                        if (!termProperties.get("vsntag")) {
-                              termProperties.set("vsntag", mrg.terminology.vsntag);
-                              termRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:default' `
-                                    + `> '${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
+                        if (!term.vsntag) {
+                              term.vsntag = mrg.terminology.vsntag;
+                              termRef = `${term.id!}@${term.scopetag!}:default' `
+                                    + `> '${term.id!}@${term.scopetag!}:${term.vsntag!}`;
                         } else {
-                              termRef = `${termProperties.get("term")!}@${termProperties.get("scopetag")!}:${termProperties.get("vsntag")!}`;
+                              termRef = `${term.id!}@${term.scopetag!}:${term.vsntag!}`;
                         }
 
                         // Find the matching entry in mrg.entries based on the term
                         let matchingEntries = mrg.entries.filter(entry =>
-                              entry.term === termProperties.get("term")! || 
-                              entry.altterms?.includes(termProperties.get("term")!)
+                              entry.term === term.id! || 
+                              entry.altterms?.includes(term.id!)
                         );
 
                         let replacement = "";
                         let entry = undefined;
                         if (matchingEntries.length === 1) {
                               entry = matchingEntries[0];
-                              termProperties.set("term", entry.term);
+                              term.id = entry.term;
                               // Convert the term using the configured converter
-                              replacement = converter!.convert(entry, termProperties);
+                              replacement = converter!.convert(entry, term);
                               if (replacement === "") {
                                     let message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`;
                                     report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message);

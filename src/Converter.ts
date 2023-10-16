@@ -3,6 +3,7 @@ import { log } from './Report.js';
 import { interpreter } from './Run.js'
 import { Entry } from './Glossary.js';
 import { saf } from './Run.js';
+import { Term } from './Interpreter.js';
 
 type AnyObject = { [key: string]: any };
 
@@ -43,14 +44,12 @@ export class Converter {
             log.info(`Using ${this.type} template: '${this.template}'`)
       }
 
-      convert(entry: Entry, term: Map<string, string>): string {
-            let termObject = Object.fromEntries(term);
-
+      convert(entry: Entry, term: Term): string {
             // Evaluate the properties inside the entry object
             const evaluatedEntry: AnyObject = {};
             for (const [key, value] of Object.entries(entry)) {
                   if (typeof value === 'string') {
-                        evaluatedEntry[key] = evaluateExpressions(value, { ...entry, termObject });
+                        evaluatedEntry[key] = evaluateExpressions(value, { ...entry, term });
                   } else {
                         evaluatedEntry[key] = value;
                   }
@@ -58,7 +57,7 @@ export class Converter {
 
             const template = Handlebars.compile(this.template, {noEscape: true, compat: true});
 
-            return template({ ...evaluatedEntry, ...termObject });
+            return template({ ...evaluatedEntry, ...term });
       }
 
       getType(): string {
@@ -111,11 +110,11 @@ function noRefsHelper(this: any, text: string, options: any) {
             if (matches.length > 0) {
                   // iterate over each match found in the text string
                   for (const match of matches) {
-                        const termProperties: Map<string, string> = interpreter!.interpret(match);
+                        const term: Term = interpreter!.interpret(match, saf);
             
-                        if (termProperties.get("showtext")) {
+                        if (term.showtext) {
                               // replace the match with the showtext property and make the first letter(s) capitalized
-                              text = text.replace(match[0], capFirstHelper(termProperties.get("showtext")!));
+                              text = text.replace(match[0], capFirstHelper(term.showtext!));
                         }
                   }
             }

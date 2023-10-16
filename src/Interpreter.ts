@@ -1,4 +1,13 @@
 import { log } from './Report.js';
+import { SAF } from './Glossary.js';
+
+export type Term = {
+      showtext: string,
+      id: string,
+      trait: string,
+      scopetag: string,
+      vsntag: string,
+};
 
 /**
  * The Interpreter class handles the interpretation of a term reference.
@@ -34,18 +43,19 @@ export class Interpreter {
             return this.regex;
       }
 
-      interpret(match: RegExpMatchArray): Map<string, string> {
-            var termProperties: Map<string, string> = new Map();
-
-            if (match.groups != undefined) {
-                  termProperties.set("showtext", match.groups.showtext);
-                  termProperties.set("term", match.groups.id || match.groups.showtext.toLowerCase().replace(/['()]+/g, "").replace(/[^a-z0-9_-]+/g, "-"));
-                  termProperties.set("trait", match.groups.trait);
-                  termProperties.set("scopetag", match.groups.scopetag);
-                  termProperties.set("vsntag", match.groups.vsntag);
+      interpret(match: RegExpMatchArray, saf: SAF): Term {
+            // added as feedback from Michiel, should not happen as it would not be a match if there are no groups
+            if (match.groups === undefined) {
+                  throw new Error(`Error in evaluating regex pattern. No groups provided`);
             }
 
-            return termProperties;
+            return {
+                  showtext: match.groups.showtext,
+                  id: match.groups.id || match.groups.showtext.toLowerCase().replace(/['()]+/g, "").replace(/[^a-z0-9_-]+/g, "-"),
+                  trait: match.groups.trait,
+                  scopetag: match.groups.scopetag || saf.scope.scopetag,
+                  vsntag: match.groups.vsntag,
+            }
       }
 
       getType(): string {

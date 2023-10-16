@@ -38,7 +38,7 @@ program.parse()
 
 async function main(): Promise<void> {
       // Parse command line parameters
-      var options = program.opts();
+      let options = program.opts();
       if (program.args[0]) {
             options.input = program.args[0]
       }
