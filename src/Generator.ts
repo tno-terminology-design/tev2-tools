@@ -18,13 +18,13 @@ export class Generator {
 
         // Check if the vsntag exists in the SAF
         if (this.vsntag) {
-            const vsn = saf.versions.find(vsn => vsn.vsntag === this.vsntag);
+            const vsn = saf.versions?.find(vsn => vsn.vsntag === this.vsntag);
             if (vsn) {
                 log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml)...`);
                 this.generate(vsn);
             } else {
                 // check altvsntags
-                const vsn = saf.versions.find(vsn => vsn.altvsntags.includes(this.vsntag));
+                const vsn = saf.versions?.find(vsn => vsn.altvsntags.includes(this.vsntag));
 
                 if (vsn) {
                     log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}') (mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml)...`);
@@ -58,14 +58,14 @@ export class Generator {
                 let entrymatch: Entry | undefined;
                 // if no identifier (@) is specified, refer to the ctextmap
                 if (!properties.groups.identifier) {
-                    entrymatch = TuC.cTextMap.find(ctext => ctext.term === properties!.groups!.term);
+                    entrymatch = TuC.cTextMap?.find(ctext => ctext.term === properties!.groups!.term);
                 // if the identifier is @, refer to the MRG
                 } else {
                     let mrgfile = `mrg.${properties.groups.scopetag ?? saf.scope.scopetag}.${properties.groups.vsntag ?? saf.scope.defaultvsn}.yaml`;
                     // if the mrgfile exists as a MRG.instance, use that instance. Otherwise, create a new instance
-                    let mrg = MRG.instances.find(mrg => mrg.filename === mrgfile) ?? new MRG({ filename: mrgfile });
+                    let mrg = MRG.instances?.find(mrg => mrg.filename === mrgfile) ?? new MRG({ filename: mrgfile });
                     if (mrg) {
-                        entrymatch = mrg.entries.find(entry => entry.term === properties!.groups!.term);
+                        entrymatch = mrg.entries?.find(entry => entry.term === properties!.groups!.term);
                         if (!entrymatch) {
                             // remove the synonymOf entry if it doesn't exist in the MRG
                             TuC.synonymOf.splice(index, 1);
@@ -98,7 +98,7 @@ export class Generator {
         TuC.instances.filter(i => i.cText)?.forEach(tuc => {
             // find matches in TuC.entries for each TuC.synonymOf
             TuC.synonymOf?.forEach(synonymOf => {
-                let index = tuc.entries.findIndex(entry => {
+                let index = tuc.entries?.findIndex(entry => {
                     // see if every field in entry matches the corresponding field in synonymOf
                     return Object.keys(entry).every(key => {
                         return entry[key] === synonymOf[key];

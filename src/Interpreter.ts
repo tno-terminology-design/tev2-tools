@@ -93,7 +93,7 @@ export class TuC {
                 continue;
             }
             // find the corresponding scope in the SAF's scope section
-            let SAFscope = saf.scopes.find(SAFscope => SAFscope.scopetag === scope.scopetag);
+            let SAFscope = saf.scopes?.find(SAFscope => SAFscope.scopetag === scope.scopetag);
             if (SAFscope) {
                 scope.scopedir = SAFscope.scopedir;
             } else {
@@ -242,7 +242,7 @@ export class TuC {
                 let mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`;
                 source = `'${mrgFile}'`;
 
-                let mrgMap = MRG.instances.find(mrg => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
+                let mrgMap = MRG.instances?.find(mrg => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
                 entries = mrgMap.entries;
             }
             
