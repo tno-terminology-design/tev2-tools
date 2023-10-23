@@ -1,6 +1,6 @@
 import Handlebars from 'handlebars'
 import { log } from './Report.js'
-import { interpreter, saf } from './Run.js'
+import { resolver } from './Run.js'
 import { type Entry } from './MRG.js'
 import { type Term } from './Interpreter.js'
 
@@ -91,7 +91,7 @@ function noRefsHelper (this: any, text: string, options: any): string {
     // switch on element of type to determine which regex to use
     switch (element.toLowerCase()) {
       case 'interpreter':
-        regex = interpreter.getRegex()
+        regex = resolver.interpreter.getRegex()
         break
       case 'html':
         regex = /<a\b[^>]*?>(?<showtext>.*?)<\/a>/g
@@ -109,7 +109,7 @@ function noRefsHelper (this: any, text: string, options: any): string {
     if (matches.length > 0) {
       // iterate over each match found in the text string
       for (const match of matches) {
-        const term: Term = interpreter.interpret(match, saf)
+        const term: Term = resolver.interpreter.interpret(match, resolver.saf)
 
         if (term.showtext != null) {
           // replace the match with the showtext property and make the first letter(s) capitalized
@@ -162,7 +162,7 @@ function ifValueHelper (this: any, conditional: any, options: any): string {
 function localizeHelper (url: string): string {
   try {
     const parsedURL = new URL(url)
-    const parsedWebsite = new URL(saf.scope.website)
+    const parsedWebsite = new URL(resolver.saf.scope.website)
     if (parsedURL.host === parsedWebsite.host) {
       url = parsedURL.pathname
     }

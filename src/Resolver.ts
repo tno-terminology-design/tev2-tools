@@ -1,8 +1,9 @@
-import { interpreter, converter, saf } from './Run.js'
 import { report, log } from './Report.js'
 import { glob } from 'glob'
 import { MrgBuilder, type MRG } from './MRG.js'
-import { type Term } from './Interpreter.js'
+import { type Interpreter, type Term } from './Interpreter.js'
+import { type Converter } from './Converter.js'
+import { type SAF } from './SAF.js'
 
 import matter from 'gray-matter'
 import fs = require('fs')
@@ -21,19 +22,31 @@ export class Resolver {
   private readonly outputPath: string
   private readonly globPattern: string
   private readonly force: boolean
+  interpreter: Interpreter
+  converter: Converter
+  saf: SAF
 
   public constructor ({
     outputPath,
     globPattern,
-    force
+    force,
+    interpreter,
+    converter,
+    saf
   }: {
     outputPath: string
     globPattern: string
     force: boolean
+    interpreter: Interpreter
+    converter: Converter
+    saf: SAF
   }) {
     this.outputPath = outputPath
     this.globPattern = globPattern
     this.force = force
+    this.interpreter = interpreter
+    this.converter = converter
+    this.saf = saf
   }
 
   /**
@@ -77,11 +90,11 @@ export class Resolver {
    */
   private async interpretAndConvert (file: matter.GrayMatterFile<string>, filePath: string): Promise<string | undefined> {
     // Get the matches of the regex in the file.orig string
-    const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(interpreter.getRegex()))
+    const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.getRegex()))
     if (file.matter != null) {
       // If the file has frontmatter, get the matches of the regex in the frontmatter string
       // remove count of frontmatter matches from the front of the matches array
-      const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(interpreter.getRegex()))
+      const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.getRegex()))
       matches.splice(0, frontmatter.length)
     }
 
@@ -90,7 +103,7 @@ export class Resolver {
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
-      const term: Term = interpreter.interpret(match, saf)
+      const term: Term = this.interpreter.interpret(match, this.saf)
 
       const mrgFile = term.vsntag != null
         ? `mrg.${term.scopetag}.${term.vsntag}.yaml`
@@ -134,7 +147,7 @@ export class Resolver {
           entry = matchingEntries[0]
           term.id = entry.term
           // Convert the term using the configured converter
-          replacement = converter.convert(entry, term)
+          replacement = this.converter.convert(entry, term)
           if (replacement === '') {
             const message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`
             report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message)

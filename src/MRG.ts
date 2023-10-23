@@ -1,5 +1,5 @@
 import { log, report } from './Report.js'
-import { saf } from './Run.js'
+import { resolver } from './Run.js'
 
 import fs = require('fs')
 import path = require('path')
@@ -49,6 +49,7 @@ export class MrgBuilder {
   mrg: MRG
 
   public constructor ({ filename }: { filename: string }) {
+    const saf = resolver.saf
     this.mrg = this.setMrgMap(path.join(saf.scope.scopedir, saf.scope.glossarydir, filename))
 
     if (this.mrg.entries.length > 0) {

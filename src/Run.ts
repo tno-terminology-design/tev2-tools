@@ -2,7 +2,7 @@
 
 import { Interpreter } from './Interpreter.js'
 import { Converter } from './Converter.js'
-import { type SAF, SafBuilder } from './SAF.js'
+import { SafBuilder } from './SAF.js'
 import { Resolver } from './Resolver.js'
 import { Command } from 'commander'
 import { readFileSync } from 'fs'
@@ -13,9 +13,6 @@ import yaml from 'js-yaml'
 import chalk from 'chalk'
 import figlet from 'figlet'
 
-export let interpreter: Interpreter
-export let converter: Converter
-export let saf: SAF
 export let resolver: Resolver
 const program = new Command()
 
@@ -69,15 +66,18 @@ async function main (): Promise<void> {
     process.exit(1)
   } else {
     // Create an interpreter, converter and glossary with the provided options
-    converter = new Converter({ template: options.converter ?? 'markdown' })
-    interpreter = new Interpreter({ regex: options.interpreter ?? 'basic' })
-    saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+    const converter = new Converter({ template: options.converter ?? 'markdown' })
+    const interpreter = new Interpreter({ regex: options.interpreter ?? 'basic' })
+    const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
 
     // Create a resolver with the provided options
     resolver = new Resolver({
       outputPath: resolve(options.output),
       globPattern: options.input,
-      force: options.force
+      force: options.force,
+      interpreter,
+      converter,
+      saf
     })
 
     // Resolve terms
