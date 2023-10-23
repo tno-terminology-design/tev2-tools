@@ -5,25 +5,16 @@ import fs = require('fs')
 import path = require('path')
 import yaml = require('js-yaml')
 
-interface Scope {
-  website: string
-  scopetag: string
-  scopedir: string
-  curatedir: string
-  glossarydir: string
-  defaultvsn: string
-  mrgfile: string
+export interface MRG {
+  filename?: string
+  terminology: Terminology
+  scopes: Scopes[]
+  entries: Entry[]
 }
 
 interface Scopes {
   scopetags: string[]
   scopedir: string
-}
-
-interface Version {
-  vsntag: string
-  mrgfile: string
-  altvsntags: string[]
 }
 
 interface Terminology {
@@ -49,48 +40,39 @@ export interface Entry {
 }
 
 /**
- * The MRG class handles the retrieval and processing of an MRG (Machine Readable Glossary).
+ * The MrgBuilder class handles the retrieval and processing of an MRG (Machine Readable Glossary).
  * An MRG is retrieved based on the `filename` and processed into an MRG object.
  * The MRG object with its MRG entries can then be used to populate the runtime glossary.
  */
-export class MRG {
-  public filename: string
-  public terminology: Terminology
-  public scopes: Scopes[]
-  public entries: Entry[] = []
-
+export class MrgBuilder {
   static instances: MRG[] = []
+  mrg: MRG
 
   public constructor ({ filename }: { filename: string }) {
-    const mrg = this.getMrgMap(path.join(saf.scope.scopedir, saf.scope.glossarydir, filename))
+    this.mrg = this.setMrgMap(path.join(saf.scope.scopedir, saf.scope.glossarydir, filename))
 
-    this.filename = filename
-    this.terminology = mrg.terminology
-    this.scopes = mrg.scopes
-    if (mrg.entries.length > 0) {
-      this.entries = this.populate(mrg)
+    if (this.mrg.entries.length > 0) {
+      this.mrg.entries = this.populate(this.mrg)
     }
 
-    MRG.instances.push(this)
+    MrgBuilder.instances.push(this.mrg)
   }
 
   /**
-   * Reads the MRG at `mrgURL` and maps it as an MRG object.
+   * Reads the MRG at `mrgURL` and maps it as the this.mrg MRG object.
    * @param mrgURL - The full path of the MRG to be retrieved.
    * @returns - The MRG as an MRG object.
    */
-  public getMrgMap (mrgURL: string): MRG {
-    let mrg = {} as MRG
-
+  public setMrgMap (mrgURL: string): MRG {
     try {
       // try to load the MRG map from the `mrgURL`
       const mrgfile = fs.readFileSync(mrgURL, 'utf8')
-      mrg = yaml.load(mrgfile) as MRG
+      this.mrg = yaml.load(mrgfile) as MRG
 
       // check for missing required properties in MRG terminology
       type TerminologyProperty = keyof Terminology
       const requiredProperties: TerminologyProperty[] = ['scopetag', 'scopedir', 'curatedir', 'vsntag']
-      const terminology = mrg.terminology
+      const terminology = this.mrg.terminology
       const missingProperties = requiredProperties.filter(prop => terminology[prop] == null)
 
       if (missingProperties.length > 0) {
@@ -100,7 +82,7 @@ export class MRG {
 
       const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator']
 
-      for (const entry of mrg.entries) {
+      for (const entry of this.mrg.entries) {
         // add vsntag, scopetag, and altvsntags from MRG to MRG entries
         entry.vsntag = terminology.vsntag
         entry.scopetag = terminology.scopetag
@@ -124,7 +106,7 @@ export class MRG {
       }
     }
 
-    return mrg
+    return this.mrg
   }
 
   /**
@@ -165,54 +147,6 @@ export class MRG {
       throw err
     }
     return entries
-  }
-}
-
-/**
- * The SAF class handles the retrieval and processing of a SAF (Scope Administration File).
- * A SAF is retrieved based on the `scopedir` and processed into a SAF object.
- */
-export class SAF {
-  public scope: Scope
-  public scopes: Scopes[]
-  public versions: Version[]
-
-  public constructor ({ scopedir }: { scopedir: string }) {
-    const saf = this.getSafMap(path.join(scopedir, 'saf.yaml'))
-
-    this.scope = saf.scope
-    this.scope.scopedir = scopedir // override scopedir with the one passed as a parameter
-    this.scopes = saf.scopes
-    this.versions = saf.versions
-  }
-
-  /**
-   * Reads the SAF at `safURL` and maps it as a SAF object.
-   * @param safURL - The full path of the SAF to be retrieved.
-   * @returns - The SAF as a SAF object.
-   */
-  private getSafMap (safURL: string): SAF {
-    let saf = {} as SAF
-
-    try {
-      // try to load the SAF map from the scopedir
-      saf = yaml.load(fs.readFileSync(safURL, 'utf8')) as SAF
-
-      // check for missing required properties in SAF
-      type ScopeProperty = keyof Scope
-      const requiredProperties: ScopeProperty[] = ['scopetag', 'scopedir', 'curatedir', 'defaultvsn']
-      const missingProperties = requiredProperties.filter(prop => saf.scope[prop] == null)
-
-      if (missingProperties.length > 0) {
-        log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
-        process.exit(1)
-      }
-    } catch (err) {
-      log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err)
-      process.exit(1)
-    }
-
-    return saf
   }
 }
 

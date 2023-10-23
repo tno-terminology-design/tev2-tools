@@ -1,7 +1,7 @@
 import { interpreter, converter, saf } from './Run.js'
 import { report, log } from './Report.js'
 import { glob } from 'glob'
-import { MRG } from './Glossary.js'
+import { MrgBuilder, type MRG } from './MRG.js'
 import { type Term } from './Interpreter.js'
 
 import matter from 'gray-matter'
@@ -99,7 +99,7 @@ export class Resolver {
       let mrg: MRG | undefined
 
       // Check if an MRG class instance with the `filename` property of `mrgFile` has already been created
-      for (const instance of MRG.instances) {
+      for (const instance of MrgBuilder.instances) {
         if (instance.filename === mrgFile) {
           mrg = instance
           break
@@ -108,7 +108,7 @@ export class Resolver {
 
       // If no MRG class instance was found, create a new one
       if (mrg == null) {
-        mrg = new MRG({ filename: mrgFile })
+        mrg = new MrgBuilder({ filename: mrgFile }).mrg
       }
 
       if (mrg.entries.length > 0) {

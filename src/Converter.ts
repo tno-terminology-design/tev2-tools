@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars'
 import { log } from './Report.js'
 import { interpreter, saf } from './Run.js'
-import { type Entry } from './Glossary.js'
+import { type Entry } from './MRG.js'
 import { type Term } from './Interpreter.js'
 
 type AnyObject = Record<string, any>

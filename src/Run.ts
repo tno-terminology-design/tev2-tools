@@ -2,7 +2,7 @@
 
 import { Interpreter } from './Interpreter.js'
 import { Converter } from './Converter.js'
-import { SAF } from './Glossary.js'
+import { type SAF, SafBuilder } from './SAF.js'
 import { Resolver } from './Resolver.js'
 import { Command } from 'commander'
 import { readFileSync } from 'fs'
@@ -71,7 +71,7 @@ async function main (): Promise<void> {
     // Create an interpreter, converter and glossary with the provided options
     converter = new Converter({ template: options.converter ?? 'markdown' })
     interpreter = new Interpreter({ regex: options.interpreter ?? 'basic' })
-    saf = new SAF({ scopedir: resolve(options.scopedir) })
+    saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
 
     // Create a resolver with the provided options
     resolver = new Resolver({

@@ -1,5 +1,5 @@
 import { log } from './Report.js'
-import { type SAF } from './Glossary.js'
+import { type SAF } from './SAF.js'
 
 export interface Term {
   showtext: string
