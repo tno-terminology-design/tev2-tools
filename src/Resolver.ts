@@ -9,6 +9,8 @@ import matter from 'gray-matter'
 import fs = require('fs')
 import path = require('path')
 
+type GrayMatterFile = matter.GrayMatterFile<string> & { path: string, lastIndex: number, converted: number }
+
 /**
  * The Resolver class handles the resolution of term references in files.
  * This resolution happens according to a string that is supplied in `globPattern`.
@@ -83,12 +85,11 @@ export class Resolver {
   }
 
   /**
-   * Interprets and converts terms in the given data string based on the interpreter and converter.
+   * Iterates over the matches found by the interpreter in `file` and attempts to convert using the converter.
    * @param file The file object of the file being processed.
-   * @param filePath The path of the file being processed.
    * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
    */
-  private async interpretAndConvert (file: matter.GrayMatterFile<string>, filePath: string): Promise<string | undefined> {
+  private async matchIterator (file: GrayMatterFile): Promise<string | undefined> {
     // Get the matches of the regex in the file.orig string
     const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.getRegex()))
     if (file.matter != null) {
@@ -98,93 +99,117 @@ export class Resolver {
       matches.splice(0, frontmatter.length)
     }
 
-    let converted = 0
-    let lastIndex = 0
+    file.lastIndex = 0
+    file.converted = 0
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
+      // Interpret the match using the interpreter
       const term: Term = this.interpreter.interpret(match, this.saf)
 
-      const mrgFile = term.vsntag != null
-        ? `mrg.${term.scopetag}.${term.vsntag}.yaml`
-        : `mrg.${term.scopetag}.yaml`
+      // Get the MRG instance based on the term
+      const mrg = this.getMRGInstance(term)
 
-      let mrg: MRG | undefined
-
-      // Check if an MRG class instance with the `filename` property of `mrgFile` has already been created
-      for (const instance of MrgBuilder.instances) {
-        if (instance.filename === mrgFile) {
-          mrg = instance
-          break
-        }
-      }
-
-      // If no MRG class instance was found, create a new one
-      if (mrg == null) {
-        mrg = new MrgBuilder({ filename: mrgFile }).mrg
-      }
-
-      if (mrg.entries.length > 0) {
-        let termRef = ''
-        // if the term has an empty vsntag, set it to the vsntag of the MRG
-        if (term.vsntag == null) {
-          term.vsntag = mrg.terminology.vsntag
-          termRef = `${term.id}@${term.scopetag}:default' ` +
-                                    `> '${term.id}@${term.scopetag}:${term.vsntag}`
-        } else {
-          termRef = `${term.id}@${term.scopetag}:${term.vsntag}`
-        }
-
-        // Find the matching entry in mrg.entries based on the term
-        const matchingEntries = mrg.entries.filter(entry =>
-          entry.term === term.id ||
-                              entry.altterms?.includes(term.id)
-        )
-
-        let replacement = ''
-        let entry
-        if (matchingEntries.length === 1) {
-          entry = matchingEntries[0]
-          term.id = entry.term
-          // Convert the term using the configured converter
-          replacement = this.converter.convert(entry, term)
-          if (replacement === '') {
-            const message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`
-            report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message)
-          }
-        } else if (matchingEntries.length > 1) {
-          // Multiple matches found, display a warning
-          const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrgFile}'`
-          report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message)
-        } else {
-          const message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
-          report.termHelp(filePath, file.orig.toString().substring(0, match.index).split('\n').length, message)
-        }
-
-        // Only execute the replacement steps if the 'replacement' string is not empty
-        if (replacement.length > 0 && match.index != null) {
-          const startIndex = match.index + lastIndex
-          const matchLength = match[0].length
-          const textBeforeMatch = file.orig.toString().substring(0, startIndex)
-          const textAfterMatch = file.orig.toString().substring(startIndex + matchLength)
-
-          // Replace the matched term with the generated replacement in the data string
-          file.orig = `${textBeforeMatch}${replacement}${textAfterMatch}`
-
-          // Update the lastIndex to account for the length difference between the match and replacement
-          lastIndex += replacement.length - matchLength
-
-          // Log the converted term
-          report.termConverted(entry)
-          converted++
-        }
+      if (mrg?.entries.length > 0) {
+        this.replacementHandler(match, term, mrg, file)
       }
     }
-    if (converted > 0) {
+    if (file.converted > 0) {
       return file.orig.toString()
     } else {
       return undefined
     }
+  }
+
+  /**
+   * Replaces the matched term with the generated replacement in the data string.
+   * @param match - The match of the term reference.
+   * @param term - The interpreted term.
+   * @param mrg - The MRG instance.
+   * @param file - The file object of the file being processed.
+   * @returns The file object.
+   */
+  replacementHandler (match: RegExpMatchArray, term: Term, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
+    let termRef = ''
+    // if the term has an empty vsntag, set it to the vsntag of the MRG
+    if (term.vsntag == null) {
+      term.vsntag = mrg.terminology.vsntag
+      termRef = `${term.id}@${term.scopetag}:default' ` + `> '${term.id}@${term.scopetag}:${term.vsntag}`
+    } else {
+      termRef = `${term.id}@${term.scopetag}:${term.vsntag}`
+    }
+
+    // Find the matching entry in mrg.entries based on the term
+    const matchingEntries = mrg.entries.filter(entry =>
+      entry.term === term.id || entry.altterms?.includes(term.id)
+    )
+
+    let replacement = ''
+    let entry
+    if (matchingEntries.length === 1) {
+      entry = matchingEntries[0]
+      term.id = entry.term
+      // Convert the term using the configured converter
+      replacement = this.converter.convert(entry, term)
+      if (replacement === '') {
+        const message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`
+        report.termHelp(file.path, file.orig.toString().substring(0, match.index).split('\n').length, message)
+      }
+    } else if (matchingEntries.length > 1) {
+      // Multiple matches found, display a warning
+      const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'`
+      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split('\n').length, message)
+    } else {
+      const message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
+      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split('\n').length, message)
+    }
+
+    // Only execute the replacement steps if the 'replacement' string is not empty
+    if (replacement.length > 0 && match.index != null) {
+      const startIndex = match.index + file.lastIndex
+      const matchLength = match[0].length
+      const textBeforeMatch = file.orig.toString().substring(0, startIndex)
+      const textAfterMatch = file.orig.toString().substring(startIndex + matchLength)
+
+      // Replace the matched term with the generated replacement in the data string
+      file.orig = `${textBeforeMatch}${replacement}${textAfterMatch}`
+
+      // Update the lastIndex to account for the length difference between the match and replacement
+      file.lastIndex += replacement.length - matchLength
+
+      // Log the converted term
+      report.termConverted(entry)
+      file.converted++
+    }
+
+    return file
+  }
+
+  /**
+   * Returns an MRG class instance based on the term's properties.
+   * @param term - The interpreted term.
+   * @returns The MRG class instance.
+   */
+  getMRGInstance (term: Term): MRG {
+    const mrgFile = term.vsntag != null
+      ? `mrg.${term.scopetag}.${term.vsntag}.yaml`
+      : `mrg.${term.scopetag}.yaml`
+
+    let mrg: MRG | undefined
+
+    // Check if an MRG class instance with the `filename` property of `mrgFile` has already been created
+    for (const instance of MrgBuilder.instances) {
+      if (instance.filename === mrgFile) {
+        mrg = instance
+        break
+      }
+    }
+    // If no existing MRG class instance was found, create a new one
+    if (mrg == null) {
+      mrg = new MrgBuilder({ filename: mrgFile }).mrg
+    }
+
+    return mrg
   }
 
   /**
@@ -205,7 +230,8 @@ export class Resolver {
       // Read the file content
       let file
       try {
-        file = matter(fs.readFileSync(filePath, 'utf8'))
+        file = matter(fs.readFileSync(filePath, 'utf8')) as GrayMatterFile
+        file.path = filePath
       } catch (err) {
         console.log(`E009 Could not read file '${filePath}':`, err)
         continue
@@ -214,9 +240,9 @@ export class Resolver {
       // Interpret and convert the file data
       let convertedData
       try {
-        convertedData = await this.interpretAndConvert(file, filePath)
+        convertedData = await this.matchIterator(file)
       } catch (err) {
-        console.log(`E010 Could not interpret and convert file '${filePath}':`, err)
+        console.log(`E010 Could not interpret and convert file '${file.path}':`, err)
         continue
       }
 

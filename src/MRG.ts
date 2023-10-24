@@ -6,7 +6,7 @@ import path = require('path')
 import yaml = require('js-yaml')
 
 export interface MRG {
-  filename?: string
+  filename: string
   terminology: Terminology
   scopes: Scopes[]
   entries: Entry[]
@@ -51,6 +51,7 @@ export class MrgBuilder {
   public constructor ({ filename }: { filename: string }) {
     const saf = resolver.saf
     this.mrg = this.setMrgMap(path.join(saf.scope.scopedir, saf.scope.glossarydir, filename))
+    this.mrg.filename = filename
 
     if (this.mrg.entries.length > 0) {
       this.mrg.entries = this.populate(this.mrg)
@@ -113,7 +114,6 @@ export class MrgBuilder {
   /**
    * Populates the runtime glossary by processing MRG entries.
    * @param mrg - The MRG (Machine Readable Glossary) map.
-   * @param filename - The filename of the MRG being processed.
    * @returns A promise that resolves to the populated runtime glossary.
    */
   public populate (mrg: MRG): Entry[] {
