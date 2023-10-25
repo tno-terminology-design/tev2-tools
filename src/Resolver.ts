@@ -197,14 +197,14 @@ export class Resolver {
 
     let mrg: MRG | undefined
 
-    // Check if an MRG class instance with the `filename` property of `mrgFile` has already been created
+    // Check if an MRG class instance with the `filename` property of `mrgFile` has already been loaded
     for (const instance of MrgBuilder.instances) {
       if (instance.filename === mrgFile) {
         mrg = instance
         break
       }
     }
-    // If no existing MRG class instance was found, create a new one
+    // If no existing MRG class instance was found, build the MRG according to the `mrgFile`
     if (mrg == null) {
       mrg = new MrgBuilder({ filename: mrgFile }).mrg
     }
@@ -213,7 +213,7 @@ export class Resolver {
   }
 
   /**
-   * Calles interpretAndConvert() on files based on `this.globPattern`.
+   * Calles matchIterator() on files based on `this.globPattern`.
    * @returns A Promise that resolves to true if the resolution was successful.
    */
   public async resolve (): Promise<boolean> {
@@ -233,7 +233,7 @@ export class Resolver {
         file = matter(fs.readFileSync(filePath, 'utf8')) as GrayMatterFile
         file.path = filePath
       } catch (err) {
-        console.log(`E009 Could not read file '${filePath}':`, err)
+        log.error(`E009 Could not read file '${filePath}':`, err)
         continue
       }
 
@@ -242,7 +242,7 @@ export class Resolver {
       try {
         convertedData = await this.matchIterator(file)
       } catch (err) {
-        console.log(`E010 Could not interpret and convert file '${file.path}':`, err)
+        log.error(`E010 Could not interpret or convert file '${file.path}':`, err)
         continue
       }
 

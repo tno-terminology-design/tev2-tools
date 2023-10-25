@@ -1,4 +1,4 @@
-import { log, report } from './Report.js'
+import { report } from './Report.js'
 import { resolver } from './Run.js'
 
 import fs = require('fs')
@@ -78,8 +78,7 @@ export class MrgBuilder {
       const missingProperties = requiredProperties.filter(prop => terminology[prop] == null)
 
       if (missingProperties.length > 0) {
-        log.error(`E003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
-        process.exit(1)
+        throw new Error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
       }
 
       const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator']
@@ -102,10 +101,8 @@ export class MrgBuilder {
         }
       }
     } catch (err) {
-      if (err instanceof Error) {
-        const errorMessage = `E005 An error occurred while attempting to load an MRG: ${err.message}`
-        report.mrgHelp(mrgURL, -1, errorMessage)
-      }
+      const errorMessage = `E005 An error occurred while attempting to load an MRG: ${(err as Error).message}`
+      report.mrgHelp(mrgURL, -1, errorMessage)
     }
 
     return this.mrg
@@ -144,8 +141,7 @@ export class MrgBuilder {
         entries.push(entry)
       }
     } catch (err) {
-      log.error(`E006 An error occurred while attempting to process the MRG at '${mrg.filename}':`, err)
-      throw err
+      throw new Error(`E006 An error occurred while attempting to process the MRG at '${mrg.filename}':`, { cause: err })
     }
     return entries
   }

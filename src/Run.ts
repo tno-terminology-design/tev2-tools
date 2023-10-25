@@ -34,59 +34,63 @@ program
 program.parse()
 
 async function main (): Promise<void> {
-  // Parse command line parameters
-  let options = program.opts()
-  if (program.args[0] != null) {
-    options.input = program.args[0]
-  }
-
-  console.log(
-    chalk.red(
-      figlet.textSync('trrt-cli', { horizontalLayout: 'full' })
-    )
-  )
-
-  if (options.config != null) {
-    try {
-      const config = yaml.load(readFileSync(resolve(options.config), 'utf8')) as yaml.Schema
-
-      // Merge config options with command line options
-      options = { ...config, ...options }
-    } catch (err) {
-      log.error(`E011 Failed to read or parse the config file '${options.config}':`, err)
-      process.exit(1)
+  try {
+    // Parse command line parameters
+    let options = program.opts()
+    if (program.args[0] != null) {
+      options.input = program.args[0]
     }
-  }
 
-  // Check if required options are provided
-  if (options.output == null || options.scopedir == null || options.input == null) {
-    program.addHelpText('after', '\nRequired options are missing\n' +
-      'Provide at least the following options: output <path>, scopedir <path> and input <globpattern>\n')
-    program.help()
-    process.exit(1)
-  } else {
-    // Create an interpreter, converter and glossary with the provided options
-    const converter = new Converter({ template: options.converter ?? 'markdown' })
-    const interpreter = new Interpreter({ regex: options.interpreter ?? 'basic' })
-    const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+    console.log(
+      chalk.red(
+        figlet.textSync('trrt-cli', { horizontalLayout: 'full' })
+      )
+    )
 
-    // Create a resolver with the provided options
-    resolver = new Resolver({
-      outputPath: resolve(options.output),
-      globPattern: options.input,
-      force: options.force,
-      interpreter,
-      converter,
-      saf
-    })
+    if (options.config != null) {
+      try {
+        const config = yaml.load(readFileSync(resolve(options.config), 'utf8')) as yaml.Schema
 
-    // Resolve terms
-    try {
+        // Merge config options with command line options
+        options = { ...config, ...options }
+      } catch (err) {
+        throw new Error(`E011 Failed to read or parse the config file '${options.config}':`, { cause: err })
+      }
+    }
+
+    // Check if required options are provided
+    if (options.output == null || options.scopedir == null || options.input == null) {
+      program.addHelpText('after', '\nRequired options are missing\n' +
+        'Provide at least the following options: output <path>, scopedir <path> and input <globpattern>\n')
+      program.help()
+      process.exit(1)
+    } else {
+      // Create an interpreter, converter and glossary with the provided options
+      const converter = new Converter({ template: options.converter ?? 'markdown' })
+      const interpreter = new Interpreter({ regex: options.interpreter ?? 'basic' })
+      const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+
+      // Create a resolver with the provided options
+      resolver = new Resolver({
+        outputPath: resolve(options.output),
+        globPattern: options.input,
+        force: options.force,
+        interpreter,
+        converter,
+        saf
+      })
+
+      // Resolve terms
       await resolver.resolve()
       log.info('Resolution complete...')
       report.print()
       process.exit(0)
-    } catch (err) {
+    }
+  } catch (err) {
+    if ((err as Error).cause != null) {
+      log.error(err)
+      process.exit(1)
+    } else {
       log.error('E012 Something unexpected went wrong while resoluting terms:', err)
       process.exit(1)
     }

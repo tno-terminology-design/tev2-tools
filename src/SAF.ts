@@ -1,5 +1,3 @@
-import { log } from './Report.js'
-
 import fs = require('fs')
 import path = require('path')
 import yaml = require('js-yaml')
@@ -60,12 +58,10 @@ export class SafBuilder {
       const missingProperties = requiredProperties.filter(prop => this.saf.scope[prop] == null)
 
       if (missingProperties.length > 0) {
-        log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
-        process.exit(1)
+        throw new Error(`Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
       }
     } catch (err) {
-      log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err)
-      process.exit(1)
+      throw new Error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, { cause: err })
     }
 
     return this.saf
