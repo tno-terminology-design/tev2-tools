@@ -12,8 +12,19 @@
     "resolveJsonModule": true,
     "noEmitOnError": true,
     "skipLibCheck": true,
-    "rootDir": "./src",
-    "outDir": "./lib",
-    "composite": true,
-  }
+    "baseUrl": ".",
+    "paths": {
+      "@tno-terminology-design/*": ["*/src"]
+    },
+    "noEmit": true
+  },
+  "references": [
+    {
+      "path": "./mrg-import"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "lib"
+  ]
 }
