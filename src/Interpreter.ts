@@ -278,9 +278,17 @@ export class TuC {
 
             if (entries.length > 0) {
                 // add entries to TuC and overwrite existing entries with the same term
-                this.entries = this.entries.filter(entry => !entries.some(e => e.term === entry.term));
-                this.entries.push(...entries);
-                // add scope to scopes set
+                for (const newEntry of entries) {
+                    const existingIndex = this.entries.findIndex(entry => entry.term === newEntry.term);
+                    if (existingIndex !== -1) {
+                        // If an entry with the same term already exists, replace it with the new entry
+                        this.entries[existingIndex] = { ...newEntry }; // Create a shallow copy of the new entry
+                    } else {
+                        // If no entry with the same term exists, add a shallow copy of the new entry to this.entries
+                        this.entries.push({ ...newEntry }); // Create a shallow copy of the new entry
+                    }
+                }
+
                 this.scopes.add({
                     scopetag: scopetag,
                     scopedir: ''
