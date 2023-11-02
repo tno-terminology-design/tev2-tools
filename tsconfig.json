@@ -23,8 +23,5 @@
       "path": "./mrg-import"
     }
   ],
-  "exclude": [
-    "node_modules",
-    "lib"
-  ]
+  "exclude": ["node_modules", "lib"]
 }

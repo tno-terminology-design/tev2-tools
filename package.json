@@ -6,13 +6,16 @@
   ],
   "scripts": {
     "build": "tsc --build --verbose",
-    "lint": "eslint --ext js,ts ."
+    "format": "prettier . --write && npm run lint",
+    "lint": "eslint . --cache --fix --ext js,ts"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.9.0",
     "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
