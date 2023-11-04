@@ -4,14 +4,16 @@
   "description": "Machine Readable Glossary (Generation Tool (MRGT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
+  "files": [
+    "lib"
+  ],
   "bin": {
     "mrgt": "./lib/Run.js"
   },
   "type": "module",
   "scripts": {
-    "build": "tsc -p .",
-    "rebuild": "npm uninstall @tno-terminology-design/mrgt -g && rm lib -rf && npm run build && npm i -g",
-    "test": "mocha __tests__/**/*.test.js"
+    "build": "tsc --build",
+    "rebuild": "npm uninstall @tno-terminology-design/mrgt -g && npm run build && npm i -g"
   },
   "repository": {
     "type": "git",
@@ -36,11 +38,6 @@
     "@types/figlet": "^1.5.6",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^20.4.10",
-    "chai": "^4.3.7",
-    "mocha": "^10.2.0",
     "typescript": "^5.1.6"
-  },
-  "files": [
-    "lib/**/*"
-  ]
+  }
 }
