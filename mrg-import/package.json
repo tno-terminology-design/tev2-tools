@@ -36,7 +36,6 @@
     "tslog": "^4.8.2"
   },
   "devDependencies": {
-    "@types/clear": "^0.1.2",
     "@types/figlet": "^1.5.6",
     "@types/git-url-parse": "^9.0.1",
     "@types/js-yaml": "^4.0.5",
