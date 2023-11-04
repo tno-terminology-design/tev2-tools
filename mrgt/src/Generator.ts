@@ -134,38 +134,24 @@ export class Generator {
     writeFile(path.join(glossarydir, mrgFile), yaml.dump(tuc.output(), { forceQuotes: true }))
 
     if (vsn.altvsntags || saf.scope.defaultvsn === tuc.terminology.vsntag) {
-      log.info(`\tCreating symbolic link(s)...`)
+      log.info(`\tCreating duplicates...`)
     }
 
-    // if the vsntag or any of the altvsntags is the default version, create a symbolic link
+    // if the version is the default version, create a duplicate {mrg.{import-scopetag}.yaml}
     if (saf.scope.defaultvsn === tuc.terminology.vsntag || tuc.terminology.altvsntags?.includes(saf.scope.defaultvsn)) {
-      const defaultmrgFile = `mrg.${tuc.terminology.scopetag}.yaml`
-      const defaultmrgURL = path.join(glossarydir, defaultmrgFile)
+      const defaultmrgURL = path.join(glossarydir, `mrg.${tuc.terminology.scopetag}.yaml`)
+      writeFile(defaultmrgURL, yaml.dump(mrgFile, { forceQuotes: true }))
       log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default) > '${mrgFile}'`)
-      if (!fs.existsSync(defaultmrgURL)) {
-        fs.symlinkSync(mrgFile, defaultmrgURL)
-      } else {
-        // overwrite existing symlink
-        fs.unlinkSync(defaultmrgURL)
-        fs.symlinkSync(mrgFile, defaultmrgURL)
-      }
     }
 
-    // Create a symlink for every altvsntag
+    // Create a duplicate for every altvsntag
     if (typeof vsn.altvsntags === "string") {
       vsn.altvsntags = [vsn.altvsntags]
     }
     vsn.altvsntags?.forEach((altvsntag) => {
-      const altmrgFile = `mrg.${tuc.terminology.scopetag}.${altvsntag}.yaml`
-      const altmrgURL = path.join(glossarydir, altmrgFile)
-      log.trace(`\t\t'${path.basename(altmrgURL)}' > '${mrgFile}'`)
-      if (!fs.existsSync(altmrgURL)) {
-        fs.symlinkSync(mrgFile, altmrgURL)
-      } else {
-        // overwrite existing symlink
-        fs.unlinkSync(altmrgURL)
-        fs.symlinkSync(mrgFile, altmrgURL)
-      }
+      const altmrgURL = path.join(glossarydir, `mrg.${tuc.terminology.scopetag}.${altvsntag}.yaml`)
+      writeFile(altmrgURL, yaml.dump(mrgFile, { forceQuotes: true }))
+      log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
     })
   }
 }
