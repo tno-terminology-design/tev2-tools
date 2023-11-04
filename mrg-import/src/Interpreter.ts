@@ -123,37 +123,24 @@ export async function initialize({ scopedir }: { scopedir: string }) {
         log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`)
 
         if (version.altvsntags || version.vsntag === importSaf.scope.defaultvsn) {
-          log.info(`\tCreating symbolic link(s)...`)
+          log.info(`\tCreating duplicates...`)
         }
 
-        // if the version is the default version, create a symbolic link {mrg.{import-scopetag}.yaml}
+        // if the version is the default version, create a duplicate {mrg.{import-scopetag}.yaml}
         if (version.vsntag === importSaf.scope.defaultvsn || version.altvsntags?.includes(importSaf.scope.defaultvsn)) {
           const defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`)
-          log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default) > '${path.basename(mrgURL)}'`)
-          if (!fs.existsSync(defaultmrgURL)) {
-            fs.symlinkSync(path.basename(mrgURL), defaultmrgURL)
-          } else {
-            // overwrite existing symbolic link
-            fs.unlinkSync(defaultmrgURL)
-            fs.symlinkSync(path.basename(mrgURL), defaultmrgURL)
-          }
+          writeFile(defaultmrgURL, yaml.dump(mrg, { forceQuotes: true }))
+          log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default)`)
         }
 
-        // Create a symlink for every altvsntag
+        // Create a duplicate for every altvsntag
         if (typeof version.altvsntags === "string") {
           version.altvsntags = [version.altvsntags]
         }
         version.altvsntags?.forEach((altvsntag) => {
-          const altmrgFile = `mrg.${scope.scopetag}.${altvsntag}.yaml`
-          const altmrgURL = path.join(path.dirname(mrgURL), altmrgFile)
-          log.trace(`\t\t'${path.basename(altmrgURL)}' > '${path.basename(mrgURL)}'`)
-          if (!fs.existsSync(altmrgURL)) {
-            fs.symlinkSync(path.basename(mrgURL), altmrgURL)
-          } else {
-            // overwrite existing symbolic link
-            fs.unlinkSync(altmrgURL)
-            fs.symlinkSync(path.basename(mrgURL), altmrgURL)
-          }
+          const altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`)
+          writeFile(altmrgURL, yaml.dump(mrg, { forceQuotes: true }))
+          log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
         })
       } catch (err) {
         onNotExistError(err as Error)
