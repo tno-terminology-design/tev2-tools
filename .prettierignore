@@ -1,0 +1,9 @@
+# Ignore artifacts:
+**/lib
+**/.git
+**/.svn
+**/.hg
+**/node_modules
+
+# Ignore all Markdown files:
+**/*.md
