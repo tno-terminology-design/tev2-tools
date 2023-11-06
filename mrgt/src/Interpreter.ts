@@ -272,7 +272,7 @@ export class TuC {
                   return true // then include the entry
                 }
               } else {
-                if ((entry[key] as string[]).includes(value)) {
+                if ((entry[key] as string[])?.includes(value)) {
                   // if the entry[key] is an array
                   return true // then include the entry
                 }
@@ -413,8 +413,8 @@ export class TuC {
       return undefined
     }
 
-    const { rawTerm, fieldmodifierlist } = match.groups! // Extract the term and the field modifier list
-    const term = rawTerm.trim() // Remove leading and trailing whitespace
+    const fieldmodifierlist = match.groups!.fieldmodifierlist
+    const term = match.groups!.term.trim()
     const fieldModifiers: Record<string, unknown> = {} // Initialize an object for field modifiers
     const modifierString: string[] = []
 
