@@ -1,16 +1,20 @@
-import { saf } from "./Run.js"
 import { log } from "./Report.js"
-import { Entry, MRG, TuC, Version } from "./Interpreter.js"
+import { TuC } from "./Interpreter.js"
 import { writeFile } from "./Handler.js"
+import { type SAF, type Version } from "./SAF.js"
+import { type Entry } from "./MRG.js"
 
 import path = require("path")
 import yaml = require("js-yaml")
+import { MrgBuilder } from "./MRG.js"
 
 export class Generator {
   public vsntag: string
+  saf: SAF
 
-  public constructor({ vsntag }: { vsntag: string }) {
+  public constructor({ vsntag, saf }: { vsntag: string; saf: SAF }) {
     this.vsntag = vsntag
+    this.saf = saf
   }
 
   public initialize(): void {
@@ -18,17 +22,17 @@ export class Generator {
 
     // Check if the vsntag exists in the SAF
     if (this.vsntag) {
-      const vsn = saf.versions?.find((vsn) => vsn.vsntag === this.vsntag)
+      const vsn = this.saf.versions?.find((vsn) => vsn.vsntag === this.vsntag)
       if (vsn) {
-        log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml)...`)
+        log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...`)
         this.generate(vsn)
       } else {
         // check altvsntags
-        const vsn = saf.versions?.find((vsn) => vsn.altvsntags.includes(this.vsntag))
+        const vsn = this.saf.versions?.find((vsn) => vsn.altvsntags.includes(this.vsntag))
 
         if (vsn) {
           log.info(
-            `\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}') (mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml)...`
+            `\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}') (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...`
           )
           this.generate(vsn)
         } else {
@@ -39,11 +43,11 @@ export class Generator {
     } else {
       // If no vsntag was specified, process all versions
       log.info(`No vsntag was specified. Processing all versions...`)
-      if (saf.versions?.length === 0) {
+      if (this.saf.versions?.length === 0) {
         throw new Error(`No versions were found in the SAF`)
       }
-      saf.versions?.forEach((vsn) => {
-        log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml)...`)
+      this.saf.versions?.forEach((vsn) => {
+        log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...`)
         this.generate(vsn)
       })
     }
@@ -65,11 +69,12 @@ export class Generator {
           entrymatch = TuC.cTextMap?.find((ctext) => ctext.term === properties!.groups!.term)
           // if the identifier is @, refer to the MRG
         } else {
-          const mrgfile = `mrg.${properties.groups.scopetag ?? saf.scope.scopetag}.${
-            properties.groups.vsntag ?? saf.scope.defaultvsn
+          const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
+            properties.groups.vsntag ?? this.saf.scope.defaultvsn
           }.yaml`
           // if the mrgfile exists as a MRG.instance, use that instance. Otherwise, create a new instance
-          const mrg = MRG.instances?.find((mrg) => mrg.filename === mrgfile) ?? new MRG({ filename: mrgfile })
+          const mrg =
+            MrgBuilder.instances?.find((mrg) => mrg.filename === mrgfile) ?? new MrgBuilder({ filename: mrgfile }).mrg
           if (mrg) {
             entrymatch = mrg.entries?.find((entry) => entry.term === properties!.groups!.term)
             if (!entrymatch) {
@@ -119,7 +124,7 @@ export class Generator {
 
         // output the modified tuc.entries array to a file
         writeFile(
-          path.join(saf.scope.localscopedir, saf.scope.glossarydir, tuc.filename),
+          path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir, tuc.filename),
           yaml.dump(tuc.output(), { forceQuotes: true })
         )
       })
@@ -127,18 +132,21 @@ export class Generator {
 
   public generate(vsn: Version): void {
     const tuc = new TuC({ vsn: vsn })
-    const glossarydir = path.join(saf.scope.localscopedir, saf.scope.glossarydir)
+    const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)
 
     // Output the MRG to a file
     const mrgFile = `mrg.${tuc.terminology.scopetag}.${tuc.terminology.vsntag}.yaml`
     writeFile(path.join(glossarydir, mrgFile), yaml.dump(tuc.output(), { forceQuotes: true }))
 
-    if (vsn.altvsntags || saf.scope.defaultvsn === tuc.terminology.vsntag) {
+    if (vsn.altvsntags || this.saf.scope.defaultvsn === tuc.terminology.vsntag) {
       log.info(`\tCreating duplicates...`)
     }
 
     // if the version is the default version, create a duplicate {mrg.{import-scopetag}.yaml}
-    if (saf.scope.defaultvsn === tuc.terminology.vsntag || tuc.terminology.altvsntags?.includes(saf.scope.defaultvsn)) {
+    if (
+      this.saf.scope.defaultvsn === tuc.terminology.vsntag ||
+      tuc.terminology.altvsntags?.includes(this.saf.scope.defaultvsn)
+    ) {
       const defaultmrgURL = path.join(glossarydir, `mrg.${tuc.terminology.scopetag}.yaml`)
       writeFile(defaultmrgURL, yaml.dump(mrgFile, { forceQuotes: true }))
       log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default) > '${mrgFile}'`)

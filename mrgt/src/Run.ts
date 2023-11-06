@@ -4,14 +4,13 @@ import { Command } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 import { log } from "./Report.js"
-import { SAF } from "./Interpreter.js"
+import { SafBuilder } from "./SAF.js"
 import { Generator } from "./Generator.js"
 
 import yaml from "js-yaml"
 import chalk from "chalk"
 import figlet from "figlet"
 
-export let saf: SAF
 export let generator: Generator
 export let onNotExist: string = "throw"
 const program = new Command()
@@ -75,8 +74,8 @@ async function main(): Promise<void> {
     }
   }
 
-  saf = new SAF({ scopedir: options.scopedir })
-  generator = new Generator({ vsntag: options.vsntag })
+  const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+  generator = new Generator({ vsntag: options.vsntag, saf: saf })
 
   // Resolve terms
   try {

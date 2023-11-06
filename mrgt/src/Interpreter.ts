@@ -1,57 +1,11 @@
 import { log } from "./Report.js"
-import { saf } from "./Run.js"
+import { generator } from "./Run.js"
 
 import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
-import yaml = require("js-yaml")
-
-interface Scope {
-  website: string
-  navpath: string
-  scopetag: string
-  scopedir: string
-  curatedir: string
-  glossarydir: string
-  defaultvsn: string
-  localscopedir: string
-  bodyFileID?: string
-}
-
-interface Scopes {
-  scopetag: string
-  scopedir: string
-}
-
-export interface Version {
-  vsntag: string
-  altvsntags: string[]
-  termselection: string[]
-}
-
-interface Terminology {
-  scopetag: string
-  scopedir: string
-  curatedir: string
-  vsntag: string
-  altvsntags: string[]
-}
-
-export interface Entry {
-  term: string
-  vsntag: string
-  scopetag: string
-  locator: string
-  bodyFile?: string
-  synonymOf?: string
-  formPhrases?: string
-  glossaryText: string
-  navurl?: string
-  headingids?: string[]
-  altvsntags?: string[]
-  grouptags?: string[]
-  [key: string]: unknown
-}
+import { type MRG, type Entry, type Terminology, MrgBuilder } from "./MRG.js"
+import { type Version, type Scopes } from "./SAF.js"
 
 export class TuC {
   public entries: Entry[] = []
@@ -73,9 +27,9 @@ export class TuC {
 
     // set relevant fields in the terminology section
     this.terminology = {
-      scopetag: saf.scope.scopetag,
-      scopedir: saf.scope.scopedir,
-      curatedir: saf.scope.curatedir,
+      scopetag: generator.saf.scope.scopetag,
+      scopedir: generator.saf.scope.scopedir,
+      curatedir: generator.saf.scope.curatedir,
       vsntag: vsn.vsntag,
       altvsntags: vsn.altvsntags
     }
@@ -93,7 +47,7 @@ export class TuC {
         continue
       }
       // find the corresponding scope in the SAF's scope section
-      const SAFscope = saf.scopes?.find((SAFscope) => SAFscope.scopetag === scope.scopetag)
+      const SAFscope = generator.saf.scopes?.find((SAFscope) => SAFscope.scopetag === scope.scopetag)
       if (SAFscope) {
         scope.scopedir = SAFscope.scopedir
       } else {
@@ -139,7 +93,7 @@ export class TuC {
     if (TuC.cTextMap.length > 0) {
       return TuC.cTextMap
     }
-    const curatedir = path.join(saf.scope.localscopedir, saf.scope.curatedir)
+    const curatedir = path.join(generator.saf.scope.localscopedir, generator.saf.scope.curatedir)
 
     // Get all the curated texts from the curatedir and their subdirectories
     let curatedirContent = []
@@ -174,23 +128,25 @@ export class TuC {
       })
 
       // construct navurl from website, navpath and ctext name, or bodyFile
-      const navUrl = new URL(saf.scope.website)
+      const navUrl = new URL(generator.saf.scope.website)
       const pathname = navUrl.pathname
       if (ctextYAML.bodyFile) {
         // If the bodyFile property is set, then use that to construct the navurl
         const bodyFilePath = path.parse(ctextYAML.bodyFile)
         navUrl.pathname = path.join(pathname, bodyFilePath.dir, bodyFilePath.name)
         try {
-          const bodyFile = matter(fs.readFileSync(path.join(saf.scope.localscopedir, ctextYAML.bodyFile), "utf8"))
+          const bodyFile = matter(
+            fs.readFileSync(path.join(generator.saf.scope.localscopedir, ctextYAML.bodyFile), "utf8")
+          )
           body = bodyFile.content
 
           // if the bodyFile has a `bodyFileID` property, then use that to construct the navurl
-          if (saf.scope.bodyFileID) {
-            if (bodyFile.data[saf.scope.bodyFileID]) {
+          if (generator.saf.scope.bodyFileID) {
+            if (bodyFile.data[generator.saf.scope.bodyFileID]) {
               navUrl.pathname = path.join(
                 pathname,
                 bodyFilePath.dir,
-                path.parse(bodyFile.data[saf.scope.bodyFileID]).name
+                path.parse(bodyFile.data[generator.saf.scope.bodyFileID]).name
               )
             }
           }
@@ -200,14 +156,19 @@ export class TuC {
           }
         }
       } else {
-        navUrl.pathname = path.join(pathname, saf.scope.navpath, path.parse(ctext).dir, path.parse(ctext).name)
+        navUrl.pathname = path.join(
+          pathname,
+          generator.saf.scope.navpath,
+          path.parse(ctext).dir,
+          path.parse(ctext).name
+        )
       }
 
       // Extract heading IDs from markdown content
       const headingIds = extractHeadingIds(body)
 
       // add properties to MRG Entry
-      ctextYAML.scopetag = saf.scope.scopetag
+      ctextYAML.scopetag = generator.saf.scope.scopetag
       ctextYAML.locator = ctext
       ctextYAML.navurl = navUrl.href
       ctextYAML.headingids = headingIds
@@ -246,10 +207,11 @@ export class TuC {
         entries = this.getCtextEntries()
       } else {
         // add all terms in the MRG for either the current or the specified scope and version
-        const mrgFile = `mrg.${scopetag ?? saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
+        const mrgFile = `mrg.${scopetag ?? generator.saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
         source = `'${mrgFile}'`
 
-        const mrgMap = MRG.instances?.find((mrg) => mrg.filename === mrgFile) ?? new MRG({ filename: mrgFile })
+        const mrgMap =
+          MrgBuilder.instances?.find((mrg) => mrg.filename === mrgFile) ?? new MrgBuilder({ filename: mrgFile }).mrg
         entries = mrgMap.entries
       }
 
@@ -461,117 +423,6 @@ export class TuC {
         log.error(`\t\tInstruction caused an error: ${err.message}`)
       }
     }
-  }
-}
-
-export class MRG {
-  public filename: string
-  public terminology: Terminology
-  public scopes: Scopes[]
-  public entries: Entry[] = []
-
-  static instances: MRG[] = []
-
-  public constructor({ filename }: { filename: string }) {
-    const mrg = this.getMrgMap(path.join(saf.scope.localscopedir, saf.scope.glossarydir, filename))
-
-    this.filename = filename
-    this.terminology = mrg.terminology
-    this.scopes = mrg.scopes
-    this.entries = mrg.entries
-
-    MRG.instances.push(this)
-  }
-
-  /**
-   * Retrieves the MRG (Machine Readable Glossary) map.
-   * @returns A promise that resolves to the MRG map.
-   */
-  private getMrgMap(mrgURL: string): MRG {
-    let mrg = {} as MRG
-
-    try {
-      // Try to load the MRG map from the `mrgURL`
-      const mrgfile = fs.readFileSync(mrgURL, "utf8")
-      mrg = yaml.load(mrgfile) as MRG
-
-      // Check for missing required properties in MRG terminology
-      type TerminologyProperty = keyof Terminology
-      const requiredProperties: TerminologyProperty[] = ["scopetag", "scopedir", "curatedir", "vsntag"]
-      const terminology = mrg.terminology
-      const missingProperties = requiredProperties.filter((prop) => !terminology[prop])
-
-      if (missingProperties.length > 0) {
-        log.error(`\tE003 Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
-        process.exit(1)
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        err.message = `E005 An error occurred while attempting to load the MRG at '${mrgURL}': ${err}`
-      }
-      throw err
-    }
-
-    return mrg
-  }
-}
-
-export class SAF {
-  public scope: Scope
-  public scopes: Scopes[]
-  public versions: Version[]
-
-  public constructor({ scopedir }: { scopedir: string }) {
-    const saf = this.getSafMap(path.join(scopedir, "saf.yaml"))
-
-    this.scope = saf.scope
-    this.scope.localscopedir = scopedir
-    this.scopes = saf.scopes
-    this.versions = saf.versions
-  }
-
-  /**
-   * Retrieves the SAF (Scope Administration File) map.
-   * @returns A promise that resolves to the SAF map.
-   */
-  private getSafMap(safURL: string): SAF {
-    let saf = {} as SAF
-
-    try {
-      // Try to load the SAF map from the scopedir
-      saf = yaml.load(fs.readFileSync(safURL, "utf8")) as SAF
-
-      // Check for missing required properties in SAF
-      type ScopeProperty = keyof Scope
-      const requiredProperties: ScopeProperty[] = ["scopetag", "scopedir", "curatedir", "defaultvsn"]
-      const missingProperties = requiredProperties.filter((prop) => !saf.scope[prop])
-
-      if (missingProperties.length > 0) {
-        log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
-        process.exit(1)
-      }
-
-      // Set default values for optional properties in SAF
-      if (saf.scope.website == undefined) {
-        log.warn(`No 'website' property found in SAF. Using '/' as default value.`)
-        saf.scope.website = "/"
-      }
-      if (saf.scope.navpath == undefined) {
-        log.warn(`No 'navpath' property found in SAF. Using '/' as default value.`)
-        saf.scope.navpath = "/"
-      }
-
-      // Check if there are existing versions
-      if (!saf.versions || saf.versions.length === 0) {
-        log.error(`E003 No versions found in SAF at '${safURL}'`)
-        process.exit(1)
-      }
-    } catch (err) {
-      log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err)
-      process.exit(1)
-    }
-
-    return saf
   }
 }
 
