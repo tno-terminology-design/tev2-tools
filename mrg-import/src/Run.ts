@@ -73,7 +73,7 @@ async function main(): Promise<void> {
 
   try {
     // Execute the interpreter
-    await initialize({ scopedir: options.scopedir })
+    await initialize({ scopedir: resolve(options.scopedir) })
     log.info("The MRG Import Tool has finished execution")
     process.exit(0)
   } catch (err) {
