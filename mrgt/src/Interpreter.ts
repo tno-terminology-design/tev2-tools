@@ -547,16 +547,27 @@ export class SAF {
       const missingProperties = requiredProperties.filter((prop) => !saf.scope[prop])
 
       if (missingProperties.length > 0) {
-        log.error(`\tE002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
+        log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
         process.exit(1)
       }
+
+      // Set default values for optional properties in SAF
+      if (saf.scope.website == undefined) {
+        log.warn(`No 'website' property found in SAF. Using '/' as default value.`)
+        saf.scope.website = "/"
+      }
+      if (saf.scope.navpath == undefined) {
+        log.warn(`No 'navpath' property found in SAF. Using '/' as default value.`)
+        saf.scope.navpath = "/"
+      }
+
       // Check if there are existing versions
       if (!saf.versions || saf.versions.length === 0) {
-        log.error(`\tE003 No versions found in SAF at '${safURL}'`)
+        log.error(`E003 No versions found in SAF at '${safURL}'`)
         process.exit(1)
       }
     } catch (err) {
-      log.error(`\tE004 An error occurred while attempting to load the SAF at '${safURL}':`, err)
+      log.error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, err)
       process.exit(1)
     }
 
