@@ -4,23 +4,27 @@ import { Command } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 import { log } from "./Report.js"
-import { initialize } from "./Interpreter.js"
+import { SAF } from "./Interpreter.js"
+import { Generator } from "./Generator.js"
 
 import yaml from "js-yaml"
 import chalk from "chalk"
 import figlet from "figlet"
+
+export let saf: SAF
+export let generator: Generator
+export let onNotExist: string = "throw"
 const program = new Command()
 
-export let onNotExist: string = "throw"
-
 program
-  .name("mrg-import")
+  .name("mrgt")
   .version("0.1.6")
   .usage("[ <paramlist> ]\n" + "- <paramlist> (optional) is a list of key-value pairs")
-  .description("The CLI for the MRG Import Tool")
+  .description("The CLI for the Machine Readable Glossary (Generation) Tool")
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-s, --scopedir <path>", "Path of the scope directory from which the tool is called")
-  .option("-o, --onNotExist <action>", "The action in case an MRG file unexpectedly does not exist")
+  .option("-v, --vsntag <vsntag>", "Versiontag for which the MRG needs to be (re)generated")
+  .option("-o, --onNotExist <action>", "The action in case a `vsntag` was specified, but wasn't found in the SAF")
   .parse(process.argv)
 
 program.parse()
@@ -32,7 +36,7 @@ async function main(): Promise<void> {
     options.input = program.args[0]
   }
 
-  console.log(chalk.red(figlet.textSync("mrg-import", { horizontalLayout: "full" })))
+  console.log(chalk.red(figlet.textSync("mrgt-cli", { horizontalLayout: "full" })))
 
   if (options.config) {
     try {
@@ -50,7 +54,7 @@ async function main(): Promise<void> {
   if (!options.scopedir) {
     program.addHelpText(
       "after",
-      "\nA required option is missing\n" + "Provide at least the following option: --scopedir <path>"
+      "\nRequired option is missing\n" + "Provide at least the following option: --scopedir <path>"
     )
     program.help()
     process.exit(1)
@@ -71,13 +75,17 @@ async function main(): Promise<void> {
     }
   }
 
+  saf = new SAF({ scopedir: options.scopedir })
+  generator = new Generator({ vsntag: options.vsntag })
+
+  // Resolve terms
   try {
-    // Execute the interpreter
-    await initialize({ scopedir: options.scopedir })
-    log.info("The MRG Import Tool has finished execution")
+    generator.initialize()
+    log.info("Generation complete")
+    // report.print();
     process.exit(0)
   } catch (err) {
-    log.error("E012 Something unexpected went wrong:", err)
+    log.error("E012 Something unexpected went wrong during generation:", err)
     process.exit(1)
   }
 }

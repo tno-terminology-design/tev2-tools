@@ -1,19 +1,19 @@
 {
-  "name": "@tno-terminology-design/mrg-import",
+  "name": "@tno-terminology-design/mrgt",
   "version": "0.1.6",
-  "description": "Machine-readable glossary (MRG) import tool",
+  "description": "Machine Readable Glossary (Generation Tool (MRGT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
   "files": [
     "lib"
   ],
   "bin": {
-    "mrg-import": "./lib/Run.js"
+    "mrgt": "./lib/Run.js"
   },
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "rebuild": "npm uninstall @tno-terminology-design/mrg-import -g && npm run build && npm i -g"
+    "rebuild": "npm uninstall @tno-terminology-design/mrgt -g && npm run build && npm i -g"
   },
   "repository": {
     "type": "git",
@@ -27,19 +27,17 @@
   },
   "homepage": "https://github.com/tno-terminology-design/tev2-tools#readme",
   "dependencies": {
-    "axios": "^1.4.0",
     "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
-    "git-url-parse": "^13.1.0",
+    "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
-    "tslog": "^4.8.2"
+    "tslog": "^4.9.1"
   },
   "devDependencies": {
     "@types/figlet": "^1.5.6",
-    "@types/git-url-parse": "^9.0.1",
     "@types/js-yaml": "^4.0.5",
-    "@types/node": "^18.11.18",
-    "typescript": "^4.9.5"
+    "@types/node": "^20.4.10",
+    "typescript": "^5.1.6"
   }
 }

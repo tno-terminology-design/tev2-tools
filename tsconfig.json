@@ -21,10 +21,10 @@
   "references": [
     {
       "path": "./mrg-import"
+    },
+    {
+      "path": "./mrgt"
     }
   ],
-  "exclude": [
-    "node_modules",
-    "lib"
-  ]
+  "exclude": ["node_modules", "lib"]
 }
