@@ -39,6 +39,7 @@ export interface Entry {
 
 export class MrgBuilder {
   static instances: MRG[] = []
+
   mrg: MRG
 
   public constructor({ filename }: { filename: string }) {

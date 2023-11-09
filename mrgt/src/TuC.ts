@@ -7,43 +7,50 @@ import path = require("path")
 import { type MRG, type Entry, type Terminology, MrgBuilder } from "./MRG.js"
 import { type Version, type Scopes } from "./SAF.js"
 
-export class TuC {
-  public entries: Entry[] = []
-  public scopes = new Set<Scopes>()
-  public terminology = {} as Terminology
-  public filename: string
-  public cText = false
+interface TuC {
+  terminology: Terminology
+  scopes: Set<Scopes>
+  entries: Entry[]
+  filename: string
+  cText: boolean
+}
 
-  static instances: TuC[] = []
+export class TuCBuilder {
+  static instances: TuCBuilder[] = []
   static cTextMap: Entry[] = []
   static synonymOf: Entry[] = []
 
+  tuc: TuC
+
   public constructor({ vsn }: { vsn: Version }) {
+    this.tuc = {
+      terminology: {
+        scopetag: generator.saf.scope.scopetag,
+        scopedir: generator.saf.scope.scopedir,
+        curatedir: generator.saf.scope.curatedir,
+        vsntag: vsn.vsntag,
+        altvsntags: vsn.altvsntags
+      },
+      scopes: new Set<Scopes>(),
+      entries: [],
+      filename: `mrg.${generator.saf.scope.scopetag}.${vsn.vsntag}.yaml`,
+      cText: false
+    }
+
     if (!vsn.termselection) {
       log.warn(`\tNo 'termselection' items found for '${vsn.vsntag}'`)
     } else {
-      this.getTuCMap(vsn.termselection)
+      this.resolveInstructions(vsn.termselection)
     }
-
-    // set relevant fields in the terminology section
-    this.terminology = {
-      scopetag: generator.saf.scope.scopetag,
-      scopedir: generator.saf.scope.scopedir,
-      curatedir: generator.saf.scope.curatedir,
-      vsntag: vsn.vsntag,
-      altvsntags: vsn.altvsntags
-    }
-
-    this.filename = `mrg.${this.terminology.scopetag}.${this.terminology.vsntag}.yaml`
 
     // set fields in the scopes section
-    for (const scope of this.scopes) {
+    for (const scope of this.tuc.scopes) {
       // Check if a scope with the same scopetag already exists in this.scopes
-      const existingScope = [...this.scopes].filter((s) => s.scopetag === scope.scopetag)
+      const existingScope = [...this.tuc.scopes].filter((s) => s.scopetag === scope.scopetag)
 
       if (existingScope?.length > 1) {
         // If an existing scope is found, delete it
-        this.scopes.delete(scope)
+        this.tuc.scopes.delete(scope)
         continue
       }
       // find the corresponding scope in the SAF's scope section
@@ -51,14 +58,14 @@ export class TuC {
       if (SAFscope) {
         scope.scopedir = SAFscope.scopedir
       } else {
-        this.scopes.delete(scope)
+        this.tuc.scopes.delete(scope)
       }
     }
 
-    TuC.instances.push(this)
+    TuCBuilder.instances.push(this)
   }
 
-  public getTuCMap(instructions: string[]): Entry[] {
+  public resolveInstructions(instructions: string[]): Entry[] {
     instructions?.forEach((instruction) => {
       if (instruction.startsWith("-")) {
         // Execute removal
@@ -72,15 +79,15 @@ export class TuC {
       }
     })
 
-    return this.entries
+    return this.tuc.entries
   }
 
   public output(): MRG {
     // create the MRG using terminology, scopes and entries and sort the entries by term
     const mrg = {
-      terminology: this.terminology,
-      scopes: Array.from(this.scopes),
-      entries: this.entries.sort((a, b) => a.term.localeCompare(b.term))
+      terminology: this.tuc.terminology,
+      scopes: Array.from(this.tuc.scopes),
+      entries: this.tuc.entries.sort((a, b) => a.term.localeCompare(b.term))
     }
 
     return mrg as MRG
@@ -88,10 +95,10 @@ export class TuC {
 
   private getCtextEntries(): Entry[] {
     // signal use of curated texts
-    this.cText = true
+    this.tuc.cText = true
     // return cTextMap if it already exists
-    if (TuC.cTextMap.length > 0) {
-      return TuC.cTextMap
+    if (TuCBuilder.cTextMap.length > 0) {
+      return TuCBuilder.cTextMap
     }
     const curatedir = path.join(generator.saf.scope.localscopedir, generator.saf.scope.curatedir)
 
@@ -174,11 +181,11 @@ export class TuC {
       ctextYAML.headingids = headingIds
 
       if (ctextYAML.synonymOf) {
-        TuC.synonymOf.push(ctextYAML)
+        TuCBuilder.synonymOf.push(ctextYAML)
       }
-      TuC.cTextMap.push(ctextYAML)
+      TuCBuilder.cTextMap.push(ctextYAML)
     })
-    return TuC.cTextMap
+    return TuCBuilder.cTextMap
   }
 
   private addMrgEntry(instruction: string): void {
@@ -251,17 +258,17 @@ export class TuC {
       if (entries.length > 0) {
         // add entries to TuC and overwrite existing entries with the same term
         for (const newEntry of entries) {
-          const existingIndex = this.entries.findIndex((entry) => entry.term === newEntry.term)
+          const existingIndex = this.tuc.entries.findIndex((entry) => entry.term === newEntry.term)
           if (existingIndex !== -1) {
             // If an entry with the same term already exists, replace it with the new entry
-            this.entries[existingIndex] = { ...newEntry } // Create a shallow copy of the new entry
+            this.tuc.entries[existingIndex] = { ...newEntry } // Create a shallow copy of the new entry
           } else {
             // If no entry with the same term exists, add a shallow copy of the new entry to this.entries
-            this.entries.push({ ...newEntry }) // Create a shallow copy of the new entry
+            this.tuc.entries.push({ ...newEntry }) // Create a shallow copy of the new entry
           }
         }
 
-        this.scopes.add({
+        this.tuc.scopes.add({
           scopetag: scopetag,
           scopedir: ""
         })
@@ -309,7 +316,7 @@ export class TuC {
     instruction = `-${key}[${valuelist ? valuelist.join(", ") : ""}]`
 
     try {
-      this.entries = this.entries.filter((entry) => {
+      this.tuc.entries = this.tuc.entries.filter((entry) => {
         // if the entry has a field with the same name as the key
         if (entry[key] !== undefined) {
           // and both the values list and key entry property is empty
@@ -328,7 +335,7 @@ export class TuC {
                 return false // then exclude the entry
               }
             } else {
-              if ((entry[key] as string[]).includes(value)) {
+              if ((entry[key] as string[])?.includes(value)) {
                 // if the entry[key] is an array
                 removed.push(entry)
                 return true // then exclude the entry
@@ -398,7 +405,7 @@ export class TuC {
       }
 
       // Find the entries with the term
-      const entries = this.entries.filter((entry) => entry.term === term)
+      const entries = this.tuc.entries.filter((entry) => entry.term === term)
       const renamed: string[] = []
 
       if (entries?.length > 0) {

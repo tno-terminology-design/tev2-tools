@@ -29,63 +29,67 @@ program
 program.parse()
 
 async function main(): Promise<void> {
-  // Parse command line parameters
-  let options = program.opts()
-  if (program.args[0]) {
-    options.input = program.args[0]
-  }
-
-  console.log(chalk.red(figlet.textSync("mrgt-cli", { horizontalLayout: "full" })))
-
-  if (options.config) {
-    try {
-      const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as yaml.Schema
-
-      // Merge config options with command line options
-      options = { ...config, ...options }
-    } catch (err) {
-      log.error(`E011 Failed to read or parse the config file '${options.config}':`, err)
-      process.exit(1)
+  try {
+    // Parse command line parameters
+    let options = program.opts()
+    if (program.args[0]) {
+      options.input = program.args[0]
     }
-  }
 
-  // Check if required option is missing
-  if (!options.scopedir) {
-    program.addHelpText(
-      "after",
-      "\nRequired option is missing\n" + "Provide at least the following option: --scopedir <path>"
-    )
-    program.help()
-    process.exit(1)
-  }
+    console.log(chalk.red(figlet.textSync("mrgt-cli", { horizontalLayout: "full" })))
 
-  // When `onNotExist` is set, make sure it is set to a correct value
-  if (options.onNotExist) {
-    if (["throw", "warn", "log", "ignore"].includes(options.onNotExist.toLowerCase())) {
-      onNotExist = options.onNotExist.toLowerCase()
-    } else {
+    if (options.config) {
+      try {
+        const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as yaml.Schema
+
+        // Merge config options with command line options
+        options = { ...config, ...options }
+      } catch (err) {
+        throw new Error(`E011 Failed to read or parse the config file '${options.config}':`, { cause: err })
+      }
+    }
+
+    // Check if required option is missing
+    if (!options.scopedir) {
       program.addHelpText(
         "after",
-        `\nOption 'onNotExist' is not set properly\n` +
-          `Provide one of the following values: 'throw', 'warn', 'log', 'ignore'`
+        "\nRequired option is missing\n" + "Provide at least the following option: --scopedir <path>"
       )
       program.help()
       process.exit(1)
     }
-  }
 
-  const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
-  generator = new Generator({ vsntag: options.vsntag, saf: saf })
+    // When `onNotExist` is set, make sure it is set to a correct value
+    if (options.onNotExist) {
+      if (["throw", "warn", "log", "ignore"].includes(options.onNotExist.toLowerCase())) {
+        onNotExist = options.onNotExist.toLowerCase()
+      } else {
+        program.addHelpText(
+          "after",
+          `\nOption 'onNotExist' is not set properly\n` +
+            `Provide one of the following values: 'throw', 'warn', 'log', 'ignore'`
+        )
+        program.help()
+        process.exit(1)
+      }
+    }
 
-  // Resolve terms
-  try {
+    const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+    generator = new Generator({ vsntag: options.vsntag, saf: saf })
+
+    // Generate MRGs
     generator.initialize()
     log.info("Generation complete")
     // report.print();
     process.exit(0)
   } catch (err) {
-    log.error("E012 Something unexpected went wrong during generation:", err)
-    process.exit(1)
+    if ((err as Error).cause != null) {
+      log.error(err)
+      process.exit(1)
+    } else {
+      log.error("E012 Something unexpected went wrong during generation:", err)
+      process.exit(1)
+    }
   }
 }
 

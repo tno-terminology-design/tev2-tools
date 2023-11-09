@@ -1,5 +1,5 @@
 import { log } from "./Report.js"
-import { TuC } from "./Interpreter.js"
+import { TuCBuilder } from "./TuC.js"
 import { writeFile } from "./Handler.js"
 import { type SAF, type Version } from "./SAF.js"
 import { type Entry } from "./MRG.js"
@@ -36,7 +36,6 @@ export class Generator {
           )
           this.generate(vsn)
         } else {
-          // TODO Run onnotexist? Seems strange to do as there is no other vsntag to process
           throw new Error(`The specified vsntag '${this.vsntag}' was not found in the SAF`)
         }
       }
@@ -53,11 +52,15 @@ export class Generator {
     }
 
     // Handle synonymOf entries if they exist in curated text
-    if (TuC.synonymOf.length > 0) {
-      log.info(`\x1b[1;37mProcessing synonymOf entries...`)
+    if (TuCBuilder.synonymOf.length > 0) {
+      this.synonymOf()
     }
+  }
+
+  private synonymOf(): void {
+    log.info(`\x1b[1;37mProcessing synonymOf entries...`)
     let mrgfileWarnings: string[]
-    TuC.synonymOf?.forEach((synonymOf, index) => {
+    TuCBuilder.synonymOf?.forEach((synonymOf, index) => {
       // wrangle the synonymOf field using a regex
       const properties = synonymOf.synonymOf!.match(
         /(?:(?<term>[a-z0-9_-]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
@@ -66,7 +69,7 @@ export class Generator {
         let entrymatch: Entry | undefined
         // if no identifier (@) is specified, refer to the ctextmap
         if (!properties.groups.identifier) {
-          entrymatch = TuC.cTextMap?.find((ctext) => ctext.term === properties!.groups!.term)
+          entrymatch = TuCBuilder.cTextMap?.find((ctext) => ctext.term === properties!.groups!.term)
           // if the identifier is @, refer to the MRG
         } else {
           const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
@@ -79,12 +82,12 @@ export class Generator {
             entrymatch = mrg.entries?.find((entry) => entry.term === properties!.groups!.term)
             if (!entrymatch) {
               // remove the synonymOf entry if it doesn't exist in the MRG
-              TuC.synonymOf.splice(index, 1)
+              TuCBuilder.synonymOf.splice(index, 1)
               log.warn(`\tTerm '${properties!.groups!.term}' not found in MRG '${mrgfile}'`)
             }
           } else {
             // remove the synonymOf entry if the MRG cannot be found
-            TuC.synonymOf.splice(index, 1)
+            TuCBuilder.synonymOf.splice(index, 1)
             if (!mrgfileWarnings.includes(mrgfile)) {
               log.warn(`\tMRG '${mrgfile}' not found`)
               mrgfileWarnings.push(mrgfile)
@@ -100,54 +103,54 @@ export class Generator {
             }
           })
           // merge the synonymOf entry with the MRG entry
-          TuC.synonymOf[index] = { ...entrymatch, ...TuC.synonymOf[index] }
+          TuCBuilder.synonymOf[index] = { ...entrymatch, ...TuCBuilder.synonymOf[index] }
         }
       }
     })
 
     // Handle TuC.synonymOf entries if they exist in TuC.entries
-    TuC.instances
-      .filter((i) => i.cText)
-      ?.forEach((tuc) => {
+    TuCBuilder.instances
+      .filter((i) => i.tuc.cText)
+      ?.forEach((instance) => {
         // find matches in TuC.entries for each TuC.synonymOf
-        TuC.synonymOf?.forEach((synonymOf) => {
-          const index = tuc.entries?.findIndex((entry) => {
+        TuCBuilder.synonymOf?.forEach((synonymOf) => {
+          const index = instance.tuc.entries?.findIndex((entry) => {
             // see if every field in entry matches the corresponding field in synonymOf
             return Object.keys(entry).every((key) => {
               return entry[key] === synonymOf[key]
             })
           })
           if (index >= 0) {
-            tuc.entries[index] = synonymOf
+            instance.tuc.entries[index] = synonymOf
           }
         })
 
         // output the modified tuc.entries array to a file
         writeFile(
-          path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir, tuc.filename),
-          yaml.dump(tuc.output(), { forceQuotes: true })
+          path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir, instance.tuc.filename),
+          yaml.dump(instance.output(), { forceQuotes: true })
         )
       })
   }
 
   public generate(vsn: Version): void {
-    const tuc = new TuC({ vsn: vsn })
+    const build = new TuCBuilder({ vsn: vsn })
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)
 
     // Output the MRG to a file
-    const mrgFile = `mrg.${tuc.terminology.scopetag}.${tuc.terminology.vsntag}.yaml`
-    writeFile(path.join(glossarydir, mrgFile), yaml.dump(tuc.output(), { forceQuotes: true }))
+    const mrgFile = `mrg.${build.tuc.terminology.scopetag}.${build.tuc.terminology.vsntag}.yaml`
+    writeFile(path.join(glossarydir, mrgFile), yaml.dump(build.output(), { forceQuotes: true }))
 
-    if (vsn.altvsntags || this.saf.scope.defaultvsn === tuc.terminology.vsntag) {
+    if (vsn.altvsntags || this.saf.scope.defaultvsn === build.tuc.terminology.vsntag) {
       log.info(`\tCreating duplicates...`)
     }
 
     // if the version is the default version, create a duplicate {mrg.{import-scopetag}.yaml}
     if (
-      this.saf.scope.defaultvsn === tuc.terminology.vsntag ||
-      tuc.terminology.altvsntags?.includes(this.saf.scope.defaultvsn)
+      this.saf.scope.defaultvsn === build.tuc.terminology.vsntag ||
+      build.tuc.terminology.altvsntags?.includes(this.saf.scope.defaultvsn)
     ) {
-      const defaultmrgURL = path.join(glossarydir, `mrg.${tuc.terminology.scopetag}.yaml`)
+      const defaultmrgURL = path.join(glossarydir, `mrg.${build.tuc.terminology.scopetag}.yaml`)
       writeFile(defaultmrgURL, yaml.dump(mrgFile, { forceQuotes: true }))
       log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default) > '${mrgFile}'`)
     }
@@ -157,7 +160,7 @@ export class Generator {
       vsn.altvsntags = [vsn.altvsntags]
     }
     vsn.altvsntags?.forEach((altvsntag) => {
-      const altmrgURL = path.join(glossarydir, `mrg.${tuc.terminology.scopetag}.${altvsntag}.yaml`)
+      const altmrgURL = path.join(glossarydir, `mrg.${build.tuc.terminology.scopetag}.${altvsntag}.yaml`)
       writeFile(altmrgURL, yaml.dump(mrgFile, { forceQuotes: true }))
       log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
     })
