@@ -4,7 +4,7 @@ import { Interpreter } from "./Interpreter.js"
 import { Converter } from "./Converter.js"
 import { SafBuilder } from "./SAF.js"
 import { Resolver } from "./Resolver.js"
-import { Command } from "commander"
+import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 import { report, log } from "./Report.js"
@@ -47,10 +47,11 @@ async function main(): Promise<void> {
 
     if (options.config != null) {
       try {
-        const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as yaml.Schema
+        const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
 
-        // Merge config options with command line options
-        options = { ...config, ...options }
+        // Overwrite command line options with config options and trrt specific config options
+        const { trrt, ...rest } = config
+        options = { ...rest, ...trrt, ...options }
       } catch (err) {
         throw new Error(`E011 Failed to read or parse the config file '${options.config}':`, { cause: err })
       }

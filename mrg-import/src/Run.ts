@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Command, OptionValues } from "commander"
+import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 import { log } from "./Report.js"
