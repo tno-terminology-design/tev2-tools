@@ -1,16 +1,19 @@
 {
   "compilerOptions": {
     "module": "node16",
-    "noImplicitAny": true,
     "target": "ES2022",
     "lib": ["es2022", "dom"],
+    "sourceMap": true,
     "declaration": true,
-    "outDir": "lib",
-    "rootDir": "src",
+    "declarationMap": true,
     "strict": true,
     "types": ["node"],
     "esModuleInterop": true,
-    "resolveJsonModule": true
-  },
-  "exclude": ["node_modules", "**/*.test.ts"]
+    "resolveJsonModule": true,
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "composite": true
+  }
 }
