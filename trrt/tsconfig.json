@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "node16",
+    "noImplicitAny": true,
+    "target": "ES2022",
+    "lib": ["es2022", "dom"],
+    "declaration": true,
+    "outDir": "lib",
+    "rootDir": "src",
+    "strict": true,
+    "types": ["node"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules", "**/*.test.ts"]
+}

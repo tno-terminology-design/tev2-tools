@@ -1,0 +1,7 @@
+{   "title": "TEv2 Manuals",
+    "items": [
+        { "label": "Curators",     "href": "https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/curator/curator-overview" },
+        { "label": "Contributors", "href": "https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/contributor/contributor-overview" },
+        { "label": "Authors",      "href": "https://tno-terminology-design.github.io/tev2-specifications/docs/manuals/author/author-overview" }
+    ]
+}
