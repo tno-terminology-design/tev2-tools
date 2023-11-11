@@ -24,6 +24,9 @@
     },
     {
       "path": "./mrgt"
+    },
+    {
+      "path": "./trrt"
     }
   ],
   "exclude": ["node_modules", "lib"]

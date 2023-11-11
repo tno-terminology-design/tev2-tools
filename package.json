@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": [
     "mrg-import",
-    "mrgt"
+    "mrgt",
+    "trrt"
   ],
   "scripts": {
     "build": "tsc --build --verbose",
