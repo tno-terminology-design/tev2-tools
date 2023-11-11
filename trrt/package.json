@@ -4,26 +4,28 @@
   "description": "Term Reference Resolution Tool (TRRT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
+  "files": [
+    "lib"
+  ],
   "bin": {
     "trrt": "./lib/Run.js"
   },
   "type": "module",
   "scripts": {
-    "build": "tsc -p .",
-    "rebuild": "npm uninstall @tno-terminology-design/trrt -g && rm lib -rf && npm run build && npm i -g",
-    "test": "mocha __tests__/**/*.test.js"
+    "build": "tsc --build",
+    "rebuild": "npm uninstall @tno-terminology-design/trrt -g && npm run build && npm i -g"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tno-terminology-design/trrt"
+    "url": "git+https://github.com/tno-terminology-design/tev2-tools"
   },
   "keywords": [],
   "author": "TNO Terminology Design",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tno-terminology-design/trrt/issues"
+    "url": "https://github.com/tno-terminology-design/tev2-tools/issues"
   },
-  "homepage": "https://github.com/tno-terminology-design/trrt#readme",
+  "homepage": "https://github.com/tno-terminology-design/tev2-tools#readme",
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "10.0.0",
@@ -38,17 +40,6 @@
     "@types/figlet": "^1.5.5",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^18.11.18",
-    "@typescript-eslint/eslint-plugin": "^6.7.5",
-    "chai": "^4.3.7",
-    "eslint": "^8.51.0",
-    "eslint-config-standard-with-typescript": "^39.1.1",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-n": "^16.2.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "mocha": "^10.2.0",
     "typescript": "^4.9.5"
-  },
-  "files": [
-    "lib/**/*"
-  ]
+  }
 }
