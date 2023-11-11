@@ -176,7 +176,7 @@ export class Resolver {
       file.lastIndex += replacement.length - matchLength
 
       // Log the converted term
-      report.termConverted(entry)
+      report.termConverted(entry!.term)
       file.converted++
     }
 

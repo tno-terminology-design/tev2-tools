@@ -31,7 +31,7 @@ class Report {
     this.errors.add(this.formatMessage("MRG HELP", file, line, message))
   }
 
-  public termConverted(term: any): void {
+  public termConverted(term: string): void {
     this.converted.items.push({ content: term })
   }
 

@@ -1,10 +1,8 @@
-import Handlebars from "handlebars"
+import Handlebars, { type HelperOptions } from "handlebars"
 import { log } from "./Report.js"
 import { resolver } from "./Run.js"
 import { type Entry } from "./MRG.js"
 import { type Term } from "./Interpreter.js"
-
-type AnyObject = Record<string, any>
 
 /**
  * The Converter class handles the conversion of a glossary entry to a specific format.
@@ -16,7 +14,7 @@ export class Converter {
   private readonly type: string
   private readonly template: string
 
-  public constructor({ template }: { template: any }) {
+  public constructor({ template }: { template: string }) {
     // map of default templates for each type
     const map: Record<string, string> = {
       html: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>',
@@ -46,7 +44,7 @@ export class Converter {
 
   convert(entry: Entry, term: Term): string {
     // Evaluate the properties inside the entry object
-    const evaluatedEntry: AnyObject = {}
+    const evaluatedEntry: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(entry)) {
       if (typeof value === "string") {
         evaluatedEntry[key] = evaluateExpressions(value, { ...entry, term })
@@ -71,7 +69,7 @@ export class Converter {
  * @param options - The options to be used in the processing
  * @returns The processed string
  */
-function noRefsHelper(this: any, text: string, options: any): string {
+function noRefsHelper(text: string, options: HelperOptions): string {
   // handle empty strings
   if (Handlebars.Utils.isEmpty(text)) {
     return text
@@ -145,7 +143,7 @@ function capFirstHelper(text: string): string {
  * @param options - The second value to compare
  * @returns The result of the comparison
  */
-function ifValueHelper(this: any, conditional: any, options: any): string {
+function ifValueHelper(this: unknown, conditional: unknown, options: HelperOptions): string {
   if (conditional === options.hash.equals) {
     return options.fn(this)
   } else {
@@ -177,7 +175,7 @@ function localizeHelper(url: string): string {
  * @param data - The data to be used in the evaluation
  * @returns The evaluated string
  */
-function evaluateExpressions(input: string, data: AnyObject): string {
+function evaluateExpressions(input: string, data: Record<string, unknown>): string {
   const template = Handlebars.compile(input, { noEscape: true, compat: true })
   return template(data)
 }
