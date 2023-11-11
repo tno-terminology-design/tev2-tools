@@ -122,8 +122,8 @@ export class MrgBuilder {
     const entries: Entry[] = []
     try {
       const regexMap: Record<string, string[]> = {
-        "{ss}": ["", "s"],
-        "{yies}": ["y", "ys", "ies"],
+        "{ss}": ["", "s", "'s", "(s)"],
+        "{yies}": ["y", "y's", "ies"],
         "{ying}": ["y", "ier", "ying", "ies", "ied"]
       }
 
