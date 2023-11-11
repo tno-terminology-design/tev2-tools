@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Command } from "commander"
+import { Command, OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 import { log } from "./Report.js"
@@ -40,10 +40,11 @@ async function main(): Promise<void> {
 
     if (options.config) {
       try {
-        const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as yaml.Schema
+        const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
 
-        // Merge config options with command line options
-        options = { ...config, ...options }
+        // Overwrite command line options with config options and mrgt specific config options
+        const { mrgt, ...rest } = config
+        options = { ...rest, ...mrgt, ...options }
       } catch (err) {
         throw new Error(`E011 Failed to read or parse the config file '${options.config}':`, { cause: err })
       }
