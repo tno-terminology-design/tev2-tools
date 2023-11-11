@@ -1,6 +1,6 @@
-import fs = require('fs')
-import path = require('path')
-import yaml = require('js-yaml')
+import fs = require("fs")
+import path = require("path")
+import yaml = require("js-yaml")
 
 export interface SAF {
   scope: Scope
@@ -36,8 +36,8 @@ interface Version {
 export class SafBuilder {
   saf: SAF
 
-  public constructor ({ scopedir }: { scopedir: string }) {
-    this.saf = this.setSafMap(path.join(scopedir, 'saf.yaml'))
+  public constructor({ scopedir }: { scopedir: string }) {
+    this.saf = this.setSafMap(path.join(scopedir, "saf.yaml"))
 
     this.saf.scope.scopedir = scopedir // override scopedir with the one passed as a parameter
   }
@@ -47,15 +47,15 @@ export class SafBuilder {
    * @param safURL - The full path of the SAF to be retrieved.
    * @returns - The SAF as a SAF object.
    */
-  private setSafMap (safURL: string): SAF {
+  private setSafMap(safURL: string): SAF {
     try {
       // try to load the SAF map from the scopedir
-      this.saf = yaml.load(fs.readFileSync(safURL, 'utf8')) as SAF
+      this.saf = yaml.load(fs.readFileSync(safURL, "utf8")) as SAF
 
       // check for missing required properties in SAF
       type ScopeProperty = keyof Scope
-      const requiredProperties: ScopeProperty[] = ['scopetag', 'scopedir', 'curatedir', 'defaultvsn']
-      const missingProperties = requiredProperties.filter(prop => this.saf.scope[prop] == null)
+      const requiredProperties: ScopeProperty[] = ["scopetag", "scopedir", "curatedir", "defaultvsn"]
+      const missingProperties = requiredProperties.filter((prop) => this.saf.scope[prop] == null)
 
       if (missingProperties.length > 0) {
         throw new Error(`Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)

@@ -1,15 +1,15 @@
-import { report, log } from './Report.js'
-import { glob } from 'glob'
-import { MrgBuilder, type MRG } from './MRG.js'
-import { type Interpreter, type Term } from './Interpreter.js'
-import { type Converter } from './Converter.js'
-import { type SAF } from './SAF.js'
+import { report, log } from "./Report.js"
+import { glob } from "glob"
+import { MrgBuilder, type MRG } from "./MRG.js"
+import { type Interpreter, type Term } from "./Interpreter.js"
+import { type Converter } from "./Converter.js"
+import { type SAF } from "./SAF.js"
 
-import matter from 'gray-matter'
-import fs = require('fs')
-import path = require('path')
+import matter from "gray-matter"
+import fs = require("fs")
+import path = require("path")
 
-type GrayMatterFile = matter.GrayMatterFile<string> & { path: string, lastIndex: number, converted: number }
+type GrayMatterFile = matter.GrayMatterFile<string> & { path: string; lastIndex: number; converted: number }
 
 /**
  * The Resolver class handles the resolution of term references in files.
@@ -28,7 +28,7 @@ export class Resolver {
   converter: Converter
   saf: SAF
 
-  public constructor ({
+  public constructor({
     outputPath,
     globPattern,
     force,
@@ -57,7 +57,7 @@ export class Resolver {
    * @param data - The data to write.
    * @param force - Whether to overwrite existing files.
    */
-  private writeFile (fullPath: string, data: string, force: boolean = false): void {
+  private writeFile(fullPath: string, data: string, force: boolean = false): void {
     const dirPath = path.dirname(fullPath)
     const file = path.basename(fullPath)
     // Check if the directory path doesn't exist
@@ -89,7 +89,7 @@ export class Resolver {
    * @param file The file object of the file being processed.
    * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
    */
-  private async matchIterator (file: GrayMatterFile): Promise<string | undefined> {
+  private async matchIterator(file: GrayMatterFile): Promise<string | undefined> {
     // Get the matches of the regex in the file.orig string
     const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.getRegex()))
     if (file.matter != null) {
@@ -129,8 +129,8 @@ export class Resolver {
    * @param file - The file object of the file being processed.
    * @returns The file object.
    */
-  replacementHandler (match: RegExpMatchArray, term: Term, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
-    let termRef = ''
+  replacementHandler(match: RegExpMatchArray, term: Term, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
+    let termRef = ""
     // if the term has an empty vsntag, set it to the vsntag of the MRG
     if (term.vsntag == null) {
       term.vsntag = mrg.terminology.vsntag
@@ -140,28 +140,26 @@ export class Resolver {
     }
 
     // Find the matching entry in mrg.entries based on the term
-    const matchingEntries = mrg.entries.filter(entry =>
-      entry.term === term.id || entry.altterms?.includes(term.id)
-    )
+    const matchingEntries = mrg.entries.filter((entry) => entry.term === term.id || entry.altterms?.includes(term.id))
 
-    let replacement = ''
+    let replacement = ""
     let entry
     if (matchingEntries.length === 1) {
       entry = matchingEntries[0]
       term.id = entry.term
       // Convert the term using the configured converter
       replacement = this.converter.convert(entry, term)
-      if (replacement === '') {
+      if (replacement === "") {
         const message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`
-        report.termHelp(file.path, file.orig.toString().substring(0, match.index).split('\n').length, message)
+        report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
       }
     } else if (matchingEntries.length > 1) {
       // Multiple matches found, display a warning
       const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'`
-      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split('\n').length, message)
+      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
     } else {
       const message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
-      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split('\n').length, message)
+      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
     }
 
     // Only execute the replacement steps if the 'replacement' string is not empty
@@ -190,10 +188,8 @@ export class Resolver {
    * @param term - The interpreted term.
    * @returns The MRG class instance.
    */
-  getMRGInstance (term: Term): MRG {
-    const mrgFile = term.vsntag != null
-      ? `mrg.${term.scopetag}.${term.vsntag}.yaml`
-      : `mrg.${term.scopetag}.yaml`
+  getMRGInstance(term: Term): MRG {
+    const mrgFile = term.vsntag != null ? `mrg.${term.scopetag}.${term.vsntag}.yaml` : `mrg.${term.scopetag}.yaml`
 
     let mrg: MRG | undefined
 
@@ -216,7 +212,7 @@ export class Resolver {
    * Calles matchIterator() on files based on `this.globPattern`.
    * @returns A Promise that resolves to true if the resolution was successful.
    */
-  public async resolve (): Promise<boolean> {
+  public async resolve(): Promise<boolean> {
     // Log information about the interpreter, converter and the files being read
     log.info(`Reading files using pattern string '${this.globPattern}'`)
 
@@ -230,7 +226,7 @@ export class Resolver {
       // Read the file content
       let file
       try {
-        file = matter(fs.readFileSync(filePath, 'utf8')) as GrayMatterFile
+        file = matter(fs.readFileSync(filePath, "utf8")) as GrayMatterFile
         file.path = filePath
       } catch (err) {
         log.error(`E009 Could not read file '${filePath}':`, err)
@@ -250,7 +246,8 @@ export class Resolver {
       if (convertedData != null) {
         this.writeFile(
           path.join(this.outputPath, path.dirname(filePath), path.basename(filePath)),
-          convertedData, this.force
+          convertedData,
+          this.force
         )
       }
     }

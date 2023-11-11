@@ -1,9 +1,9 @@
-import { report } from './Report.js'
-import { resolver } from './Run.js'
+import { report } from "./Report.js"
+import { resolver } from "./Run.js"
 
-import fs = require('fs')
-import path = require('path')
-import yaml = require('js-yaml')
+import fs = require("fs")
+import path = require("path")
+import yaml = require("js-yaml")
 
 export interface MRG {
   filename: string
@@ -36,7 +36,7 @@ export interface Entry {
   navurl?: string
   headingids?: string[]
   altvsntags?: string[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
 /**
@@ -48,7 +48,7 @@ export class MrgBuilder {
   static instances: MRG[] = []
   mrg: MRG
 
-  public constructor ({ filename }: { filename: string }) {
+  public constructor({ filename }: { filename: string }) {
     const saf = resolver.saf
     this.mrg = this.setMrgMap(path.join(saf.scope.scopedir, saf.scope.glossarydir, filename))
     this.mrg.filename = filename
@@ -65,23 +65,23 @@ export class MrgBuilder {
    * @param mrgURL - The full path of the MRG to be retrieved.
    * @returns - The MRG as an MRG object.
    */
-  public setMrgMap (mrgURL: string): MRG {
+  public setMrgMap(mrgURL: string): MRG {
     try {
       // try to load the MRG map from the `mrgURL`
-      const mrgfile = fs.readFileSync(mrgURL, 'utf8')
+      const mrgfile = fs.readFileSync(mrgURL, "utf8")
       this.mrg = yaml.load(mrgfile) as MRG
 
       // check for missing required properties in MRG terminology
       type TerminologyProperty = keyof Terminology
-      const requiredProperties: TerminologyProperty[] = ['scopetag', 'scopedir', 'curatedir', 'vsntag']
+      const requiredProperties: TerminologyProperty[] = ["scopetag", "scopedir", "curatedir", "vsntag"]
       const terminology = this.mrg.terminology
-      const missingProperties = requiredProperties.filter(prop => terminology[prop] == null)
+      const missingProperties = requiredProperties.filter((prop) => terminology[prop] == null)
 
       if (missingProperties.length > 0) {
         throw new Error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
       }
 
-      const requiredEntryProperties = ['term', 'vsntag', 'scopetag', 'locator']
+      const requiredEntryProperties = ["term", "vsntag", "scopetag", "locator"]
 
       for (const entry of this.mrg.entries) {
         // add vsntag, scopetag, and altvsntags from MRG to MRG entries
@@ -90,13 +90,18 @@ export class MrgBuilder {
         entry.altvsntags = terminology.altvsntags
 
         // check for missing required properties in MRG entries
-        const missingProperties = requiredEntryProperties.filter(prop => entry[prop] == null)
+        const missingProperties = requiredEntryProperties.filter((prop) => entry[prop] == null)
 
         if (missingProperties.length > 0) {
           // create a reference to the problematic entry using the first three property-value pairs
-          const reference = Object.keys(entry).slice(0, 3).map(prop => `${prop}: '${entry[prop]}'`).join(', ')
+          const reference = Object.keys(entry)
+            .slice(0, 3)
+            .map((prop) => `${prop}: '${entry[prop]}'`)
+            .join(", ")
 
-          const errorMessage = `MRG entry missing required property: '${missingProperties.join("', '")}'. Entry starts with values ${reference}`
+          const errorMessage = `MRG entry missing required property: '${missingProperties.join(
+            "', '"
+          )}'. Entry starts with values ${reference}`
           report.mrgHelp(mrgURL, -1, errorMessage)
         }
       }
@@ -113,17 +118,17 @@ export class MrgBuilder {
    * @param mrg - The MRG (Machine Readable Glossary) map.
    * @returns A promise that resolves to the populated runtime glossary.
    */
-  public populate (mrg: MRG): Entry[] {
+  public populate(mrg: MRG): Entry[] {
     const entries: Entry[] = []
     try {
       const regexMap: Record<string, string[]> = {
-        '{ss}': ['', 's'],
-        '{yies}': ['y', 'ys', 'ies'],
-        '{ying}': ['y', 'ier', 'ying', 'ies', 'ied']
+        "{ss}": ["", "s"],
+        "{yies}": ["y", "ys", "ies"],
+        "{ying}": ["y", "ier", "ying", "ies", "ied"]
       }
 
       for (const entry of mrg.entries) {
-        const alternatives = entry.formPhrases != null ? entry.formPhrases.split(',').map(t => t.trim()) : []
+        const alternatives = entry.formPhrases != null ? entry.formPhrases.split(",").map((t) => t.trim()) : []
 
         // create a new set of alternatives that includes all possible macro replacements
         const modifiedAlternatives = new Set<string>()
@@ -141,7 +146,9 @@ export class MrgBuilder {
         entries.push(entry)
       }
     } catch (err) {
-      throw new Error(`E006 An error occurred while attempting to process the MRG at '${mrg.filename}':`, { cause: err })
+      throw new Error(`E006 An error occurred while attempting to process the MRG at '${mrg.filename}':`, {
+        cause: err
+      })
     }
     return entries
   }
@@ -153,7 +160,7 @@ export class MrgBuilder {
  * @param regexMap - A map of macros and their possible replacements.
  * @returns An array of strings with all possible alternatives after macro replacements.
  */
-function applyMacroReplacements (input: string, regexMap: Record<string, string[]>): string[] {
+function applyMacroReplacements(input: string, regexMap: Record<string, string[]>): string[] {
   // check if the input contains a macro
   const match = input.match(/\{(\w+)}/)
 

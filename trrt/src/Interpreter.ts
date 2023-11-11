@@ -1,5 +1,5 @@
-import { log } from './Report.js'
-import { type SAF } from './SAF.js'
+import { log } from "./Report.js"
+import { type SAF } from "./SAF.js"
 
 export interface Term {
   showtext: string
@@ -19,10 +19,11 @@ export class Interpreter {
   private readonly type: string
   private readonly regex: RegExp
 
-  public constructor ({ regex }: { regex: string }) {
+  public constructor({ regex }: { regex: string }) {
     const map: Record<string, RegExp> = {
       alt: /(?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)(?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\](?:\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))/g,
-      basic: /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)/g
+      basic:
+        /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -32,33 +33,39 @@ export class Interpreter {
       this.type = key
       this.regex = map[key]
     } else {
-      this.type = 'custom'
+      this.type = "custom"
       // Remove leading and trailing slashes, and flags
-      this.regex = new RegExp(regex.replace(/^\/|\/[a-z]*$/g, ''), 'g')
+      this.regex = new RegExp(regex.replace(/^\/|\/[a-z]*$/g, ""), "g")
     }
     log.info(`Using ${this.type} interpreter: '${this.regex}'`)
   }
 
-  getRegex (): RegExp {
+  getRegex(): RegExp {
     return this.regex
   }
 
-  interpret (match: RegExpMatchArray, saf: SAF): Term {
+  interpret(match: RegExpMatchArray, saf: SAF): Term {
     // added as feedback from Michiel, should not happen as it would not be a match if there are no groups
     if (match.groups === undefined) {
-      throw new Error('Error in evaluating regex pattern. No groups provided')
+      throw new Error("Error in evaluating regex pattern. No groups provided")
     }
 
     return {
       showtext: match.groups.showtext,
-      id: match.groups.id?.length > 0 ? match.groups.id : match.groups.showtext.toLowerCase().replace(/['()]+/g, '').replace(/[^a-z0-9_-]+/g, '-'),
+      id:
+        match.groups.id?.length > 0
+          ? match.groups.id
+          : match.groups.showtext
+              .toLowerCase()
+              .replace(/['()]+/g, "")
+              .replace(/[^a-z0-9_-]+/g, "-"),
       trait: match.groups.trait,
       scopetag: match.groups.scopetag?.length > 0 ? match.groups.scopetag : saf.scope.scopetag,
       vsntag: match.groups.vsntag
     }
   }
 
-  getType (): string {
+  getType(): string {
     return this.type
   }
 }

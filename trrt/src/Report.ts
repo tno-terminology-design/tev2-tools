@@ -1,4 +1,4 @@
-import { Logger } from 'tslog'
+import { Logger } from "tslog"
 
 interface Output<T> {
   items: T[]
@@ -9,7 +9,7 @@ interface Output<T> {
  * It also handles the reporting of the number of files modified and terms converted.
  */
 class Report {
-  termErrors: Output<{ file: string, line: number, message: string }> = {
+  termErrors: Output<{ file: string; line: number; message: string }> = {
     items: []
   }
 
@@ -23,32 +23,32 @@ class Report {
 
   errors = new Set()
 
-  public termHelp (file: string, line: number, message: string): void {
+  public termHelp(file: string, line: number, message: string): void {
     this.termErrors.items.push({ file, line, message })
   }
 
-  public mrgHelp (file: string, line: number, message: string): void {
-    this.errors.add(this.formatMessage('MRG HELP', file, line, message))
+  public mrgHelp(file: string, line: number, message: string): void {
+    this.errors.add(this.formatMessage("MRG HELP", file, line, message))
   }
 
-  public termConverted (term: any): void {
+  public termConverted(term: any): void {
     this.converted.items.push({ content: term })
   }
 
-  public fileWritten (file: string): void {
+  public fileWritten(file: string): void {
     this.files.items.push({ content: file })
   }
 
-  public print (): void {
-    console.log('\x1b[1;37m')
-    console.log(' Resolution Report:')
-    console.log('       \x1b[0mNumber of files modified: ' + this.files.items.length)
-    console.log('       \x1b[0mNumber of terms converted: ' + this.converted.items.length)
+  public print(): void {
+    console.log("\x1b[1;37m")
+    console.log(" Resolution Report:")
+    console.log("       \x1b[0mNumber of files modified: " + this.files.items.length)
+    console.log("       \x1b[0mNumber of terms converted: " + this.converted.items.length)
 
     if (this.termErrors.items.length > 0) {
-      console.log('   \x1b[1;37mTerm Errors:\x1b[0m')
+      console.log("   \x1b[1;37mTerm Errors:\x1b[0m")
 
-      let uniqueTermHelpMessages = new Map<string, Array<{ file: string, line: number }>>()
+      let uniqueTermHelpMessages = new Map<string, Array<{ file: string; line: number }>>()
 
       for (const item of this.termErrors.items) {
         const key = item.message
@@ -66,7 +66,7 @@ class Report {
       uniqueTermHelpMessages = new Map(sortedEntries)
 
       for (const [key, value] of uniqueTermHelpMessages) {
-        console.log(`\x1b[1;31m${'TERM HELP'.padEnd(12)} \x1b[0m${key}:`)
+        console.log(`\x1b[1;31m${"TERM HELP".padEnd(12)} \x1b[0m${key}:`)
         const filesMap = new Map<string, number[]>()
 
         for (const item of value) {
@@ -77,14 +77,14 @@ class Report {
         }
 
         for (const [file, lines] of filesMap) {
-          const lineNumbers = lines.join(':')
+          const lineNumbers = lines.join(":")
           console.log(`   \x1b[1;37m${file}:${lineNumbers}`)
         }
       }
     }
 
     if (this.errors.size > 0) {
-      console.log('\n   \x1b[1;37mMain Errors:\x1b[0m')
+      console.log("\n   \x1b[1;37mMain Errors:\x1b[0m")
 
       for (const err of this.errors) {
         console.log(err)
@@ -92,7 +92,7 @@ class Report {
     }
   }
 
-  private formatMessage (type: string, file: string, line: number, message: string): string {
+  private formatMessage(type: string, file: string, line: number, message: string): string {
     let locator = `${file}`
     if (line > -1) {
       locator += `:${line}`

@@ -1,8 +1,8 @@
-import Handlebars from 'handlebars'
-import { log } from './Report.js'
-import { resolver } from './Run.js'
-import { type Entry } from './MRG.js'
-import { type Term } from './Interpreter.js'
+import Handlebars from "handlebars"
+import { log } from "./Report.js"
+import { resolver } from "./Run.js"
+import { type Entry } from "./MRG.js"
+import { type Term } from "./Interpreter.js"
 
 type AnyObject = Record<string, any>
 
@@ -16,19 +16,20 @@ export class Converter {
   private readonly type: string
   private readonly template: string
 
-  public constructor ({ template }: { template: any }) {
+  public constructor({ template }: { template: any }) {
     // map of default templates for each type
     const map: Record<string, string> = {
       html: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}">{{showtext}}</a>',
-      essif: '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>',
-      markdown: '[{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})'
+      essif:
+        '<a href="{{navurl}}{{#trait}}#{{/trait}}{{trait}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>',
+      markdown: "[{{showtext}}]({{navurl}}{{#trait}}#{{/trait}}{{trait}})"
     }
 
     // register helper functions with Handlebars
-    Handlebars.registerHelper('noRefs', noRefsHelper)
-    Handlebars.registerHelper('capFirst', capFirstHelper)
-    Handlebars.registerHelper('ifValue', ifValueHelper)
-    Handlebars.registerHelper('localize', localizeHelper)
+    Handlebars.registerHelper("noRefs", noRefsHelper)
+    Handlebars.registerHelper("capFirst", capFirstHelper)
+    Handlebars.registerHelper("ifValue", ifValueHelper)
+    Handlebars.registerHelper("localize", localizeHelper)
 
     const key = template.toLowerCase()
     const exist = Object.prototype.hasOwnProperty.call(map, key)
@@ -37,17 +38,17 @@ export class Converter {
       this.type = key
       this.template = map[key]
     } else {
-      this.type = 'custom'
+      this.type = "custom"
       this.template = template
     }
     log.info(`Using ${this.type} template: '${this.template}'`)
   }
 
-  convert (entry: Entry, term: Term): string {
+  convert(entry: Entry, term: Term): string {
     // Evaluate the properties inside the entry object
     const evaluatedEntry: AnyObject = {}
     for (const [key, value] of Object.entries(entry)) {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         evaluatedEntry[key] = evaluateExpressions(value, { ...entry, term })
       } else {
         evaluatedEntry[key] = value
@@ -59,7 +60,7 @@ export class Converter {
     return template({ ...evaluatedEntry, ...term })
   }
 
-  getType (): string {
+  getType(): string {
     return this.type
   }
 }
@@ -70,17 +71,17 @@ export class Converter {
  * @param options - The options to be used in the processing
  * @returns The processed string
  */
-function noRefsHelper (this: any, text: string, options: any): string {
+function noRefsHelper(this: any, text: string, options: any): string {
   // handle empty strings
   if (Handlebars.Utils.isEmpty(text)) {
     return text
   }
 
   // default to interpreter if no type is specified
-  let type = ['interpreter']
+  let type = ["interpreter"]
   // Split the option hash string of `type` into an array of types
   if (!Handlebars.Utils.isEmpty(options.hash.type)) {
-    type = options.hash.type.split(',').map((element: string) => {
+    type = options.hash.type.split(",").map((element: string) => {
       return element.trim()
     })
   }
@@ -90,18 +91,18 @@ function noRefsHelper (this: any, text: string, options: any): string {
   type.forEach((element: string) => {
     // switch on element of type to determine which regex to use
     switch (element.toLowerCase()) {
-      case 'interpreter':
+      case "interpreter":
         regex = resolver.interpreter.getRegex()
         break
-      case 'html':
+      case "html":
         regex = /<a\b[^>]*?>(?<showtext>.*?)<\/a>/g
         break
-      case 'markdown':
+      case "markdown":
         regex = /\[(?<showtext>[^\]]+)\]\((?:[^)]+)\)/g
         break
       default:
         // assume the element is a custom regex
-        regex = new RegExp(element.replace(/^\/|\/[a-z]*$/g, ''), 'g')
+        regex = new RegExp(element.replace(/^\/|\/[a-z]*$/g, ""), "g")
     }
 
     const matches = Array.from(text.matchAll(regex))
@@ -127,17 +128,15 @@ function noRefsHelper (this: any, text: string, options: any): string {
  * @param text - The string to be capitalized
  * @returns The capitalized string
  */
-function capFirstHelper (text: string): string {
+function capFirstHelper(text: string): string {
   if (Handlebars.Utils.isEmpty(text)) {
     return text
   }
 
   // the first character of every word separated by spaces will be capitalized
-  const words = text.split(' ')
-  const capitalizedWords = words.map((word) =>
-    word.charAt(0).toUpperCase() + word.slice(1)
-  )
-  return capitalizedWords.join(' ')
+  const words = text.split(" ")
+  const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  return capitalizedWords.join(" ")
 }
 
 /**
@@ -146,20 +145,20 @@ function capFirstHelper (text: string): string {
  * @param options - The second value to compare
  * @returns The result of the comparison
  */
-function ifValueHelper (this: any, conditional: any, options: any): string {
+function ifValueHelper(this: any, conditional: any, options: any): string {
   if (conditional === options.hash.equals) {
     return options.fn(this)
   } else {
     return options.inverse(this)
   }
-};
+}
 
 /**
  * Helper function to localize URLs (remove the host and protocol)
  * If the host of the parsed `url` is the same as website's, then the localized path is created
  * @param url - The URL to be processed
  */
-function localizeHelper (url: string): string {
+function localizeHelper(url: string): string {
   try {
     const parsedURL = new URL(url)
     const parsedWebsite = new URL(resolver.saf.scope.website)
@@ -178,7 +177,7 @@ function localizeHelper (url: string): string {
  * @param data - The data to be used in the evaluation
  * @returns The evaluated string
  */
-function evaluateExpressions (input: string, data: AnyObject): string {
+function evaluateExpressions(input: string, data: AnyObject): string {
   const template = Handlebars.compile(input, { noEscape: true, compat: true })
   return template(data)
 }
