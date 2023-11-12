@@ -6,10 +6,12 @@
     "mrgt",
     "trrt"
   ],
+  "type": "module",
   "scripts": {
     "build": "tsc --build --verbose",
     "format": "prettier . --write && npm run lint",
-    "lint": "eslint . --cache --fix --ext js,ts"
+    "lint": "eslint . --cache --fix --ext js,ts",
+    "test": "mocha '**/*.test.js'"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",
