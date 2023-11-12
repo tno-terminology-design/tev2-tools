@@ -1,6 +1,6 @@
 import { report, log } from "./Report.js"
 import { glob } from "glob"
-import { MrgBuilder, type MRG } from "./MRG.js"
+import { MrgBuilder, type MRG, type Entry } from "./MRG.js"
 import { type Interpreter, type Term } from "./Interpreter.js"
 import { type Converter } from "./Converter.js"
 import { type SAF } from "./SAF.js"
@@ -143,7 +143,7 @@ export class Resolver {
     const matchingEntries = mrg.entries.filter((entry) => entry.term === term.id || entry.altterms?.includes(term.id))
 
     let replacement = ""
-    let entry
+    let entry: Entry | undefined
     if (matchingEntries.length === 1) {
       entry = matchingEntries[0]
       term.id = entry.term
