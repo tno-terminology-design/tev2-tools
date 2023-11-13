@@ -51,13 +51,15 @@ export class MrgBuilder {
   public constructor({ filename }: { filename: string }) {
     const saf = resolver.saf
     this.mrg = this.setMrgMap(path.join(saf.scope.scopedir, saf.scope.glossarydir, filename))
-    this.mrg.filename = filename
+    if (this.mrg !== undefined) {
+      this.mrg.filename = filename
 
-    if (this.mrg.entries.length > 0) {
-      this.mrg.entries = this.populate(this.mrg)
+      if (this.mrg.entries.length > 0) {
+        this.mrg.entries = this.populate(this.mrg)
+      }
+
+      MrgBuilder.instances.push(this.mrg)
     }
-
-    MrgBuilder.instances.push(this.mrg)
   }
 
   /**
