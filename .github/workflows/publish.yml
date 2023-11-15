@@ -4,18 +4,8 @@ on:
     types: [published]
 
 jobs:
-  release:
-    name: Release Setup
-    runs-on: ubuntu-latest
-    steps:
-      # Set '$PACKAGE_NAME' to the first word of the release name
-      - run: |
-          PACKAGE_NAME=$(echo "${{ github.event.release.name }}" | awk '{print tolower($1)}')
-          echo "PACKAGE_NAME=$PACKAGE_NAME" >> "$GITHUB_ENV"
-
   github:
     name: Publish to GitHub Package Manager
-    needs: release
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,16 +19,14 @@ jobs:
           cache: "npm"
           scope: "@tno-terminology-design"
       - run: |
-          cd "$PACKAGE_NAME"
           npm ci
           npm run build
-          npm publish --access public
+          npm publish --workspaces --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   npm:
     name: Publish to Node Package Manager
-    needs: release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -49,9 +37,8 @@ jobs:
           cache: "npm"
           scope: "@tno-terminology-design"
       - run: |
-          cd "$PACKAGE_NAME"
           npm ci
           npm run build
-          npm publish --access public
+          npm publish --workspaces --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
