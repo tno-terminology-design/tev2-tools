@@ -21,7 +21,7 @@
   },
   "keywords": [],
   "author": "TNO Terminology Design",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/tno-terminology-design/tev2-tools/issues"
   },
