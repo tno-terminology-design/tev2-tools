@@ -1,31 +1,53 @@
-// import { spawn } from "child_process"
-// import path from "path"
-// import fs from "fs"
-// import { expect } from "chai"
+import { spawn } from "child_process"
+import path from "path"
+import fs from "fs"
+import { glob } from "glob"
+import { expect } from "chai"
+import { readFileSync } from "fs"
 
-// const __filename = new URL(import.meta.url).pathname
-// const __dirname = path.dirname(__filename)
+import yaml from "js-yaml"
 
-describe("TRRT", function () {
-  it("should do something", async function () {
-    // Mock process.argv to simulate command-line arguments
-    process.argv = [
-      // "node",
-      // "your-cli-script.js",
-      // "-c",
-      // "path/to/your/config.yaml",
-      // "-o",
-      // "outputDir",
-      // "-s",
-      // "scopeDir",
-      // "inputPattern"
-    ]
+const __testdir = path.dirname(new URL(import.meta.url).pathname)
+const __rootdir = process.env.PWD
 
-    // Call the main function
-    // await main()
+describe("Run TRRT on provided test files", () => {
+  it("should verify term conversion count of test files", (done) => {
+    const trrtPath = path.resolve(__rootdir, "trrt/lib/Run.js")
+    const contentPath = path.resolve(__testdir, "content")
+    const configFile = path.resolve(contentPath, "terminology-config.yaml")
 
-    // Write your assertions based on the expected behavior of your CLI
-    // For example, check if files were generated in the output directory
-    // ...
+    const trrtProcess = spawn("node", [trrtPath, "-c", configFile])
+    let consoleOutput = ""
+
+    trrtProcess.stdout.on("data", (data) => {
+      consoleOutput += data.toString()
+    })
+
+    trrtProcess.stderr.on("data", (data) => {
+      console.error(data.toString())
+    })
+
+    trrtProcess.on("close", async (code) => {
+      console.log(consoleOutput)
+      expect(code).to.equal(0)
+
+      const termRegex =
+        /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)/g
+
+      const config = yaml.load(readFileSync(configFile, "utf8"))
+
+      const inputFile = await glob(config.trrt.input[0])
+
+      fs.readFile(inputFile[0], "utf8", (_err, fileContent) => {
+        const termMatches = fileContent.match(termRegex)
+        const termCount = termMatches ? termMatches.length : 0
+        expect(consoleOutput).to.contain(`Number of terms converted: ${termCount}`)
+
+        fs.readFile(outputFile, "utf8", (_err, fileContent) => {
+          expect(fileContent).to.contain(`<a href="`)
+          done()
+        })
+      })
+    })
   })
 })
