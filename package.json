@@ -4,7 +4,8 @@
   "workspaces": [
     "mrg-import",
     "mrgt",
-    "trrt"
+    "trrt",
+    "utils"
   ],
   "type": "module",
   "scripts": {
@@ -21,6 +22,8 @@
     "eslint": "^8.52.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "glob": "^10.3.10",
+    "js-yaml": "^4.1.0",
     "mocha": "^10.2.0",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.1",
