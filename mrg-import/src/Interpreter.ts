@@ -1,6 +1,6 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
-import { log, onNotExistError } from "./Report.js"
+import { log, report } from "@tno-terminology-design/utils"
 import { download, writeFile } from "./Handler.js"
 
 import os from "os"
@@ -119,7 +119,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
 
         // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
         mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`)
-        writeFile(mrgURL, yaml.dump(mrg, { forceQuotes: true }))
+        writeFile(mrgURL, yaml.dump(mrg, { forceQuotes: true, noRefs: true }))
         log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`)
 
         if (version.altvsntags || version.vsntag === importSaf.scope.defaultvsn) {
@@ -129,7 +129,7 @@ export async function initialize({ scopedir }: { scopedir: string }) {
         // if the version is the default version, create a duplicate {mrg.{import-scopetag}.yaml}
         if (version.vsntag === importSaf.scope.defaultvsn || version.altvsntags?.includes(importSaf.scope.defaultvsn)) {
           const defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`)
-          writeFile(defaultmrgURL, yaml.dump(mrg, { forceQuotes: true }))
+          writeFile(defaultmrgURL, yaml.dump(mrg, { forceQuotes: true, noRefs: true }))
           log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default)`)
         }
 
@@ -139,11 +139,11 @@ export async function initialize({ scopedir }: { scopedir: string }) {
         }
         version.altvsntags?.forEach((altvsntag) => {
           const altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`)
-          writeFile(altmrgURL, yaml.dump(mrg, { forceQuotes: true }))
+          writeFile(altmrgURL, yaml.dump(mrg, { forceQuotes: true, noRefs: true }))
           log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
         })
       } catch (err) {
-        onNotExistError(err as Error)
+        report.onNotExistError(err as Error)
       }
     }
   }

@@ -2,12 +2,12 @@
 
 import { Interpreter } from "./Interpreter.js"
 import { Converter } from "./Converter.js"
-import { SafBuilder } from "./SAF.js"
+import { SafBuilder } from "@tno-terminology-design/utils"
 import { Resolver } from "./Resolver.js"
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
-import { report, log } from "./Report.js"
+import { report, log } from "@tno-terminology-design/utils"
 
 import yaml from "js-yaml"
 import chalk from "chalk"

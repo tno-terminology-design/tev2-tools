@@ -1,4 +1,4 @@
-import { log } from "./Report.js"
+import { log } from "@tno-terminology-design/utils"
 
 import path from "path"
 import fs from "fs"

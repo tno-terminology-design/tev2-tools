@@ -1,7 +1,7 @@
 import Handlebars, { type HelperOptions } from "handlebars"
-import { log } from "./Report.js"
+import { log } from "@tno-terminology-design/utils"
 import { resolver } from "./Run.js"
-import { type Entry } from "./MRG.js"
+import { type Entry } from "@tno-terminology-design/utils"
 import { type Term } from "./Interpreter.js"
 
 /**

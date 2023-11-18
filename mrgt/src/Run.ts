@@ -3,8 +3,8 @@
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
-import { log } from "./Report.js"
-import { SafBuilder } from "./SAF.js"
+import { log } from "@tno-terminology-design/utils"
+import { SafBuilder } from "@tno-terminology-design/utils"
 import { Generator } from "./Generator.js"
 
 import yaml from "js-yaml"

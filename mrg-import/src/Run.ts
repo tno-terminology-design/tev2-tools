@@ -3,15 +3,13 @@
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
-import { log } from "./Report.js"
+import { log, report } from "@tno-terminology-design/utils"
 import { initialize } from "./Interpreter.js"
 
 import yaml from "js-yaml"
 import chalk from "chalk"
 import figlet from "figlet"
 const program = new Command()
-
-export let onNotExist: string = "throw"
 
 program
   .name("mrg-import")
@@ -60,7 +58,7 @@ async function main(): Promise<void> {
   // When `onNotExist` is set, make sure it is set to a correct value
   if (options.onNotExist) {
     if (["throw", "warn", "log", "ignore"].includes(options.onNotExist.toLowerCase())) {
-      onNotExist = options.onNotExist.toLowerCase()
+      report.onNotExist = options.onNotExist.toLowerCase()
     } else {
       program.addHelpText(
         "after",

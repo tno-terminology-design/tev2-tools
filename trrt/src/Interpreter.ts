@@ -1,5 +1,5 @@
-import { log } from "./Report.js"
-import { type SAF } from "./SAF.js"
+import { log } from "@tno-terminology-design/utils"
+import { type SAF } from "@tno-terminology-design/utils"
 
 export interface Term {
   showtext: string

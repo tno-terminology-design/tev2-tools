@@ -1,11 +1,11 @@
-import { log } from "./Report.js"
+import { log } from "@tno-terminology-design/utils"
 import { generator } from "./Run.js"
 
 import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
-import { type MRG, type Entry, type Terminology, MrgBuilder } from "./MRG.js"
-import { type Version, type Scopes } from "./SAF.js"
+import { type MRG, type Entry, type Terminology, MrgBuilder } from "@tno-terminology-design/utils"
+import { type Version, type Scopes } from "@tno-terminology-design/utils"
 
 interface TuC {
   terminology: Terminology
@@ -54,7 +54,9 @@ export class TuCBuilder {
         continue
       }
       // find the corresponding scope in the SAF's scope section
-      const SAFscope = generator.saf.scopes?.find((SAFscope) => SAFscope.scopetag === scope.scopetag)
+      const SAFscope = generator.saf.scopes?.find(
+        (SAFscope: { scopetag: string }) => SAFscope.scopetag === scope.scopetag
+      )
       if (SAFscope) {
         scope.scopedir = SAFscope.scopedir
       } else {
@@ -218,7 +220,8 @@ export class TuCBuilder {
         source = `'${mrgFile}'`
 
         const mrgMap =
-          MrgBuilder.instances?.find((mrg) => mrg.filename === mrgFile) ?? new MrgBuilder({ filename: mrgFile }).mrg
+          MrgBuilder.instances?.find((mrg) => mrg.filename === mrgFile) ??
+          new MrgBuilder({ filename: mrgFile, saf: generator.saf, populate: false }).mrg
         entries = mrgMap.entries
       }
 
