@@ -1,0 +1,36 @@
+{
+  "name": "@tno-terminology-design/utils",
+  "description": "Utilities for the TNO Terminology Design tools",
+  "files": [
+    "lib"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "rebuild": "npm uninstall @tno-terminology-design/utils && npm run build && npm i"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tno-terminology-design/tev2-tools"
+  },
+  "keywords": [],
+  "author": "TNO Terminology Design",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/tno-terminology-design/tev2-tools/issues"
+  },
+  "homepage": "https://github.com/tno-terminology-design/tev2-tools#readme",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "tslog": "^4.9.2"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9"
+  }
+}

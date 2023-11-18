@@ -1,23 +1,21 @@
-import { report } from "./Report.js"
-import { resolver } from "./Run.js"
-
 import fs = require("fs")
 import path = require("path")
 import yaml = require("js-yaml")
+import { type SAF } from "./SAF.js"
 
 export interface MRG {
-  filename: string
+  filename?: string
   terminology: Terminology
-  scopes: Scopes[]
+  scopes?: Scopes[]
   entries: Entry[]
 }
 
 interface Scopes {
-  scopetags: string[]
+  scopetag: string
   scopedir: string
 }
 
-interface Terminology {
+export interface Terminology {
   scopetag: string
   scopedir: string
   curatedir: string
@@ -31,11 +29,14 @@ export interface Entry {
   vsntag: string
   scopetag: string
   locator: string
+  bodyFile?: string
+  synonymOf?: string
   formPhrases?: string
   glossaryText: string
   navurl?: string
   headingids?: string[]
   altvsntags?: string[]
+  grouptags?: string[]
   [key: string]: unknown
 }
 
@@ -46,16 +47,17 @@ export interface Entry {
  */
 export class MrgBuilder {
   static instances: MRG[] = []
+  populate: boolean
   mrg: MRG
 
-  public constructor({ filename }: { filename: string }) {
-    const saf = resolver.saf
-    this.mrg = this.setMrgMap(path.join(saf.scope.scopedir, saf.scope.glossarydir, filename))
+  public constructor({ filename, saf, populate }: { filename: string; saf: SAF; populate: boolean }) {
+    this.mrg = this.getMrgMap(path.join(saf.scope.localscopedir, saf.scope.glossarydir, filename))
+    this.populate = populate
     if (this.mrg !== undefined) {
       this.mrg.filename = filename
 
-      if (this.mrg.entries.length > 0) {
-        this.mrg.entries = this.populate(this.mrg)
+      if (this.mrg.entries.length > 0 && populate) {
+        this.mrg.entries = this.populateEntries(this.mrg)
       }
 
       MrgBuilder.instances.push(this.mrg)
@@ -67,7 +69,7 @@ export class MrgBuilder {
    * @param mrgURL - The full path of the MRG to be retrieved.
    * @returns - The MRG as an MRG object.
    */
-  public setMrgMap(mrgURL: string): MRG {
+  public getMrgMap(mrgURL: string): MRG {
     try {
       // try to load the MRG map from the `mrgURL`
       const mrgfile = fs.readFileSync(mrgURL, "utf8")
@@ -86,10 +88,12 @@ export class MrgBuilder {
       const requiredEntryProperties = ["term", "vsntag", "scopetag", "locator"]
 
       for (const entry of this.mrg.entries) {
-        // add vsntag, scopetag, and altvsntags from MRG to MRG entries
-        entry.vsntag = terminology.vsntag
-        entry.scopetag = terminology.scopetag
-        entry.altvsntags = terminology.altvsntags
+        if (this.populate) {
+          // add vsntag, scopetag, and altvsntags from MRG to MRG entries
+          entry.vsntag = terminology.vsntag
+          entry.scopetag = terminology.scopetag
+          entry.altvsntags = terminology.altvsntags
+        }
 
         // check for missing required properties in MRG entries
         const missingProperties = requiredEntryProperties.filter((prop) => entry[prop] == null)
@@ -101,15 +105,14 @@ export class MrgBuilder {
             .map((prop) => `${prop}: '${entry[prop]}'`)
             .join(", ")
 
-          const errorMessage = `MRG entry missing required property: '${missingProperties.join(
-            "', '"
-          )}'. Entry starts with values ${reference}`
-          report.mrgHelp(mrgURL, -1, errorMessage)
+          throw new Error(
+            `MRG entry missing required property: '${missingProperties.join("', '")}'. 
+            Entry starts with values ${reference}`
+          )
         }
       }
     } catch (err) {
-      const errorMessage = `E005 An error occurred while attempting to load an MRG: ${(err as Error).message}`
-      report.mrgHelp(mrgURL, -1, errorMessage)
+      throw new Error(`E005 An error occurred while attempting to load an MRG: ${err}`)
     }
 
     return this.mrg
@@ -120,7 +123,7 @@ export class MrgBuilder {
    * @param mrg - The MRG (Machine Readable Glossary) map.
    * @returns A promise that resolves to the populated runtime glossary.
    */
-  public populate(mrg: MRG): Entry[] {
+  public populateEntries(mrg: MRG): Entry[] {
     const entries: Entry[] = []
     try {
       const regexMap: Record<string, string[]> = {
