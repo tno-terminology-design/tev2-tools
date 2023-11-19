@@ -20,7 +20,7 @@
   },
   "references": [
     {
-      "path": "./mrg-import"
+      "path": "./utils"
     },
     {
       "path": "./mrgt"
@@ -29,7 +29,7 @@
       "path": "./trrt"
     },
     {
-      "path": "./utils"
+      "path": "./mrg-import"
     }
   ],
   "exclude": ["node_modules", "lib"]
