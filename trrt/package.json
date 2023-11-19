@@ -8,7 +8,7 @@
     "lib"
   ],
   "bin": {
-    "trrt": "./lib/Run.js"
+    "trrt": "lib/Run.js"
   },
   "type": "module",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tno-terminology-design/tev2-tools"
+    "url": "git+https://github.com/tno-terminology-design/tev2-tools.git"
   },
   "keywords": [],
   "author": "TNO Terminology Design",
