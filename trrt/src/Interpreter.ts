@@ -3,7 +3,7 @@ import { type SAF } from "@tno-terminology-design/utils"
 
 export interface Term {
   showtext: string
-  termtype?: string
+  type?: string
   id: string
   trait?: string
   scopetag?: string
@@ -22,9 +22,9 @@ export class Interpreter {
 
   public constructor({ regex }: { regex: string }) {
     const map: Record<string, RegExp> = {
-      alt: /(?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)(?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+?))?\](?:\((?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]+?))?\))/g,
+      alt: /(?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)(?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*?))?\](?:\((?:(?:(?<type>[a-z0-9_-]+):)?)(?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]*?))?\))/g,
       basic:
-        /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]+))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]+))?\)/g
+        /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -60,6 +60,7 @@ export class Interpreter {
               .toLowerCase()
               .replace(/['()]+/g, "")
               .replace(/[^a-z0-9_-]+/g, "-"),
+      type: match.groups.type,
       trait: match.groups.trait,
       scopetag: match.groups.scopetag?.length > 0 ? match.groups.scopetag : saf.scope.scopetag,
       vsntag: match.groups.vsntag

@@ -137,16 +137,16 @@ export class Resolver {
     if (term.vsntag == null) {
       term.vsntag = mrg.terminology.vsntag
       termRef =
-        `${term.termtype}:${term.id}@${term.scopetag}:default' ` +
-        `> '${term.termtype}:${term.id}@${term.scopetag}:${term.vsntag}`
+        `${term.type}:${term.id}@${term.scopetag}:default' ` +
+        `> '${term.type}:${term.id}@${term.scopetag}:${term.vsntag}`
     } else {
-      termRef = `${term.termtype}:${term.id}@${term.scopetag}:${term.vsntag}`
+      termRef = `${term.type}:${term.id}@${term.scopetag}:${term.vsntag}`
     }
 
     // Find the matching entry in mrg.entries based on the term and termtype
     const matchingEntries = mrg.entries.filter((entry) =>
-      term.termtype
-        ? entry.type === term.termtype && (entry.term === term.id || entry.altterms?.includes(term.id))
+      term.type
+        ? entry.type === term.type && (entry.term === term.id || entry.altterms?.includes(term.id))
         : entry.term === term.id || entry.altterms?.includes(term.id)
     )
 
