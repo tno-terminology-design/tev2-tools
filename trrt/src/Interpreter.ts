@@ -60,7 +60,7 @@ export class Interpreter {
               .toLowerCase()
               .replace(/['()]+/g, "")
               .replace(/[^a-z0-9_-]+/g, "-"),
-      type: match.groups.type,
+      type: match.groups.type ?? "concept",
       trait: match.groups.trait,
       scopetag: match.groups.scopetag?.length > 0 ? match.groups.scopetag : saf.scope.scopetag,
       vsntag: match.groups.vsntag
