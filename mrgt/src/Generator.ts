@@ -152,7 +152,7 @@ export class Generator {
       build.tuc.terminology.altvsntags?.includes(this.saf.scope.defaultvsn)
     ) {
       const defaultmrgURL = path.join(glossarydir, `mrg.${build.tuc.terminology.scopetag}.yaml`)
-      writeFile(defaultmrgURL, yaml.dump(mrgFile, { forceQuotes: true, noRefs: true }))
+      writeFile(defaultmrgURL, yaml.dump(build.output(), { forceQuotes: true, noRefs: true }))
       log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default) > '${mrgFile}'`)
     }
 
@@ -162,7 +162,7 @@ export class Generator {
     }
     vsn.altvsntags?.forEach((altvsntag) => {
       const altmrgURL = path.join(glossarydir, `mrg.${build.tuc.terminology.scopetag}.${altvsntag}.yaml`)
-      writeFile(altmrgURL, yaml.dump(mrgFile, { forceQuotes: true, noRefs: true }))
+      writeFile(altmrgURL, yaml.dump(build.output(), { forceQuotes: true, noRefs: true }))
       log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
     })
   }
