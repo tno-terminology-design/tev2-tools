@@ -3,10 +3,11 @@ import { type SAF } from "@tno-terminology-design/utils"
 
 export interface Term {
   showtext: string
+  termtype?: string
   id: string
-  trait: string
-  scopetag: string
-  vsntag: string
+  trait?: string
+  scopetag?: string
+  vsntag?: string
 }
 
 /**

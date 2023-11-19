@@ -136,13 +136,19 @@ export class Resolver {
     // if the term has an empty vsntag, set it to the vsntag of the MRG
     if (term.vsntag == null) {
       term.vsntag = mrg.terminology.vsntag
-      termRef = `${term.id}@${term.scopetag}:default' ` + `> '${term.id}@${term.scopetag}:${term.vsntag}`
+      termRef =
+        `${term.termtype}:${term.id}@${term.scopetag}:default' ` +
+        `> '${term.termtype}:${term.id}@${term.scopetag}:${term.vsntag}`
     } else {
-      termRef = `${term.id}@${term.scopetag}:${term.vsntag}`
+      termRef = `${term.termtype}:${term.id}@${term.scopetag}:${term.vsntag}`
     }
 
-    // Find the matching entry in mrg.entries based on the term
-    const matchingEntries = mrg.entries.filter((entry) => entry.term === term.id || entry.altterms?.includes(term.id))
+    // Find the matching entry in mrg.entries based on the term and termtype
+    const matchingEntries = mrg.entries.filter((entry) =>
+      term.termtype
+        ? entry.type === term.termtype && (entry.term === term.id || entry.altterms?.includes(term.id))
+        : entry.term === term.id || entry.altterms?.includes(term.id)
+    )
 
     let replacement = ""
     let entry: Entry | undefined

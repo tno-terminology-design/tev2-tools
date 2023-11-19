@@ -91,6 +91,9 @@ export class TuCBuilder {
       scopes: Array.from(this.tuc.scopes),
       entries: this.tuc.entries.sort((a, b) => a.term.localeCompare(b.term))
     }
+    for (const entry of mrg.entries) {
+      entry.vsntag = entry.vsntag ?? this.tuc.terminology.vsntag
+    }
 
     return mrg as MRG
   }
@@ -131,7 +134,7 @@ export class TuCBuilder {
 
       // remove properties that match specific set of predetermined properties
       Object.keys(ctextYAML).forEach((key) => {
-        if (["scopetag", "locator", "navurl", "headingids"].includes(key.toLowerCase())) {
+        if (["scopetag", "vsntag", "locator", "navurl", "headingids", "termid"].includes(key.toLowerCase())) {
           delete ctextYAML[key]
         }
       })
@@ -177,7 +180,8 @@ export class TuCBuilder {
       const headingIds = extractHeadingIds(body)
 
       // add properties to MRG Entry
-      ctextYAML.scopetag = generator.saf.scope.scopetag
+      ctextYAML.scopetag = this.tuc.terminology.scopetag
+      ctextYAML.termid = `${ctextYAML.termType ?? "concept"}:${ctextYAML.term}`
       ctextYAML.locator = ctext
       ctextYAML.navurl = navUrl.href
       ctextYAML.headingids = headingIds

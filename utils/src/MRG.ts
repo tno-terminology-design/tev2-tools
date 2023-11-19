@@ -25,6 +25,8 @@ export interface Terminology {
 
 export interface Entry {
   term: string
+  type?: string
+  termid: string
   altterms?: string[]
   vsntag: string
   scopetag: string
@@ -85,7 +87,7 @@ export class MrgBuilder {
         throw new Error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
       }
 
-      const requiredEntryProperties = ["term", "vsntag", "scopetag", "locator"]
+      const requiredEntryProperties = ["term", "scopetag", "locator"]
 
       for (const entry of this.mrg.entries) {
         if (this.populate) {
