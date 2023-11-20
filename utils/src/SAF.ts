@@ -14,7 +14,7 @@ interface Scope {
   curatedir: string
   glossarydir: string
   defaultvsn: string
-  defaulttype?: string
+  defaulttype: string
   website: string
   navpath: string
   bodyFileID?: string
@@ -74,6 +74,10 @@ export class SafBuilder {
       if (this.saf.scope.navpath == undefined) {
         // log.warn(`No 'navpath' property found in SAF. Using '/' as default value.`)
         this.saf.scope.navpath = "/"
+      }
+      if (this.saf.scope.defaulttype == undefined) {
+        // log.warn(`No 'defaulttype' property found in SAF. Using 'term' as default value.`)
+        this.saf.scope.defaulttype = "concept"
       }
 
       // Check if there are existing versions

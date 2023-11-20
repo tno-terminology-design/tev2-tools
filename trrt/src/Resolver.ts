@@ -132,26 +132,37 @@ export class Resolver {
    * @returns The file object.
    */
   replacementHandler(match: RegExpMatchArray, term: Term, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
-    let termRef = ""
-    // if the term has an empty vsntag, set it to the vsntag of the MRG
-    if (term.vsntag == null) {
+    const termRefAlt = `${term.type || "default"}:${term.id}@${term.scopetag || "default"}:${term.vsntag || "default"}`
+
+    if (!term.vsntag) {
       term.vsntag = mrg.terminology.vsntag
-      termRef =
-        `${term.type}:${term.id}@${term.scopetag}:default' ` +
-        `> '${term.type}:${term.id}@${term.scopetag}:${term.vsntag}`
-    } else {
-      termRef = `${term.type}:${term.id}@${term.scopetag}:${term.vsntag}`
+    }
+    if (!term.type) {
+      term.type = this.saf.scope.defaulttype
+    }
+    if (!term.scopetag) {
+      term.scopetag = this.saf.scope.scopetag
     }
 
-    // Find the matching entry in mrg.entries based on the term and termtype
-    const matchingEntries = mrg.entries.filter((entry) =>
-      term.type
-        ? entry.type === term.type && (entry.term === term.id || entry.altterms?.includes(term.id))
-        : entry.term === term.id || entry.altterms?.includes(term.id)
-    )
+    let termRef = `${term.type}:${term.id}@${term.scopetag}:${term.vsntag}`
+    if (termRefAlt !== termRef) {
+      termRef = `${termRefAlt}' > '${termRefAlt}`
+    }
+
+    // Find the matching entry in mrg.entries based on the term
+    let matchingEntries = mrg.entries.filter((entry) => entry.term === term.id || entry.altterms?.includes(term.id))
 
     let replacement = ""
     let entry: Entry | undefined
+    if (matchingEntries.length > 1) {
+      if (this.saf.scope.defaulttype) {
+        matchingEntries = mrg.entries.filter((entry) => entry.type === term.type)
+      } else {
+        // Multiple matches found, display a warning
+        const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'`
+        report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
+      }
+    }
     if (matchingEntries.length === 1) {
       entry = matchingEntries[0]
       term.id = entry.term
@@ -161,10 +172,6 @@ export class Resolver {
         const message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`
         report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
       }
-    } else if (matchingEntries.length > 1) {
-      // Multiple matches found, display a warning
-      const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'`
-      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
     } else {
       const message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
       report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
