@@ -181,7 +181,7 @@ export class TuCBuilder {
 
       // add properties to MRG Entry
       ctextYAML.scopetag = this.tuc.terminology.scopetag
-      ctextYAML.termid = `${ctextYAML.termType ?? "concept"}:${ctextYAML.term}`
+      ctextYAML.termid = `${ctextYAML.termType ?? generator.saf.scope.defaulttype}:${ctextYAML.term}`
       ctextYAML.locator = ctext
       ctextYAML.navurl = navUrl.href
       ctextYAML.headingids = headingIds
