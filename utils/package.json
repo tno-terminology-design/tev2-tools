@@ -1,7 +1,7 @@
 {
   "name": "@tno-terminology-design/utils",
-  "private": true,
-  "description": "Utilities for the TNO Terminology Design tools",
+  "version": "0.1.1",
+  "description": "Utility functions for TNO Terminology Design tools",
   "files": [
     "lib"
   ],
@@ -18,7 +18,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tno-terminology-design/tev2-tools.git"
+    "url": "git+https://github.com/tno-terminology-design/tev2-tools.git",
+    "directory": "utils"
   },
   "keywords": [],
   "author": "TNO Terminology Design",
@@ -33,6 +34,5 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9"
-  },
-  "version": ""
+  }
 }

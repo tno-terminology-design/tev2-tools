@@ -1,6 +1,6 @@
 {
   "name": "@tno-terminology-design/mrg-import",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Machine-readable glossary (MRG) import tool",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
@@ -17,7 +17,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tno-terminology-design/tev2-tools.git"
+    "url": "git+https://github.com/tno-terminology-design/tev2-tools.git",
+    "directory": "mrg-import"
   },
   "keywords": [],
   "author": "TNO Terminology Design",
