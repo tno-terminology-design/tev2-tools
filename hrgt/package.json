@@ -1,0 +1,47 @@
+{
+  "name": "@tno-terminology-design/hrgt",
+  "version": "0.1.1",
+  "private": true,
+  "description": "Human Readable Glossary (Generation) Tool (HRGT)",
+  "main": "lib/Run.js",
+  "types": "lib/Run.d.ts",
+  "files": [
+    "lib"
+  ],
+  "bin": {
+    "hrgt": "lib/Run.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build",
+    "rebuild": "npm uninstall @tno-terminology-design/hrgt -g && npm run build && npm i -g"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tno-terminology-design/tev2-tools.git",
+    "directory": "hrgt"
+  },
+  "keywords": [],
+  "author": "TNO Terminology Design",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/tno-terminology-design/tev2-tools/issues"
+  },
+  "homepage": "https://github.com/tno-terminology-design/tev2-tools#readme",
+  "dependencies": {
+    "@tno-terminology-design/utils": "^0.1.1",
+    "chalk": "^4.1.2",
+    "commander": "10.0.0",
+    "figlet": "^1.6.0",
+    "glob": "^10.2.6",
+    "gray-matter": "^4.0.3",
+    "handlebars": "^4.7.7",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.5.5",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "^18.11.18",
+    "typescript": "^4.9.5"
+  }
+}

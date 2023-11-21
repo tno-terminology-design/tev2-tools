@@ -30,6 +30,9 @@
     },
     {
       "path": "./mrg-import"
+    },
+    {
+      "path": "./hrgt"
     }
   ],
   "exclude": ["node_modules", "lib"]
