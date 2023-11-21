@@ -140,9 +140,6 @@ export class Resolver {
     if (!term.type) {
       term.type = this.saf.scope.defaulttype
     }
-    if (!term.scopetag) {
-      term.scopetag = this.saf.scope.scopetag
-    }
 
     let termRef = `${term.type}:${term.id}@${term.scopetag}:${term.vsntag}`
     if (termRefAlt !== termRef) {
