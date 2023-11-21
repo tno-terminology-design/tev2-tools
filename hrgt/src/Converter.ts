@@ -1,6 +1,6 @@
 import Handlebars, { type HelperOptions } from "handlebars"
 import { log } from "@tno-terminology-design/utils"
-import { type MRG } from "@tno-terminology-design/utils"
+import { type Entry } from "@tno-terminology-design/utils"
 import { type MRGRef } from "./Interpreter.js"
 
 export class Converter {
@@ -31,10 +31,10 @@ export class Converter {
     log.info(`Using ${this.type} template: '${this.template}'`)
   }
 
-  convert(mrg: MRG, mrgref: MRGRef): string {
+  convert(entry: Entry, mrgref: MRGRef): string {
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
-    return template({ ...mrg, ...mrgref })
+    return template({ ...entry, ...mrgref })
   }
 
   getType(): string {
