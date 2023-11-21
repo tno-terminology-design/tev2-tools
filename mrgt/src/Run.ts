@@ -17,7 +17,7 @@ const program = new Command()
 
 program
   .name("mrgt")
-  .version("0.1.6")
+  .version("0.1.7")
   .usage("[ <paramlist> ]\n" + "- <paramlist> (optional) is a list of key-value pairs")
   .description("The CLI for the Machine Readable Glossary (Generation) Tool")
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")

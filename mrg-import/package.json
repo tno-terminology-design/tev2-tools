@@ -1,7 +1,7 @@
 {
   "name": "@tno-terminology-design/mrg-import",
   "version": "0.1.7",
-  "description": "Machine-readable glossary (MRG) import tool",
+  "description": "Machine Readable Glossary (MRG) Import Tool",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
   "files": [
