@@ -1,6 +1,7 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
 import { log, report } from "@tno-terminology-design/utils"
+import { SAF, MRG, Scope, Terminology } from "@tno-terminology-design/utils"
 import { download, writeFile } from "./Handler.js"
 
 import os from "os"
@@ -8,60 +9,6 @@ import fs = require("fs")
 import path = require("path")
 import yaml = require("js-yaml")
 import { AxiosError } from "axios"
-
-interface SAF {
-  scope: Scope
-  scopes: Scopes[]
-  versions: Version[]
-}
-
-interface Scope {
-  website: string
-  scopetag: string
-  scopedir: string
-  curatedir: string
-  glossarydir: string
-  defaultvsn: string
-  mrgfile: string
-}
-
-interface Scopes {
-  scopetag: string
-  scopedir: string
-}
-
-interface Version {
-  vsntag: string
-  mrgfile: string
-  altvsntags: string[]
-}
-
-interface MRG {
-  terminology: Terminology
-  scopes: Scopes[]
-  entries: Entry[]
-}
-
-interface Terminology {
-  scopetag: string
-  scopedir: string
-  curatedir: string
-  vsntag: string
-  altvsntags: string[]
-}
-
-interface Entry {
-  term: string
-  vsntag: string
-  scopetag: string
-  locator: string
-  formPhrases?: string
-  glossaryText: string
-  navurl?: string
-  headingids?: string[]
-  altvsntags?: string[]
-  [key: string]: unknown
-}
 
 /**
  * Initializes the MRG Importer.

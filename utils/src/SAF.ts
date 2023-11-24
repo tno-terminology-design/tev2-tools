@@ -8,7 +8,7 @@ export interface SAF {
   versions: Version[]
 }
 
-interface Scope {
+export interface Scope {
   scopetag: string
   scopedir: string
   curatedir: string
