@@ -80,6 +80,7 @@ export class Generator {
             MrgBuilder.instances?.find((mrg) => mrg.filename === mrgfile) ??
             new MrgBuilder({ filename: mrgfile, saf: this.saf, populate: false }).mrg
           if (mrg) {
+            // TODO: check term type and warn on multiple matches
             entrymatch = mrg.entries?.find((entry) => entry.term === properties!.groups!.term)
             if (!entrymatch) {
               // remove the synonymOf entry if it doesn't exist in the MRG
