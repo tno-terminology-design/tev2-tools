@@ -25,7 +25,7 @@ export interface Terminology {
 
 export interface Entry {
   term: string
-  type?: string
+  termType?: string
   termid: string
   altterms?: string[]
   vsntag: string

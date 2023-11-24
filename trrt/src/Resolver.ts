@@ -153,8 +153,9 @@ export class Resolver {
     let entry: Entry | undefined
     if (matchingEntries.length > 1) {
       if (this.saf.scope.defaulttype) {
-        matchingEntries = mrg.entries.filter((entry) => entry.type === term.type)
-      } else {
+        matchingEntries = mrg.entries.filter((entry) => entry.termType === term.type)
+      }
+      if (matchingEntries.length > 1) {
         // Multiple matches found, display a warning
         const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'`
         report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
