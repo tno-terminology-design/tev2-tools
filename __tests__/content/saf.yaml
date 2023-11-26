@@ -7,7 +7,7 @@
 #
 scope:
   scopetag: tev2-tools # identifier that curators have determined for this terminology
-  scopedir: https://github.com/tno-terminology-design/tev2-tools/tree/master/__tests__/content/docs # URL of the scope-directory
+  scopedir: https://github.com/tno-terminology-design/tev2-tools/tree/master/__tests__/content # URL of the scope-directory
   curatedir: terms # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
   glossarydir: glossaries # directory where all glossary files and GDFs are located. Full URL is `scopedir`/`glossarydir`
   website: # base URL for creating links to rendered versions of Curated Texts. It should also serve as the home page of the Tterminology.

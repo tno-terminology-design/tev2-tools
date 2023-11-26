@@ -4,6 +4,10 @@ import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 import { report, log } from "@tno-terminology-design/utils"
+import { SafBuilder } from "@tno-terminology-design/utils"
+import { Interpreter } from "./Interpreter.js"
+import { Converter } from "./Converter.js"
+import { Resolver } from "./Resolver.js"
 
 import yaml from "js-yaml"
 import chalk from "chalk"
@@ -62,23 +66,23 @@ async function main(): Promise<void> {
       program.help()
       process.exit(1)
     } else {
-      // Create an interpreter, converter and glossary with the provided options
-      // const converter = new Converter({ template: options.converter ?? "markdown" })
-      // const interpreter = new Interpreter({ regex: options.interpreter ?? "basic" })
-      // const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+      // Create an interpreter, converter and saf with the provided options
+      const converter = new Converter({ template: options.converter ?? "markdown" })
+      const interpreter = new Interpreter({ regex: options.interpreter ?? "basic" })
+      const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
 
       // Create a resolver with the provided options
-      // resolver = new Resolver({
-      //   outputPath: resolve(options.output),
-      //   globPattern: options.input,
-      //   force: options.force,
-      //   interpreter,
-      //   converter,
-      //   saf
-      // })
+      const resolver = new Resolver({
+        outputPath: resolve(options.output),
+        globPattern: options.input,
+        force: options.force,
+        interpreter,
+        converter,
+        saf
+      })
 
       // Resolve terms
-      // await resolver.resolve()
+      await resolver.resolve()
       log.info("Execution complete")
       report.print()
       process.exit(0)

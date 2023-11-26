@@ -37,6 +37,12 @@ export class Converter {
     return template({ ...entry, ...mrgref })
   }
 
+  getBlank(): string {
+    const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
+
+    return template({})
+  }
+
   getType(): string {
     return this.type
   }

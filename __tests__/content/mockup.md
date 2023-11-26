@@ -7,3 +7,8 @@ Using a trait:          [body](#summary@)
 Different scope:        [body](body#summary@trrt)
 Formphrase test:        [bodies](@)
 Show text to term:      [b'o(d)i'es](@)
+
+
+| Term | Description |
+| :--- | :---------- |
+{% hrg="" converter="" %}

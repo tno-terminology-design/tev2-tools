@@ -12,7 +12,7 @@ export class Interpreter {
 
   public constructor({ regex }: { regex: string }) {
     const map: Record<string, RegExp> = {
-      basic: /{%\s*hrg="(?P<hrg>(?:[^"]|\\")*)"\s*converter="(?P<converter>(?:[^"]|\\")*)"\s*%}/g
+      basic: /{%\s*hrg="(?<hrg>(?:[^"]|\\")*)"\s*converter="(?<converter>(?:[^"]|\\")*)"\s*%}/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -44,7 +44,7 @@ export class Interpreter {
     }
 
     return {
-      hrg: match.groups.hrg || `${saf.scope.scopetag}:${saf.scope.defaultvsn}`,
+      hrg: match.groups.hrg || `${saf.scope.scopetag}`,
       converter: match.groups.converter
     }
   }

@@ -99,7 +99,7 @@ export class Resolver {
       const mrgref: MRGRef = this.interpreter.interpret(match, this.saf)
 
       // Get the MRG instance based on the MRGRef
-      const mrgFile = `mrg.${mrgref.hrg}.yaml`
+      const mrgFile = `mrg.${mrgref.hrg.replace(":", ".")}.yaml`
       const mrg = this.getMRGInstance(mrgFile)
 
       if (mrg !== undefined && mrg.entries.length > 0) {
@@ -120,8 +120,13 @@ export class Resolver {
 
     let replacement = ""
     for (const entry of mrg.entries) {
-      replacement += `\n` + this.converter.convert(entry, mrgref)
+      const hrgEntry = this.converter.convert(entry, mrgref)
+      // Only add the entry to the replacement string if expressions were filled
+      if (hrgEntry != this.converter.getBlank()) {
+        replacement += hrgEntry + `\n`
+      }
     }
+    replacement = replacement.trimEnd()
 
     // Only execute the replacement steps if the 'replacement' string is not empty
     if (replacement.length > 0 && match.index != null) {
@@ -130,15 +135,15 @@ export class Resolver {
       const textBeforeMatch = file.orig.toString().substring(0, startIndex)
       const textAfterMatch = file.orig.toString().substring(startIndex + matchLength)
 
-      // Replace the matched term with the generated replacement in the data string
+      // Replace the reference with the generated replacement
       file.orig = `${textBeforeMatch}${replacement}${textAfterMatch}`
 
-      // Update the lastIndex to account for the length difference between the match and replacement
+      // Update the lastIndex to account for the length difference between the reference and replacement
       file.lastIndex += replacement.length - matchLength
 
       // // Log the converted term
       // report.termConverted(entry!.term)
-      // file.converted++
+      file.converted++
     }
 
     return file
