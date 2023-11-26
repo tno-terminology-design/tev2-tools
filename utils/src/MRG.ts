@@ -130,7 +130,7 @@ export class MrgBuilder {
     try {
       const regexMap: Record<string, string[]> = {
         "{ss}": ["", "s", "'s", "(s)"],
-        "{yies}": ["y", "y's", "ies"],
+        "{yies}": ["y", "ys", "y's", "ies"],
         "{ying}": ["y", "ier", "ying", "ies", "ied"]
       }
 

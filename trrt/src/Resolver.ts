@@ -143,7 +143,7 @@ export class Resolver {
 
     let termRef = `${term.type}:${term.id}@${term.scopetag}:${term.vsntag}`
     if (termRefAlt !== termRef) {
-      termRef = `${termRefAlt}' > '${termRefAlt}`
+      termRef = `${termRefAlt}' > '${termRef}`
     }
 
     // Find the matching entry in mrg.entries based on the term
@@ -216,7 +216,7 @@ export class Resolver {
       }
       // If no existing MRG class instance was found, build the MRG according to the `mrgFile`
       if (mrg == null) {
-        mrg = new MrgBuilder({ filename: mrgFile, saf: this.saf, populate: false }).mrg
+        mrg = new MrgBuilder({ filename: mrgFile, saf: this.saf, populate: true }).mrg
       }
 
       return mrg

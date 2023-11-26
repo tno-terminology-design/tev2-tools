@@ -137,11 +137,12 @@ export class Generator {
 
   public generate(vsn: Version): void {
     const build = new TuCBuilder({ vsn: vsn })
+    const output = yaml.dump(build.output(), { forceQuotes: true, noRefs: true })
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)
 
     // Output the MRG to a file
     const mrgFile = `mrg.${build.tuc.terminology.scopetag}.${build.tuc.terminology.vsntag}.yaml`
-    writeFile(path.join(glossarydir, mrgFile), yaml.dump(build.output(), { forceQuotes: true, noRefs: true }))
+    writeFile(path.join(glossarydir, mrgFile), output)
 
     if (vsn.altvsntags || this.saf.scope.defaultvsn === build.tuc.terminology.vsntag) {
       log.info(`\tCreating duplicates...`)
@@ -153,7 +154,7 @@ export class Generator {
       build.tuc.terminology.altvsntags?.includes(this.saf.scope.defaultvsn)
     ) {
       const defaultmrgURL = path.join(glossarydir, `mrg.${build.tuc.terminology.scopetag}.yaml`)
-      writeFile(defaultmrgURL, yaml.dump(build.output(), { forceQuotes: true, noRefs: true }))
+      writeFile(defaultmrgURL, output)
       log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default) > '${mrgFile}'`)
     }
 
@@ -163,7 +164,7 @@ export class Generator {
     }
     vsn.altvsntags?.forEach((altvsntag) => {
       const altmrgURL = path.join(glossarydir, `mrg.${build.tuc.terminology.scopetag}.${altvsntag}.yaml`)
-      writeFile(altmrgURL, yaml.dump(build.output(), { forceQuotes: true, noRefs: true }))
+      writeFile(altmrgURL, output)
       log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
     })
   }
