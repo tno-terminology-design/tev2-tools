@@ -11,6 +11,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build --clean && tsc --build --verbose",
+    "rebuild": "npm run rebuild --workspaces",
     "format": "prettier . --write && npm run lint",
     "lint": "eslint . --cache --fix --ext js,ts",
     "test": "mocha '**/*.test.js'"
