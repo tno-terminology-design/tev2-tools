@@ -121,12 +121,11 @@ export class Resolver {
     let replacement = ""
     for (const entry of mrg.entries) {
       const hrgEntry = this.converter.convert(entry, mrgref)
-      // Only add the entry to the replacement string if expressions were filled
-      if (hrgEntry != this.converter.getBlank()) {
-        replacement += hrgEntry + `\n`
+      if (hrgEntry == this.converter.getBlank()) {
+        log.warn(`Conversion of entry '${entry.term}' from '${mrg.filename}' resulted in a blank string`)
       }
+      replacement += hrgEntry
     }
-    replacement = replacement.trimEnd()
 
     // Only execute the replacement steps if the 'replacement' string is not empty
     if (replacement.length > 0 && match.index != null) {
