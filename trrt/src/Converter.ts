@@ -39,7 +39,7 @@ export class Converter {
       this.type = "custom"
       this.template = template
     }
-    log.info(`Using ${this.type} template: '${this.template}'`)
+    log.info(`Using ${this.type} template: '${this.template.replace(/\n/g, "\\n")}'`)
   }
 
   convert(entry: Entry, term: Term): string {

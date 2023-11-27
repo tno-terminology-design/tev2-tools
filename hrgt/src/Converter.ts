@@ -10,7 +10,7 @@ export class Converter {
   public constructor({ template }: { template: string }) {
     // map of default templates for each type
     const map: Record<string, string> = {
-      markdowntable: "| {{glossaryTerm}} | {{glossaryText}} |",
+      markdowntable: "| {{glossaryTerm}} | {{glossaryText}} |\n",
       essiflab: ""
     }
 
@@ -28,7 +28,7 @@ export class Converter {
       this.type = "custom"
       this.template = template
     }
-    log.info(`Using ${this.type} template: '${this.template}'`)
+    log.info(`Using ${this.type} template: '${this.template.replace(/\n/g, "\\n")}'`)
   }
 
   convert(entry: Entry, mrgref: MRGRef): string {
