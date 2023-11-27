@@ -24,21 +24,22 @@ export interface Terminology {
 }
 
 export interface Entry {
+  scopetag: string
+  vsntag: string
+  locator: string
+  navurl: string
+  headingids: string[]
+  termid: string
   term: string
   termType?: string
-  termid: string
-  altterms?: string[]
-  vsntag: string
-  scopetag: string
-  locator: string
   bodyFile?: string
+  glossaryTerm?: string
+  glossaryText?: string
   synonymOf?: string
-  formPhrases?: string
-  glossaryText: string
-  navurl?: string
-  headingids?: string[]
-  altvsntags?: string[]
   grouptags?: string[]
+  formPhrases?: string
+  altvsntags?: string[]
+  altterms?: string[]
   [key: string]: unknown
 }
 
