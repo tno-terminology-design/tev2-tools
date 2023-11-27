@@ -4,8 +4,8 @@ import { type Entry } from "@tno-terminology-design/utils"
 import { type MRGRef } from "./Interpreter.js"
 
 export class Converter {
-  private readonly type: string
-  private readonly template: string
+  public type: string
+  public template: string
 
   public constructor({ template }: { template: string }) {
     // map of default templates for each type
@@ -41,10 +41,6 @@ export class Converter {
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
     return template({})
-  }
-
-  getType(): string {
-    return this.type
   }
 }
 
