@@ -2,7 +2,7 @@ import { report, log } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { MrgBuilder, type MRG } from "@tno-terminology-design/utils"
 import { type Interpreter, type MRGRef } from "./Interpreter.js"
-import { type Converter } from "./Converter.js"
+import { Converter } from "./Converter.js"
 import { type SAF } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
@@ -31,14 +31,14 @@ export class Resolver {
     globPattern: string
     force: boolean
     interpreter: Interpreter
-    converter: Converter
+    converter: string
     saf: SAF
   }) {
     this.outputPath = outputPath
     this.globPattern = globPattern
     this.force = force
     this.interpreter = interpreter
-    this.converter = converter
+    this.converter = new Converter({ template: converter })
     this.saf = saf
   }
 
@@ -116,12 +116,20 @@ export class Resolver {
   }
 
   replacementHandler(match: RegExpMatchArray, mrgref: MRGRef, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
-    // TODO: sort MRG entries
+    let converter: Converter
+    // TODO: sort MRG entries according to the glossaryTerm?
+
+    // Check if the MRGRef has a converter specified
+    if (mrgref.converter === "" || mrgref.converter == null) {
+      converter = this.converter
+    } else {
+      converter = new Converter({ template: mrgref.converter })
+    }
 
     let replacement = ""
     for (const entry of mrg.entries) {
-      const hrgEntry = this.converter.convert(entry, mrgref)
-      if (hrgEntry == this.converter.getBlank()) {
+      const hrgEntry = converter.convert(entry, mrgref)
+      if (hrgEntry == converter.getBlank()) {
         log.warn(`Conversion of entry '${entry.term}' from '${mrg.filename}' resulted in a blank string`)
       }
       replacement += hrgEntry
