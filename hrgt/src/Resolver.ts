@@ -39,6 +39,7 @@ export class Resolver {
     this.force = force
     this.interpreter = interpreter
     this.converter = new Converter({ template: converter })
+    Converter.saf = saf
     this.saf = saf
   }
 
@@ -130,7 +131,7 @@ export class Resolver {
     for (const entry of mrg.entries) {
       const hrgEntry = converter.convert(entry, mrgref)
       if (hrgEntry == converter.getBlank()) {
-        log.warn(`Conversion of entry '${entry.term}' from '${mrg.filename}' resulted in a blank string`)
+        log.warn(`Conversion of entry '${entry.term}' from '${mrg.filename}' did not fill in any expression`)
       }
       replacement += hrgEntry
     }

@@ -2,21 +2,24 @@ import Handlebars, { type HelperOptions } from "handlebars"
 import { log } from "@tno-terminology-design/utils"
 import { type Entry } from "@tno-terminology-design/utils"
 import { type MRGRef } from "./Interpreter.js"
+import { type SAF } from "@tno-terminology-design/utils"
 
 export class Converter {
   public type: string
   public template: string
+  static saf: SAF
 
   public constructor({ template }: { template: string }) {
     // map of default templates for each type
     const map: Record<string, string> = {
       markdowntable: "| {{glossaryTerm}} | {{glossaryText}} |\n",
-      essiflab: ""
+      essiflab: "### [{{glossaryTerm}}]({{navurl}})\n\n{{glossaryText}}\n\n"
     }
 
     // register helper functions with Handlebars
     Handlebars.registerHelper("capFirst", capFirstHelper)
     Handlebars.registerHelper("ifValue", ifValueHelper)
+    Handlebars.registerHelper("localize", localizeHelper)
 
     const key = template.toLowerCase()
     const exist = Object.prototype.hasOwnProperty.call(map, key)
@@ -58,6 +61,24 @@ function capFirstHelper(text: string): string {
   const words = text.split(" ")
   const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
   return capitalizedWords.join(" ")
+}
+
+/**
+ * Helper function to localize URLs (remove the host and protocol)
+ * If the host of the parsed `url` is the same as website's, then the localized path is created
+ * @param url - The URL to be processed
+ */
+function localizeHelper(url: string): string {
+  try {
+    const parsedURL = new URL(url)
+    const parsedWebsite = new URL(Converter.saf.scope.website)
+    if (parsedURL.host === parsedWebsite.host) {
+      url = parsedURL.pathname
+    }
+  } catch (error) {
+    // do nothing
+  }
+  return url
 }
 
 /**
