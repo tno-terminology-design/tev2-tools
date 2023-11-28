@@ -26,7 +26,7 @@ export class Converter {
       this.template = map[key]
     } else {
       this.type = "custom"
-      this.template = template
+      this.template = template.replace(/\\n/g, "\n")
     }
     log.info(`Using ${this.type} template: '${this.template.replace(/\n/g, "\\n")}'`)
   }
