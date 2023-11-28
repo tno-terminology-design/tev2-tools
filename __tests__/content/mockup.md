@@ -11,4 +11,12 @@ Show text to term:      [b'o(d)i'es](@)
 
 | Term | Description |
 | :--- | :---------- |
+{% hrg="" converter="| {{glossaryTerm}} | {{glossaryText}} |\n" %}
+
+---
+
+# Glossary
+
 {% hrg="" converter="" %}
+
+---
