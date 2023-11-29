@@ -155,7 +155,7 @@ export class Generator {
     ) {
       const defaultmrgURL = path.join(glossarydir, `mrg.${build.tuc.terminology.scopetag}.yaml`)
       writeFile(defaultmrgURL, output)
-      log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default) > '${mrgFile}'`)
+      log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default)`)
     }
 
     // Create a duplicate for every altvsntag
