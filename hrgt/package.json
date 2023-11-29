@@ -1,7 +1,6 @@
 {
   "name": "@tno-terminology-design/hrgt",
   "version": "0.1.1",
-  "private": true,
   "description": "Human Readable Glossary (Generation) Tool (HRGT)",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
