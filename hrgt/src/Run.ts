@@ -3,9 +3,7 @@
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
-import { report, log } from "@tno-terminology-design/utils"
-import { SafBuilder } from "@tno-terminology-design/utils"
-import { Interpreter } from "./Interpreter.js"
+import { log } from "@tno-terminology-design/utils"
 import { Resolver } from "./Resolver.js"
 
 import yaml from "js-yaml"
@@ -65,24 +63,19 @@ async function main(): Promise<void> {
       program.help()
       process.exit(1)
     } else {
-      // Create an interpreter, converter and saf with the provided options
-      const interpreter = new Interpreter({ regex: options.interpreter ?? "basic" })
-      const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
-
       // Create a resolver with the provided options
       const resolver = new Resolver({
         outputPath: resolve(options.output),
         globPattern: options.input,
         force: options.force,
-        interpreter,
+        interpreter: options.interpreter ?? "basic",
         converter: options.converter ?? "markdowntable",
-        saf
+        saf: resolve(options.scopedir)
       })
 
       // Resolve terms
       await resolver.resolve()
       log.info("Execution complete")
-      report.print()
       process.exit(0)
     }
   } catch (err) {

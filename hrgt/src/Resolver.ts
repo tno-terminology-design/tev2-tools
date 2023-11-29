@@ -1,9 +1,9 @@
 import { report, log } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { MrgBuilder, type MRG } from "@tno-terminology-design/utils"
-import { type Interpreter, type MRGRef } from "./Interpreter.js"
+import { Interpreter, type MRGRef } from "./Interpreter.js"
 import { Converter } from "./Converter.js"
-import { type SAF } from "@tno-terminology-design/utils"
+import { type SAF, SafBuilder } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
 import fs = require("fs")
@@ -30,17 +30,18 @@ export class Resolver {
     outputPath: string
     globPattern: string
     force: boolean
-    interpreter: Interpreter
+    interpreter: string
     converter: string
-    saf: SAF
+    saf: string
   }) {
     this.outputPath = outputPath
     this.globPattern = globPattern
     this.force = force
-    this.interpreter = interpreter
+    this.interpreter = new Interpreter({ regex: interpreter })
     this.converter = new Converter({ template: converter })
-    Converter.saf = saf
-    this.saf = saf
+    this.saf = new SafBuilder({ scopedir: saf }).saf
+
+    Converter.saf = this.saf
   }
 
   /**
@@ -96,6 +97,8 @@ export class Resolver {
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
+      log.info(`\x1b[1;37mFound MRG reference '${match[0]}' in file '${file.path}'`)
+
       // Interpret the match using the interpreter
       const mrgref: MRGRef = this.interpreter.interpret(match, this.saf)
 
@@ -123,11 +126,13 @@ export class Resolver {
     // Check if the MRGRef has a converter specified
     if (mrgref.converter === "" || mrgref.converter == null) {
       converter = this.converter
+      log.info(`\tUsing default set converter '${converter.type}'`)
     } else {
       converter = new Converter({ template: mrgref.converter })
     }
 
     let replacement = ""
+    log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`)
     for (const entry of mrg.entries) {
       const hrgEntry = converter.convert(entry, mrgref)
       if (hrgEntry == converter.getBlank()) {
@@ -150,7 +155,6 @@ export class Resolver {
       file.lastIndex += replacement.length - matchLength
 
       // // Log the converted term
-      // report.termConverted(entry!.term)
       file.converted++
     }
 
@@ -195,8 +199,6 @@ export class Resolver {
     // Get the list of files based on the glob pattern
     const files = await glob(this.globPattern)
 
-    log.info(`Found ${files.length} files`)
-
     // Process each file
     for (const filePath of files) {
       // Read the file content
@@ -220,11 +222,9 @@ export class Resolver {
 
       // Write the converted data to the output file
       if (convertedData != null) {
-        this.writeFile(
-          path.join(this.outputPath, path.dirname(filePath), path.basename(filePath)),
-          convertedData,
-          this.force
-        )
+        const filepath = path.join(this.outputPath, path.dirname(filePath), path.basename(filePath))
+        log.info(`\tWriting generated HRG to '${filepath}'`)
+        this.writeFile(filepath, convertedData, this.force)
       }
     }
 
