@@ -62,7 +62,7 @@ export class Interpreter {
               .replace(/[^a-z0-9_-]+/g, "-"),
       type: match.groups.type,
       trait: match.groups.trait,
-      scopetag: saf.scope.scopetag || saf.scope.scopetag,
+      scopetag: match.groups.scopetag || saf.scope.scopetag,
       vsntag: match.groups.vsntag
     }
   }

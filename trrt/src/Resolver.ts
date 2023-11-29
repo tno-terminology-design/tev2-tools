@@ -132,7 +132,7 @@ export class Resolver {
    * @returns The file object.
    */
   replacementHandler(match: RegExpMatchArray, term: Term, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
-    const termRefAlt = `${term.type || "default"}:${term.id}@${term.scopetag || "default"}:${term.vsntag || "default"}`
+    const termRefAlt = `${term.type || "default"}:${term.id}@${term.scopetag}:${term.vsntag || "default"}`
 
     if (!term.vsntag) {
       term.vsntag = mrg.terminology.vsntag
