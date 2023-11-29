@@ -18,7 +18,7 @@ const program = new Command()
 
 program
   .name("trrt")
-  .version("1.0.9")
+  .version("1.0.10")
   .usage(
     "[ <paramlist> ] [ <globpattern> ]\n" +
       "- <paramlist> (optional) is a list of key-value pairs\n" +
