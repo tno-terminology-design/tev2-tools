@@ -1,19 +1,9 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "node16",
-    "target": "ES2022",
-    "lib": ["es2022", "dom"],
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "strict": true,
-    "types": ["node"],
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "noEmitOnError": true,
-    "skipLibCheck": true,
-    "rootDir": "./src",
-    "outDir": "./lib",
+    "baseUrl": ".",
+    "rootDir": "src",
+    "outDir": "lib",
     "composite": true
   }
 }

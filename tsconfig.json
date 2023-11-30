@@ -1,39 +1,20 @@
 {
   "compilerOptions": {
-    "module": "node16",
-    "target": "ES2022",
-    "lib": ["es2022", "dom"],
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "strict": true,
-    "types": ["node"],
+    "experimentalDecorators": true,
+    "module": "Node16",
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "noEmitOnError": true,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@tno-terminology-design/*": ["*/src"]
-    },
-    "noEmit": true
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "target": "ES2022",
+    "noImplicitAny": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "skipLibCheck": true
   },
-  "references": [
-    {
-      "path": "./utils"
-    },
-    {
-      "path": "./mrgt"
-    },
-    {
-      "path": "./trrt"
-    },
-    {
-      "path": "./mrg-import"
-    },
-    {
-      "path": "./hrgt"
-    }
-  ],
-  "exclude": ["node_modules", "lib"]
+  "paths": {
+    "*": ["node_modules/*"]
+  },
+  "ts-node": {
+    "transpileOnly": true
+  }
 }

@@ -10,7 +10,7 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "tsc --build --clean && tsc --build --verbose",
+    "build": "npm run build --workspaces",
     "rebuild": "npm run rebuild --workspaces",
     "format": "prettier . --write && npm run lint",
     "lint": "eslint . --cache --fix --ext js,ts",
