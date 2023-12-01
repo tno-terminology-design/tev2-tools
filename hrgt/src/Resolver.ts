@@ -126,7 +126,7 @@ export class Resolver {
     // Check if the MRGRef has a converter specified
     if (mrgref.converter === "" || mrgref.converter == null) {
       converter = this.converter
-      log.info(`\tUsing default set converter '${converter.type}'`)
+      log.info(`\tUsing default set converter (${converter.type})`)
     } else {
       converter = new Converter({ template: mrgref.converter })
     }
@@ -136,7 +136,7 @@ export class Resolver {
     for (const entry of mrg.entries) {
       const hrgEntry = converter.convert(entry, mrgref)
       if (hrgEntry == converter.getBlank()) {
-        log.warn(`Conversion of entry '${entry.term}' from '${mrg.filename}' did not fill in any expression`)
+        log.warn(`\tConversion of entry '${entry.term}' from '${mrg.filename}' did not fill in any expression`)
       }
       replacement += hrgEntry
     }
@@ -223,7 +223,7 @@ export class Resolver {
       // Write the converted data to the output file
       if (convertedData != null) {
         const filepath = path.join(this.outputPath, path.dirname(filePath), path.basename(filePath))
-        log.info(`\tWriting generated HRG to '${filepath}'`)
+        log.info(`Writing modified file to '${filepath}'`)
         this.writeFile(filepath, convertedData, this.force)
       }
     }

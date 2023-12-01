@@ -12,7 +12,7 @@ export class Interpreter {
 
   public constructor({ regex }: { regex: string }) {
     const map: Record<string, RegExp> = {
-      basic: /{%\s*hrg="(?<hrg>(?:[^"]|\\")*)"\s*converter="(?<converter>(?:[^"]|\\")*)"\s*%}/g
+      basic: /{%\s*hrg="(?<hrg>(?:[^"]|\\")*)"\s*(?:converter="(?<converter>(?:[^"]|\\")*)"\s*)?%}/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -37,10 +37,6 @@ export class Interpreter {
     // added as feedback from Michiel, should not happen as it would not be a match if there are no groups
     if (match.groups == undefined) {
       throw new Error("Error in evaluating regex pattern. No groups provided")
-    }
-    if (match.groups.converter == undefined) {
-      // TODO: should we default to the converter as specified in the config?
-      throw new Error("Error in evaluating regex pattern. No converter provided in the named capturing group")
     }
 
     return {

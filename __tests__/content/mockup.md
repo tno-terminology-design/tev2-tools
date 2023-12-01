@@ -17,6 +17,6 @@ Show text to term:      [b'o(d)i'es](@)
 
 # Glossary
 
-{% hrg="" converter="" %}
+{% hrg="" %}
 
 ---
