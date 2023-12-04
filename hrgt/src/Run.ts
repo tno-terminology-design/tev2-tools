@@ -14,7 +14,7 @@ const program = new Command()
 
 program
   .name("hrgt")
-  .version("0.1.1")
+  .version("0.1.2")
   .usage(
     "[ <paramlist> ] [ <globpattern> ]\n" +
       "- <paramlist> (optional) is a list of key-value pairs\n" +
