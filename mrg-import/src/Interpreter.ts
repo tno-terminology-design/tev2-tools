@@ -128,7 +128,7 @@ export class Interpreter {
         await download(parsedURL, tempPath)
         safPath = tempPath
       } catch (err) {
-        if (err instanceof TypeError && err.message.includes("Invalid URL")) {
+        if (err.message.includes("Invalid URL") || err.message.includes("Unsupported protocol")) {
           // `safURL` is not a valid URL, so assume it's a local path
         } else {
           // Handle other errors if needed
