@@ -1,9 +1,10 @@
 import { log } from "@tno-terminology-design/utils"
-import { type SAF } from "@tno-terminology-design/utils"
 
 export interface MRGRef {
   hrg: string
   converter: string
+  scopetag?: string
+  vsntag?: string
 }
 
 export class Interpreter {
@@ -33,15 +34,19 @@ export class Interpreter {
     return this.regex
   }
 
-  interpret(match: RegExpMatchArray, saf: SAF): MRGRef {
+  interpret(match: RegExpMatchArray): MRGRef {
     // added as feedback from Michiel, should not happen as it would not be a match if there are no groups
     if (match.groups == undefined) {
       throw new Error("Error in evaluating regex pattern. No groups provided")
     }
 
+    const hrg: RegExpMatchArray = match.groups.hrg.match(/(?:@)?(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?/)
+
     return {
-      hrg: match.groups.hrg || `${saf.scope.scopetag}`,
-      converter: match.groups.converter
+      hrg: match.groups.hrg,
+      converter: match.groups.converter,
+      scopetag: hrg.groups.scopetag,
+      vsntag: hrg.groups.vsntag
     }
   }
 
