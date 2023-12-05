@@ -100,10 +100,12 @@ export class Resolver {
       log.info(`\x1b[1;37mFound MRG reference '${match[0]}' in file '${file.path}'`)
 
       // Interpret the match using the interpreter
-      const mrgref: MRGRef = this.interpreter.interpret(match, this.saf)
+      const mrgref: MRGRef = this.interpreter.interpret(match)
 
       // Get the MRG instance based on the MRGRef
-      const mrgFile = `mrg.${mrgref.hrg.replace(":", ".")}.yaml`
+      const mrgFile = `mrg.${mrgref.scopetag || this.saf.scope.scopetag}${
+        mrgref.vsntag ? "." + mrgref.vsntag : ""
+      }.yaml`
       const mrg = this.getMRGInstance(mrgFile)
 
       if (mrg !== undefined && mrg.entries.length > 0) {
@@ -184,7 +186,7 @@ export class Resolver {
 
       return mrg
     } catch (err) {
-      report.mrgHelp(mrgFile, -1, (err as Error).message)
+      log.error(`E011 Could not load MRG '${mrgFile}':`, err.message)
     }
   }
 
