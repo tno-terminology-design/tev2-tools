@@ -18,7 +18,7 @@ export class Converter {
     // map of default templates for each type
     const map: Record<string, string> = {
       html: '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}">{{showtext}}</a>',
-      essif:
+      essiflab:
         '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>',
       markdown: "[{{showtext}}]({{navurl}}{{#if trait}}#{{trait}}{{/if}})"
     }
