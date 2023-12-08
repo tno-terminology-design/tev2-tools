@@ -10,10 +10,12 @@ export class Converter {
   static saf: SAF
 
   public constructor({ template }: { template: string }) {
+    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`
     // map of default templates for each type
     const map: Record<string, string> = {
-      markdowntable: "| {{glossaryTerm}} | {{glossaryText}} |\n",
-      essiflab: "### [{{glossaryTerm}}]({{navurl}})\n\n{{glossaryText}}\n\n"
+      'markdown-table-row': "| {{glossaryTerm}} | {{glossaryText}} |\n",
+      'markdown-section-2': "## [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n",
+      'markdown-section-3': "### [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n"
     }
 
     // register helper functions with Handlebars

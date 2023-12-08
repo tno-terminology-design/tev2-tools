@@ -16,18 +16,19 @@ export class Converter {
 
   public constructor({ template }: { template: string }) {
     // map of default templates for each type
+    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
     const map: Record<string, string> = {
-      html: '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}">{{showtext}}</a>',
-      essiflab:
-        '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>',
-      markdown: "[{{showtext}}]({{navurl}}{{#if trait}}#{{trait}}{{/if}})"
+      'markdown-link': "[{{showtext}}]({{navurl}}{{#if trait}}#{{trait}}{{/if}})",
+      'html-link': '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}">{{showtext}}</a>',
+      'html-hovertext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{hoverText}}{{else}}{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
+      'html-glossarytext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>'
     }
 
     // register helper functions with Handlebars
-    Handlebars.registerHelper("noRefs", noRefsHelper)
-    Handlebars.registerHelper("capFirst", capFirstHelper)
-    Handlebars.registerHelper("ifValue", ifValueHelper)
-    Handlebars.registerHelper("localize", localizeHelper)
+    Handlebars.registerHelper("noRefs", noRefsHelper)     // Remove all TermRefs
+    Handlebars.registerHelper("capFirst", capFirstHelper) // Capitalize first character
+    Handlebars.registerHelper("ifValue", ifValueHelper)   // ???
+    Handlebars.registerHelper("localize", localizeHelper) // Replace link with local equivalent
 
     const key = template.toLowerCase()
     const exist = Object.prototype.hasOwnProperty.call(map, key)

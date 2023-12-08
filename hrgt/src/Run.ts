@@ -24,8 +24,9 @@ program
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-o, --output <dir>", "(Root) directory for output files to be written")
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
-  .option("-int, --interpreter <type> or <regex>", "Type of interpreter, either: a regex, alt, or basic")
-  .option("-con, --converter <type> or <mustache>", "Type of converter, either: a mustache template, http, or markdown")
+// If interpreters or converters are added/removed, please adjust the documentation in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
+  .option("-int, --interpreter <regex> or <predeftype>", "Type of interpreter, i.e., a regex, or a predefined type (`default`)")
+  .option("-con, --converter <template> or <predeftype>", "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-table-row, `markdown-section-2`, `markdown-section-3`)")
   .option("-f, --force", "Allow overwriting of existing files")
   .parse(process.argv)
 
@@ -68,7 +69,7 @@ async function main(): Promise<void> {
         outputPath: resolve(options.output),
         globPattern: options.input,
         force: options.force,
-        interpreter: options.interpreter ?? "basic",
+        interpreter: options.interpreter ?? "default",
         converter: options.converter ?? "markdowntable",
         saf: resolve(options.scopedir)
       })
