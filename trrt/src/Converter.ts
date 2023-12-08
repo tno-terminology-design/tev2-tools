@@ -21,6 +21,7 @@ export class Converter {
       'markdown-link': "[{{showtext}}]({{navurl}}{{#if trait}}#{{trait}}{{/if}})",
       'html-link': '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}">{{showtext}}</a>',
       'html-hovertext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{hoverText}}{{else}}{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
+   // 'html-hovertext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{noRefs hoverText}}{{else}}{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
       'html-glossarytext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>'
     }
 
