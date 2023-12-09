@@ -1,4 +1,5 @@
 import { log } from "@tno-terminology-design/utils"
+import { glob } from "glob"
 import { TuCBuilder } from "./TuC.js"
 import { writeFile } from "./Handler.js"
 import { type SAF, type Version } from "@tno-terminology-design/utils"
@@ -6,6 +7,7 @@ import { type Entry } from "@tno-terminology-design/utils"
 
 import path = require("path")
 import yaml = require("js-yaml")
+import fs = require("fs")
 import { MrgBuilder } from "@tno-terminology-design/utils"
 
 export class Generator {
@@ -167,5 +169,34 @@ export class Generator {
       writeFile(altmrgURL, output)
       log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
     })
+  }
+
+  public async prune(): Promise<void> {
+    log.info(`\x1b[1;37mPruning MRGs of the local scope that are not in the SAF...`)
+    const glossaryfiles = path.join(
+      this.saf.scope.localscopedir,
+      this.saf.scope.glossarydir,
+      `mrg.${this.saf.scope.scopetag}*.yaml`
+    )
+    // get all mrg files that match the glossaryfiles pattern
+    const mrgfiles = await glob(glossaryfiles)
+
+    for (const mrgfile of mrgfiles) {
+      const basename = path.basename(mrgfile)
+      // get the vsntag from the basename
+      const vsntag = basename.match(/mrg.[a-z0-9_-]+(?:.([a-z0-9_-]+))?.yaml/)?.[1]
+      // if the vsntag (or altvsntag) is not in the SAF, delete the mrgfile
+      if (
+        vsntag != null &&
+        !this.saf.versions?.find((vsn) => vsn.vsntag === vsntag || vsn.altvsntags?.includes(vsntag))
+      ) {
+        log.trace(`\tDeleting '${basename}'...`)
+        fs.unlink(mrgfile, (err) => {
+          if (err) {
+            throw new Error(`Failed to delete '${basename}': ${err}`)
+          }
+        })
+      }
+    }
   }
 }

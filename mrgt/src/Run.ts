@@ -24,6 +24,7 @@ program
   .option("-s, --scopedir <path>", "Path of the scope directory from which the tool is called")
   .option("-v, --vsntag <vsntag>", "Versiontag for which the MRG needs to be (re)generated")
   .option("-o, --onNotExist <action>", "The action in case a `vsntag` was specified, but wasn't found in the SAF")
+  .option("-p, --prune", "Prune MRGs of the local scope that are not in the SAF")
   .parse(process.argv)
 
 program.parse()
@@ -81,6 +82,10 @@ async function main(): Promise<void> {
     // Generate MRGs
     generator.initialize()
     log.info("Generation complete")
+
+    if (options.prune) {
+      await generator.prune()
+    }
     // report.print();
     process.exit(0)
   } catch (err) {
