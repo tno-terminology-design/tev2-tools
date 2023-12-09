@@ -1,6 +1,8 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
 import { log, report } from "@tno-terminology-design/utils"
+import { glob } from "glob"
+
 import { SAF, MRG, Scope, Terminology } from "@tno-terminology-design/utils"
 import { download, writeFile } from "./Handler.js"
 
@@ -14,7 +16,7 @@ import { AxiosError } from "axios"
  * Initializes the MRG Importer.
  * @param scopedir The scopedir of the scope from which the MRG Importer is called.
  */
-export async function initialize({ scopedir }: { scopedir: string }) {
+export async function initialize({ scopedir, prune }: { scopedir: string; prune: boolean }) {
   // read the SAF of the 'own' scope
   const env = new Interpreter({ scopedir: scopedir })
   const saf = await env.saf
@@ -22,6 +24,10 @@ export async function initialize({ scopedir }: { scopedir: string }) {
   if (!saf.scopes) {
     log.warn(`No import scopes found in SAF at '${path.join(scopedir, "saf.yaml")}'`)
     return
+  }
+
+  if (prune) {
+    await env.prune()
   }
   // for each scope in the scopes-section of the 'own' SAF
   // if saf.scopes.length > 0 then log.info with import scopes instead of scope
@@ -140,6 +146,8 @@ export class Interpreter {
       const safContent = await fs.promises.readFile(safPath, "utf8")
       saf = yaml.load(safContent) as SAF
 
+      saf.scope.localscopedir = path.dirname(safURL)
+
       // Check for missing required properties in SAF
       type ScopeProperty = keyof Scope
       const requiredProperties: ScopeProperty[] = ["scopetag", "scopedir", "curatedir"]
@@ -204,5 +212,31 @@ export class Interpreter {
     }
 
     return mrg
+  }
+
+  public async prune(): Promise<void> {
+    log.info(`\x1b[1;37mPruning MRGs of scopes that are not in administered the SAF...`)
+    const saf = await this.saf
+    const glossaryfiles = path.join(saf.scope.localscopedir, saf.scope.glossarydir, `mrg.*.yaml`)
+    // get all mrg files that match the glossaryfiles pattern
+    const mrgfiles = await glob(glossaryfiles)
+
+    for (const mrgfile of mrgfiles) {
+      const basename = path.basename(mrgfile)
+      // get the scopetag from the basename
+      const scopetag = basename.match(/mrg.([a-z0-9_-]+)(?:.[a-z0-9_-]+)?.yaml/)?.[1]
+      // if the scopetag is not in the SAF, delete the mrgfile
+      if (
+        scopetag != null &&
+        !(saf.scopes?.find((scope) => scope.scopetag === scopetag) || scopetag === saf.scope.scopetag)
+      ) {
+        log.trace(`\tDeleting '${basename}'...`)
+        fs.unlink(mrgfile, (err) => {
+          if (err) {
+            throw new Error(`Failed to delete '${basename}': ${err}`)
+          }
+        })
+      }
+    }
   }
 }
