@@ -93,6 +93,7 @@ export class TuCBuilder {
     }
     for (const entry of mrg.entries) {
       entry.vsntag = entry.vsntag ?? this.tuc.terminology.vsntag
+      entry.termid = `${entry.termType ?? generator.saf.scope.defaulttype}:${entry.term}`
     }
 
     return mrg as MRG
@@ -181,7 +182,6 @@ export class TuCBuilder {
 
       // add properties to MRG Entry
       ctextYAML.scopetag = this.tuc.terminology.scopetag
-      ctextYAML.termid = `${ctextYAML.termType ?? generator.saf.scope.defaulttype}:${ctextYAML.term}`
       ctextYAML.locator = ctext
       ctextYAML.navurl = navUrl.href
       ctextYAML.headingids = headingIds
