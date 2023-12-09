@@ -142,6 +142,13 @@ export class Generator {
     const output = yaml.dump(build.output(), { forceQuotes: true, noRefs: true })
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)
 
+    // Check for duplicate termids in the MRG
+    const termids = build.tuc.entries?.map((entry) => entry.termid)
+    const duplicates = termids?.filter((termid, index) => termids.indexOf(termid) !== index)
+    if (duplicates?.length > 0) {
+      throw new Error(`Duplicate termids found in MRG: ${duplicates}`)
+    }
+
     // Output the MRG to a file
     const mrgFile = `mrg.${build.tuc.terminology.scopetag}.${build.tuc.terminology.vsntag}.yaml`
     writeFile(path.join(glossarydir, mrgFile), output)
