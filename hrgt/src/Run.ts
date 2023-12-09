@@ -26,7 +26,7 @@ program
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
 // If interpreters or converters are added/removed, please adjust the documentation in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
   .option("-int, --interpreter <regex> or <predeftype>", "Type of interpreter, i.e., a regex, or a predefined type (`default`)")
-  .option("-con, --converter <template> or <predeftype>", "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-table-row, `markdown-section-2`, `markdown-section-3`)")
+  .option("-con, --converter <template> or <predeftype>", "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-table-row`, `markdown-section-2`, `markdown-section-3`)")
   .option("-f, --force", "Allow overwriting of existing files")
   .parse(process.argv)
 
