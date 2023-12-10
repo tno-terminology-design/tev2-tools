@@ -18,17 +18,19 @@ export class Converter {
     // map of default templates for each type
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
     const map: Record<string, string> = {
-      'markdown-link': "[{{showtext}}]({{navurl}}{{#if trait}}#{{trait}}{{/if}})",
-      'html-link': '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}">{{showtext}}</a>',
-      'html-hovertext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{hoverText}}{{else}}{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
-   // 'html-hovertext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{noRefs hoverText}}{{else}}{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
-      'html-glossarytext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>'
+      "markdown-link": "[{{showtext}}]({{navurl}}{{#if trait}}#{{trait}}{{/if}})",
+      "html-link": '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}">{{showtext}}</a>',
+      "html-hovertext-link":
+        '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{hoverText}}{{else}}{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
+      // 'html-hovertext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{noRefs hoverText}}{{else}}{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
+      "html-glossarytext-link":
+        '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>'
     }
 
     // register helper functions with Handlebars
-    Handlebars.registerHelper("noRefs", noRefsHelper)     // Remove all TermRefs
+    Handlebars.registerHelper("noRefs", noRefsHelper) // Remove all TermRefs
     Handlebars.registerHelper("capFirst", capFirstHelper) // Capitalize first character
-    Handlebars.registerHelper("ifValue", ifValueHelper)   // ???
+    Handlebars.registerHelper("ifValue", ifValueHelper) // ???
     Handlebars.registerHelper("localize", localizeHelper) // Replace link with local equivalent
 
     const key = template.toLowerCase()
