@@ -124,73 +124,76 @@ export class TuCBuilder {
     const ctexts = curatedirContent.filter((ctext) => ctext.endsWith(".md"))
 
     // load properties of curated texts as MRG Entry
-    ctexts?.forEach((ctext) => {
-      const ctextPath = ctext
-      ctext = path.relative(curatedir, ctext)
+    for (let ctext of ctexts) {
+      try {
+        const ctextPath = ctext
+        ctext = path.relative(curatedir, ctext)
 
-      const ctextFile = matter(fs.readFileSync(ctextPath, "utf8"))
-      let body = ctextFile.content
+        const ctextFile = matter(fs.readFileSync(ctextPath, "utf8"))
+        let body = ctextFile.content
 
-      const ctextYAML = ctextFile.data as Entry
+        const ctextYAML = ctextFile.data as Entry
 
-      // remove properties that match specific set of predetermined properties
-      Object.keys(ctextYAML).forEach((key) => {
-        if (["scopetag", "vsntag", "locator", "navurl", "headingids", "termid"].includes(key.toLowerCase())) {
-          delete ctextYAML[key]
-        }
-      })
+        // remove properties that match specific set of predetermined properties
+        Object.keys(ctextYAML).forEach((key) => {
+          if (["scopetag", "vsntag", "locator", "navurl", "headingids", "termid"].includes(key.toLowerCase())) {
+            delete ctextYAML[key]
+          }
+        })
 
-      // construct navurl from website, navpath and ctext name, or bodyFile
-      const navUrl = new URL(generator.saf.scope.website)
-      const pathname = navUrl.pathname
-      if (ctextYAML.bodyFile) {
-        // If the bodyFile property is set, then use that to construct the navurl
-        const bodyFilePath = path.parse(ctextYAML.bodyFile)
-        navUrl.pathname = path.join(pathname, bodyFilePath.dir, bodyFilePath.name)
-        try {
-          const bodyFile = matter(
-            fs.readFileSync(path.join(generator.saf.scope.localscopedir, ctextYAML.bodyFile), "utf8")
-          )
-          body = bodyFile.content
+        // construct navurl from website, navpath and ctext name, or bodyFile
+        const navUrl = new URL(generator.saf.scope.website)
+        const pathname = navUrl.pathname
+        if (ctextYAML.bodyFile) {
+          // If the bodyFile property is set, then use that to construct the navurl
+          const bodyFilePath = path.parse(ctextYAML.bodyFile)
+          navUrl.pathname = path.join(pathname, bodyFilePath.dir, bodyFilePath.name)
+          try {
+            const bodyFile = matter(
+              fs.readFileSync(path.join(generator.saf.scope.localscopedir, ctextYAML.bodyFile), "utf8")
+            )
+            body = bodyFile.content
 
-          // if the bodyFile has a `bodyFileID` property, then use that to construct the navurl
-          if (generator.saf.scope.bodyFileID) {
-            if (bodyFile.data[generator.saf.scope.bodyFileID]) {
-              navUrl.pathname = path.join(
-                pathname,
-                bodyFilePath.dir,
-                path.parse(bodyFile.data[generator.saf.scope.bodyFileID]).name
-              )
+            // if the bodyFile has a `bodyFileID` property, then use that to construct the navurl
+            if (generator.saf.scope.bodyFileID) {
+              if (bodyFile.data[generator.saf.scope.bodyFileID]) {
+                navUrl.pathname = path.join(
+                  pathname,
+                  bodyFilePath.dir,
+                  path.parse(bodyFile.data[generator.saf.scope.bodyFileID]).name
+                )
+              }
             }
+          } catch (err) {
+            throw new Error(`While loading the bodyFile '${ctextYAML.bodyFile}': ${err.message}`)
           }
-        } catch (err) {
-          if (err instanceof Error) {
-            log.error(`\tAn error occurred while attempting to load the bodyFile '${ctextYAML.bodyFile}':`, err.message)
-          }
+        } else {
+          navUrl.pathname = path.join(
+            pathname,
+            generator.saf.scope.navpath,
+            path.parse(ctext).dir,
+            path.parse(ctext).name
+          )
         }
-      } else {
-        navUrl.pathname = path.join(
-          pathname,
-          generator.saf.scope.navpath,
-          path.parse(ctext).dir,
-          path.parse(ctext).name
-        )
+
+        // Extract heading IDs from markdown content
+        const headingIds = extractHeadingIds(body)
+
+        // add properties to MRG Entry
+        ctextYAML.scopetag = this.tuc.terminology.scopetag
+        ctextYAML.locator = ctext
+        ctextYAML.navurl = navUrl.href
+        ctextYAML.headingids = headingIds
+
+        if (ctextYAML.synonymOf) {
+          TuCBuilder.synonymOf.push(ctextYAML)
+        }
+        TuCBuilder.cTextMap.push(ctextYAML)
+      } catch (err) {
+        log.error(`\tAn error occurred while attempting to load the curated text '${ctext}':`, err.message)
+        continue
       }
-
-      // Extract heading IDs from markdown content
-      const headingIds = extractHeadingIds(body)
-
-      // add properties to MRG Entry
-      ctextYAML.scopetag = this.tuc.terminology.scopetag
-      ctextYAML.locator = ctext
-      ctextYAML.navurl = navUrl.href
-      ctextYAML.headingids = headingIds
-
-      if (ctextYAML.synonymOf) {
-        TuCBuilder.synonymOf.push(ctextYAML)
-      }
-      TuCBuilder.cTextMap.push(ctextYAML)
-    })
+    }
     return TuCBuilder.cTextMap
   }
 
@@ -301,10 +304,8 @@ export class TuCBuilder {
         log.warn(`\t\tSelection matched 0 entries`)
       }
     } catch (err) {
-      if (err instanceof Error) {
-        log.info(`\tTermselection (${source}): \t'${instruction}'`)
-        log.error(`\t\tInstruction caused an error: ${err.message}`)
-      }
+      log.info(`\tTermselection (${source}): \t'${instruction}'`)
+      log.error(`\t\tInstruction caused an error: ${err.message}`)
     }
   }
 
@@ -373,10 +374,8 @@ export class TuCBuilder {
         }
       }
     } catch (err) {
-      if (err instanceof Error) {
-        log.info(`\tTermselection (provisional): \t'${instruction}'`)
-        log.error(`\t\tInstruction caused an error: ${err.message}`)
-      }
+      log.info(`\tTermselection (provisional): \t'${instruction}'`)
+      log.error(`\t\tInstruction caused an error: ${err.message}`)
     }
   }
 
@@ -432,10 +431,8 @@ export class TuCBuilder {
         log.trace(`\t\tRenamed ${renamed.length} entr${renamed.length > 1 ? "ies" : "y"}: ${renamed.join(", ")}`)
       }
     } catch (err) {
-      if (err instanceof Error) {
-        log.info(`\tTermselection (provisional): \t'${instruction}'`)
-        log.error(`\t\tInstruction caused an error: ${err.message}`)
-      }
+      log.info(`\tTermselection (provisional): \t'${instruction}'`)
+      log.error(`\t\tInstruction caused an error: ${err.message}`)
     }
   }
 }
