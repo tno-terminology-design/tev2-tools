@@ -168,8 +168,8 @@ export class Resolver {
       const message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
       report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
     } else if (matchingEntries.length > 1) {
-      const matchingTermIds = matchingEntries.map((entry) => entry.termid).join(", ")
-      const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'. Matching termids: ${matchingTermIds}`
+      const matchingTermIds = matchingEntries.map((entry) => entry.termid).join("', '")
+      const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'. Matching termids: '${matchingTermIds}'`
       report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
     }
 
