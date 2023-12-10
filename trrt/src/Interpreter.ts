@@ -23,9 +23,11 @@ export class Interpreter {
   public constructor({ regex }: { regex: string }) {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
     const map: Record<string, RegExp> = {
-      default: /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
-      basic:   /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
-      alt:     /(?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)(?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*?))?\](?:\((?:(?:(?<type>[a-z0-9_-]+):)?)(?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]*?))?\))/g
+      default:
+        /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
+      basic:
+        /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
+      alt: /(?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#a-z0-9_-]+\))?)(?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*?))?\](?:\((?:(?:(?<type>[a-z0-9_-]+):)?)(?<id>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]*?))?\))/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -61,7 +63,7 @@ export class Interpreter {
               .toLowerCase()
               .replace(/['()]+/g, "")
               .replace(/[^a-z0-9_-]+/g, "-"),
-      type: match.groups.type,
+      type: match.groups.type || saf.scope.defaulttype,
       trait: match.groups.trait,
       scopetag: match.groups.scopetag || saf.scope.scopetag,
       vsntag: match.groups.vsntag

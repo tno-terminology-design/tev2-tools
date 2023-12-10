@@ -152,15 +152,9 @@ export class Resolver {
     let replacement = ""
     let entry: Entry | undefined
     if (matchingEntries.length > 1) {
-      if (this.saf.scope.defaulttype) {
-        matchingEntries = mrg.entries.filter((entry) => entry.termType === term.type)
-      }
-      if (matchingEntries.length > 1) {
-        // Multiple matches found, display a warning
-        const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'`
-        report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
-      }
+      matchingEntries = matchingEntries.filter((entry) => entry.termType === term.type)
     }
+
     if (matchingEntries.length === 1) {
       entry = matchingEntries[0]
       term.id = entry.term
@@ -170,8 +164,12 @@ export class Resolver {
         const message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`
         report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
       }
-    } else {
+    } else if (matchingEntries.length === 0) {
       const message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
+      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
+    } else if (matchingEntries.length > 1) {
+      const matchingTermIds = matchingEntries.map((entry) => entry.termid).join(", ")
+      const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'. Matching termids: ${matchingTermIds}`
       report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
     }
 
