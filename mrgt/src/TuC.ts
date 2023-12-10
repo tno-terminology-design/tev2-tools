@@ -266,11 +266,17 @@ export class TuCBuilder {
       log.info(`\tTermselection (${source}): \t'${instruction}'`)
 
       if (entries.length > 0) {
-        // add entries to TuC and overwrite existing entries with the same term
+        // add entries to TuC and overwrite existing entries with the same termid
         for (const newEntry of entries) {
-          const existingIndex = this.tuc.entries.findIndex((entry) => entry.term === newEntry.term)
-          if (existingIndex !== -1) {
-            // If an entry with the same term already exists, replace it with the new entry
+          if (!newEntry.termid) {
+            newEntry.termid = `${newEntry.termType ?? generator.saf.scope.defaulttype}:${newEntry.term}`
+          }
+          const existingIndex = this.tuc.entries.findIndex((entry) => entry.termid === newEntry.termid)
+          if (existingIndex !== -1 && newEntry.termid != null) {
+            // If an entry with the same termid already exists, replace it with the new entry
+            log.warn(
+              `\t\tOverwrote duplicate termid (${newEntry.termid}) from '${this.tuc.entries[existingIndex].locator}' with '${newEntry.locator}'`
+            )
             this.tuc.entries[existingIndex] = { ...newEntry } // Create a shallow copy of the new entry
           } else {
             // If no entry with the same term exists, add a shallow copy of the new entry to this.entries
