@@ -11,7 +11,7 @@ mrgt:
 
 ## Human Readable Glossary Tool
 hrgt:
-  interpreter: basic
+  interpreter: default
   converter: |
     ### [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n
     {{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n
