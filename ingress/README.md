@@ -4,10 +4,6 @@ The CTWG Toolkit is a set of tools to help the CTWG community to create and main
 
 ## Links
 
-[Github Repo](https://github.com/aviarytech/ctwg-toolkit-ingress)
-
-[Trello Development Board](https://trello.com/b/9gJGd0AH/ctwg-toolkit-development)
-
 [TEv2 Terminology Toolbox](https://essif-lab.github.io/framework/docs/tev2/tev2-toolbox)
 
 [Machine Readable Glossary (MRG)](https://essif-lab.github.io/framework/docs/tev2/spec-files/mrg)
