@@ -132,14 +132,14 @@ export class Generator {
         // output the modified tuc.entries array to a file
         writeFile(
           path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir, instance.tuc.filename),
-          yaml.dump(instance.output(), { forceQuotes: true, noRefs: true })
+          yaml.dump(instance.output(), { forceQuotes: true, quotingType: '"', noRefs: true })
         )
       })
   }
 
   public generate(vsn: Version): void {
     const build = new TuCBuilder({ vsn: vsn })
-    const output = yaml.dump(build.output(), { forceQuotes: true, noRefs: true })
+    const output = yaml.dump(build.output(), { forceQuotes: true, quotingType: '"', noRefs: true })
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)
 
     // Check for duplicate termids in the MRG

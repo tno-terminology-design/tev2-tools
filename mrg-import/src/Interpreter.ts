@@ -72,7 +72,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
 
         // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
         mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`)
-        const mrgdump = yaml.dump(mrg, { forceQuotes: true, noRefs: true })
+        const mrgdump = yaml.dump(mrg, { forceQuotes: true, quotingType: '"', noRefs: true })
         writeFile(mrgURL, mrgdump)
         log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`)
 
