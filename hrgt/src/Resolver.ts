@@ -173,6 +173,7 @@ export class Resolver {
 
     // Get the list of files based on the glob pattern
     const files = await glob(this.globPattern)
+    let changes: boolean
 
     // Process each file
     for (const filePath of files) {
@@ -200,7 +201,13 @@ export class Resolver {
         const filepath = path.join(this.outputPath, path.dirname(filePath), path.basename(filePath))
         log.info(`Writing modified file to '${filepath}'`)
         this.writeFile(filepath, convertedData, this.force)
+        changes = true
       }
+    }
+    if (!changes) {
+      log.warn(
+        `No changes were made to any files, confirm that the HRG references exist and the interpreter is correct`
+      )
     }
 
     return true
