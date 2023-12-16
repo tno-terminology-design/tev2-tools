@@ -1,7 +1,6 @@
 import fs = require("fs")
 import path = require("path")
 import yaml = require("js-yaml")
-import { type SAF } from "./SAF.js"
 
 export interface MRG {
   filename?: string
@@ -44,22 +43,42 @@ export interface Entry {
 }
 
 /**
+ * Returns an MRG class instance.
+ * @returns The MRG class instance.
+ */
+export function getMRGinstance(scopedir: string, glossarydir: string, filename: string): MRG | undefined {
+  let mrg: MRG | undefined
+
+  // Check if an MRG class instance with the `filename` property of `mrgFile` has already been loaded
+  for (const instance of MrgBuilder.instances) {
+    if (instance.filename === filename) {
+      mrg = instance
+      break
+    }
+  }
+  // If no existing MRG class instance was found, build the MRG according to the `mrgpath`
+  if (mrg == null) {
+    mrg = new MrgBuilder({ mrgpath: path.join(scopedir, glossarydir, filename) }).mrg
+  }
+
+  return mrg
+}
+
+/**
  * The MrgBuilder class handles the retrieval and processing of an MRG (Machine Readable Glossary).
  * An MRG is retrieved based on the `filename` and processed into an MRG object.
  * The MRG object with its MRG entries can then be used to populate the runtime glossary.
  */
 export class MrgBuilder {
   static instances: MRG[] = []
-  populate: boolean
   mrg: MRG
 
-  public constructor({ filename, saf, populate }: { filename: string; saf: SAF; populate: boolean }) {
-    this.mrg = this.getMrgMap(path.join(saf.scope.localscopedir, saf.scope.glossarydir, filename))
-    this.populate = populate
+  public constructor({ mrgpath }: { mrgpath: string }) {
+    this.mrg = this.getMrgMap(mrgpath)
     if (this.mrg !== undefined) {
-      this.mrg.filename = filename
+      this.mrg.filename = path.basename(mrgpath)
 
-      if (this.mrg.entries.length > 0 && populate) {
+      if (this.mrg.entries.length > 0) {
         this.mrg.entries = this.populateEntries(this.mrg)
       }
 
@@ -68,14 +87,14 @@ export class MrgBuilder {
   }
 
   /**
-   * Reads the MRG at `mrgURL` and maps it as the this.mrg MRG object.
-   * @param mrgURL - The full path of the MRG to be retrieved.
+   * Reads the MRG at `mrgpath` and maps it as the this.mrg MRG object.
+   * @param mrgpath - The full path of the MRG to be retrieved.
    * @returns - The MRG as an MRG object.
    */
-  public getMrgMap(mrgURL: string): MRG {
+  public getMrgMap(mrgpath: string): MRG {
     try {
-      // try to load the MRG map from the `mrgURL`
-      const mrgfile = fs.readFileSync(mrgURL, "utf8")
+      // try to load the MRG map from the `mrgpath`
+      const mrgfile = fs.readFileSync(mrgpath, "utf8")
       this.mrg = yaml.load(mrgfile) as MRG
 
       // check for missing required properties in MRG terminology
@@ -85,19 +104,12 @@ export class MrgBuilder {
       const missingProperties = requiredProperties.filter((prop) => terminology[prop] == null)
 
       if (missingProperties.length > 0) {
-        throw new Error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
+        throw new Error(`Missing required property in MRG at '${mrgpath}': '${missingProperties.join("', '")}'`)
       }
 
       const requiredEntryProperties = ["term", "scopetag", "locator"]
 
       for (const entry of this.mrg.entries) {
-        if (this.populate) {
-          // add vsntag, scopetag, and altvsntags from MRG to MRG entries
-          entry.vsntag = terminology.vsntag
-          entry.scopetag = terminology.scopetag
-          entry.altvsntags = terminology.altvsntags
-        }
-
         // check for missing required properties in MRG entries
         const missingProperties = requiredEntryProperties.filter((prop) => entry[prop] == null)
 

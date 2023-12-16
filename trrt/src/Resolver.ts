@@ -1,6 +1,6 @@
 import { report, log } from "@tno-terminology-design/utils"
 import { glob } from "glob"
-import { MrgBuilder, type MRG, type Entry } from "@tno-terminology-design/utils"
+import { getMRGinstance, type MRG, type Entry } from "@tno-terminology-design/utils"
 import { type Interpreter, type Term } from "./Interpreter.js"
 import { type Converter } from "./Converter.js"
 import { type SAF } from "@tno-terminology-design/utils"
@@ -107,13 +107,20 @@ export class Resolver {
       // Interpret the match using the interpreter
       const term: Term = this.interpreter.interpret(match, this.saf)
 
-      // Get the MRG instance based on the term
-      const mrg = this.getMRGInstance(term)
+      let mrg: MRG | undefined
+      const mrgfile = term.vsntag != null ? `mrg.${term.scopetag}.${term.vsntag}.yaml` : `mrg.${term.scopetag}.yaml`
+      try {
+        // Get the MRG instance based on the term
+        mrg = getMRGinstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
+      } catch (err) {
+        report.mrgHelp(mrgfile, -1, err as Error)
+      }
 
       if (mrg !== undefined && mrg.entries.length > 0) {
         this.replacementHandler(match, term, mrg, file)
       } else {
-        continue
+        const message = `Term ref '${match[0]}', could not be converted due to an MRG error`
+        report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
       }
     }
     if (file.converted > 0) {
@@ -192,35 +199,6 @@ export class Resolver {
     }
 
     return file
-  }
-
-  /**
-   * Returns an MRG class instance based on the term's properties.
-   * @param term - The interpreted term.
-   * @returns The MRG class instance.
-   */
-  getMRGInstance(term: Term): MRG | undefined {
-    const mrgFile = term.vsntag != null ? `mrg.${term.scopetag}.${term.vsntag}.yaml` : `mrg.${term.scopetag}.yaml`
-
-    try {
-      let mrg: MRG | undefined
-
-      // Check if an MRG class instance with the `filename` property of `mrgFile` has already been loaded
-      for (const instance of MrgBuilder.instances) {
-        if (instance.filename === mrgFile) {
-          mrg = instance
-          break
-        }
-      }
-      // If no existing MRG class instance was found, build the MRG according to the `mrgFile`
-      if (mrg == null) {
-        mrg = new MrgBuilder({ filename: mrgFile, saf: this.saf, populate: true }).mrg
-      }
-
-      return mrg
-    } catch (err) {
-      report.mrgHelp(mrgFile, -1, (err as Error).message)
-    }
   }
 
   /**

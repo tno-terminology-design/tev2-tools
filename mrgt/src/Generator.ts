@@ -4,11 +4,11 @@ import { TuCBuilder } from "./TuC.js"
 import { writeFile } from "./Handler.js"
 import { type SAF, type Version } from "@tno-terminology-design/utils"
 import { type Entry } from "@tno-terminology-design/utils"
+import { getMRGinstance } from "@tno-terminology-design/utils"
 
 import path = require("path")
 import yaml = require("js-yaml")
 import fs = require("fs")
-import { MrgBuilder } from "@tno-terminology-design/utils"
 
 export class Generator {
   public vsntag: string
@@ -77,10 +77,8 @@ export class Generator {
           const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
             properties.groups.vsntag ?? this.saf.scope.defaultvsn
           }.yaml`
-          // if the mrgfile exists as a MRG.instance, use that instance. Otherwise, create a new instance
-          const mrg =
-            MrgBuilder.instances?.find((mrg) => mrg.filename === mrgfile) ??
-            new MrgBuilder({ filename: mrgfile, saf: this.saf, populate: false }).mrg
+          // get the MRG instance
+          const mrg = getMRGinstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
           if (mrg) {
             // TODO: check term type and warn on multiple matches
             entrymatch = mrg.entries?.find((entry) => entry.term === properties!.groups!.term)

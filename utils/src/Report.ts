@@ -4,6 +4,8 @@ interface Output<T> {
   items: T[]
 }
 
+type termError = Error & { type: string; file: string; line: number }
+
 /**
  * The Report class handles the reporting of errors and warnings.
  * It also handles the reporting of the number of files modified and terms converted.
@@ -29,8 +31,12 @@ class Report {
     this.termErrors.items.push({ file, line, message })
   }
 
-  public mrgHelp(file: string, line: number, message: string): void {
-    this.errors.add(this.formatMessage("MRG HELP", file, line, message))
+  public mrgHelp(file: string, line: number, err: Error): void {
+    const error = err as termError
+    error.file = file
+    error.line = line
+    error.type = "MRG HELP"
+    this.errors.add(this.formatMessage(error))
   }
 
   public termConverted(term: string): void {
@@ -44,8 +50,8 @@ class Report {
   public print(): void {
     console.log("\x1b[1;37m")
     console.log(" Resolution Report:")
-    console.log("       \x1b[0mNumber of files modified: " + this.files.items.length)
-    console.log("       \x1b[0mNumber of terms converted: " + this.converted.items.length)
+    console.log("\t\x1b[0mNumber of files modified: " + this.files.items.length)
+    console.log("\t\x1b[0mNumber of terms converted: " + this.converted.items.length)
 
     if (this.termErrors.items.length > 0) {
       console.log("   \x1b[1;37mTerm Errors:\x1b[0m")
@@ -68,7 +74,7 @@ class Report {
       uniqueTermHelpMessages = new Map(sortedEntries)
 
       for (const [key, value] of uniqueTermHelpMessages) {
-        console.log(`\x1b[1;31m${"TERM HELP".padEnd(12)} \x1b[0m${key}:`)
+        console.log(`\x1b[1;31m${"TERM HELP"}\t\x1b[0m${key}:`)
         const filesMap = new Map<string, number[]>()
 
         for (const item of value) {
@@ -94,19 +100,11 @@ class Report {
     }
   }
 
-  private formatMessage(type: string, file: string, line: number, message: string): string {
-    let locator = `${file}`
-    if (line > -1) {
-      locator += `:${line}`
-    }
+  private formatMessage(error: termError): string {
+    const { file, line, message, type } = error
+    const locator = line > -1 ? `${file}:${line}` : file
 
-    if (locator.length > 50) {
-      locator = `...${locator.slice(-(50 - 5))}`
-    }
-    locator = locator.padEnd(50)
-
-    const formattedMessage = `\x1b[1;31m${type.padEnd(12)} \x1b[1;37m${locator} \x1b[0m${message}`
-    return formattedMessage
+    return `\x1b[1;31m${type}\t\x1b[1;37m${locator}\t\t\x1b[0m${message}`
   }
 
   public onNotExistError(error: Error) {

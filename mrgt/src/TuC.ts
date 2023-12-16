@@ -4,7 +4,7 @@ import { generator } from "./Run.js"
 import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
-import { type MRG, type Entry, type Terminology, MrgBuilder } from "@tno-terminology-design/utils"
+import { type MRG, type Entry, type Terminology, getMRGinstance } from "@tno-terminology-design/utils"
 import { type Version, type Scopes } from "@tno-terminology-design/utils"
 
 interface TuC {
@@ -223,12 +223,10 @@ export class TuCBuilder {
         entries = this.getCtextEntries()
       } else {
         // add all terms in the MRG for either the current or the specified scope and version
-        const mrgFile = `mrg.${scopetag ?? generator.saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
-        source = `'${mrgFile}'`
+        const mrgfile = `mrg.${scopetag ?? generator.saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
+        source = `'${mrgfile}'`
 
-        const mrgMap =
-          MrgBuilder.instances?.find((mrg) => mrg.filename === mrgFile) ??
-          new MrgBuilder({ filename: mrgFile, saf: generator.saf, populate: false }).mrg
+        const mrgMap = getMRGinstance(generator.saf.scope.localscopedir, generator.saf.scope.glossarydir, mrgfile)
         entries = mrgMap.entries
       }
 

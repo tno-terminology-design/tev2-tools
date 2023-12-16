@@ -1,6 +1,6 @@
 import { report, log } from "@tno-terminology-design/utils"
 import { glob } from "glob"
-import { MrgBuilder, type MRG } from "@tno-terminology-design/utils"
+import { getMRGinstance, type MRG } from "@tno-terminology-design/utils"
 import { Interpreter, type MRGRef } from "./Interpreter.js"
 import { Converter } from "./Converter.js"
 import { type SAF, SafBuilder } from "@tno-terminology-design/utils"
@@ -103,10 +103,10 @@ export class Resolver {
       const mrgref: MRGRef = this.interpreter.interpret(match)
 
       // Get the MRG instance based on the MRGRef
-      const mrgFile = `mrg.${mrgref.scopetag || this.saf.scope.scopetag}${
+      const mrgfile = `mrg.${mrgref.scopetag || this.saf.scope.scopetag}${
         mrgref.vsntag ? "." + mrgref.vsntag : ""
       }.yaml`
-      const mrg = this.getMRGInstance(mrgFile)
+      const mrg = getMRGinstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
 
       if (mrg !== undefined && mrg.entries.length > 0) {
         this.replacementHandler(match, mrgref, mrg, file)
@@ -161,33 +161,6 @@ export class Resolver {
     }
 
     return file
-  }
-
-  /**
-   * Returns an MRG class instance based on the mrg filename.
-   * @param term - The interpreted term.
-   * @returns The MRG class instance.
-   */
-  getMRGInstance(mrgFile: string): MRG | undefined {
-    try {
-      let mrg: MRG | undefined
-
-      // Check if an MRG class instance with the `filename` property of `mrgFile` has already been loaded
-      for (const instance of MrgBuilder.instances) {
-        if (instance.filename === mrgFile) {
-          mrg = instance
-          break
-        }
-      }
-      // If no existing MRG class instance was found, build the MRG according to the `mrgFile`
-      if (mrg == null) {
-        mrg = new MrgBuilder({ filename: mrgFile, saf: this.saf, populate: false }).mrg
-      }
-
-      return mrg
-    } catch (err) {
-      log.error(`E011 Could not load MRG '${mrgFile}':`, err.message)
-    }
   }
 
   /**
