@@ -1,12 +1,11 @@
 import Handlebars, { type HelperOptions } from "handlebars"
-import { type Entry, log } from "@tno-terminology-design/utils"
+import { type Entry } from "@tno-terminology-design/utils"
 import { type MRGRef } from "./Interpreter.js"
 import { type SAF } from "@tno-terminology-design/utils"
 
 export class Converter {
   public type: string
   public template: string
-  static instances: Converter[] = []
   static saf: SAF
 
   public constructor({ template }: { template: string }) {
@@ -37,14 +36,6 @@ export class Converter {
     } else {
       this.type = "custom"
       this.template = template.replace(/\\n/g, "\n")
-    }
-
-    // add this instance to the static instances map
-    Converter.instances.push(this)
-    if (Converter.instances.length === 1) {
-      log.info(`Using ${this.type} converter as default: '${this.template.replace(/\n/g, "\\n")}'`)
-    } else {
-      log.info(`\tUsing ${this.type} converter: '${this.template.replace(/\n/g, "\\n")}'`)
     }
   }
 

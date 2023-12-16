@@ -97,7 +97,7 @@ export class Resolver {
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
-      log.info(`\x1b[1;37mFound MRG reference '${match[0]}' in file '${file.path}'`)
+      log.info(`\x1b[1;37mFound MRG Reference '${match[0]}' in file '${file.path}'`)
 
       // Interpret the match using the interpreter
       const mrgref: MRGRef = this.interpreter.interpret(match)
@@ -107,6 +107,7 @@ export class Resolver {
         mrgref.vsntag ? "." + mrgref.vsntag : ""
       }.yaml`
       const mrg = getMRGinstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
+      log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`)
 
       if (mrg !== undefined && mrg.entries.length > 0) {
         this.replacementHandler(match, mrgref, mrg, file)
@@ -123,7 +124,14 @@ export class Resolver {
 
   replacementHandler(match: RegExpMatchArray, mrgref: MRGRef, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
     let converter: Converter
-    // TODO: sort MRG entries according to the glossaryTerm?
+    const entries = [...mrg.entries]
+
+    // Sort entries according to the sort parameter in the MRGRef
+    if (mrgref.sort != null) {
+      log.info(`\tSorting entries using '${mrgref.sort}'`)
+      const sorter = new Converter({ template: mrgref.sort })
+      entries.sort((a, b) => sorter.convert(a, mrgref).localeCompare(sorter.convert(b, mrgref)))
+    }
 
     // Check if the MRGRef has a converter specified
     if (mrgref.converter === "" || mrgref.converter == null) {
@@ -131,14 +139,14 @@ export class Resolver {
       log.info(`\tUsing default set converter (${converter.type})`)
     } else {
       converter = new Converter({ template: mrgref.converter })
+      log.info(`\tUsing ${converter.type} converter: '${converter.template.replace(/\n/g, "\\n")}'`)
     }
 
     let replacement = ""
-    log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`)
-    for (const entry of mrg.entries) {
+    for (const entry of entries) {
       const hrgEntry = converter.convert(entry, mrgref)
       if (hrgEntry == converter.getBlank()) {
-        log.warn(`\tConversion of entry '${entry.term}' from '${mrg.filename}' did not fill in any expression`)
+        log.warn(`\t\tConversion of entry '${entry.term}' from '${mrg.filename}' did not fill in any expression`)
       }
       replacement += hrgEntry
     }
@@ -169,6 +177,8 @@ export class Resolver {
    */
   public async resolve(): Promise<boolean> {
     // Log information about the interpreter, converter and the files being read
+    log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
+    log.info(`Using ${this.converter.type} converter as default: '${this.converter.template.replace(/\n/g, "\\n")}'`)
     log.info(`Reading files using pattern string '${this.globPattern}'`)
 
     // Get the list of files based on the glob pattern
@@ -206,7 +216,7 @@ export class Resolver {
     }
     if (!changes) {
       log.warn(
-        `No changes were made to any files, confirm that the HRG references exist and the interpreter is correct`
+        `No changes were made to any files, confirm that the MRG References exist and the interpreter is correct`
       )
     }
 

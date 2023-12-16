@@ -1,20 +1,19 @@
-import { log } from "@tno-terminology-design/utils"
-
 export interface MRGRef {
   hrg: string
   converter: string
+  sort: string
   scopetag?: string
   vsntag?: string
 }
 
 export class Interpreter {
-  private readonly type: string
-  private readonly regex: RegExp
+  public type: string
+  public regex: RegExp
 
   public constructor({ regex }: { regex: string }) {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
     const map: Record<string, RegExp> = {
-      default: /{%\s*hrg="(?<hrg>(?:[^"]|\\")*)"\s*(?:converter="(?<converter>(?:[^"]|\\")*)"\s*)?%}/g
+      default: /{%\s*hrg="(?<hrg>[^"]*)"\s*(?:converter="(?<converter>[^"]*)"\s*)?(?:sort="(?<sort>[^"]*)"\s*)?%}/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -28,7 +27,6 @@ export class Interpreter {
       // Remove leading and trailing slashes, and flags
       this.regex = new RegExp(regex.replace(/^\/|\/[a-z]*$/g, ""), "g")
     }
-    log.info(`Using ${this.type} interpreter: '${this.regex}'`)
   }
 
   getRegex(): RegExp {
@@ -46,6 +44,7 @@ export class Interpreter {
     return {
       hrg: match.groups.hrg,
       converter: match.groups.converter,
+      sort: match.groups.sort,
       scopetag: hrg.groups.scopetag,
       vsntag: hrg.groups.vsntag
     }
