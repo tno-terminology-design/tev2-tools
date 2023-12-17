@@ -19,7 +19,7 @@ import { AxiosError } from "axios"
 export async function initialize({ scopedir, prune }: { scopedir: string; prune: boolean }) {
   // read the SAF of the 'own' scope
   const env = new Interpreter({ scopedir: scopedir })
-  const saf = env.saf
+  const saf = await env.saf
 
   if (!saf.scopes) {
     log.warn(`No import scopes found in SAF at '${path.join(scopedir, "saf.yaml")}'`)
@@ -27,7 +27,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
   }
 
   if (prune) {
-    await env.prune()
+    env.prune()
   }
   // for each scope in the scopes-section of the 'own' SAF
   // if saf.scopes.length > 0 then log.info with import scopes instead of scope
@@ -40,7 +40,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
     log.info(`\tHandling import scope '${scope.scopetag}'`)
     // read the SAF of the import scope
     const importEnv = new Interpreter({ scopedir: scope.scopedir })
-    const importSaf = importEnv.saf
+    const importSaf = await importEnv.saf
 
     if (!importSaf.versions) {
       log.warn(`No maintained MRG files found in import scope '${scope.scopetag}'`)
@@ -61,7 +61,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
           importSaf.scope.glossarydir,
           `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`
         )
-        const mrg = importEnv.resolveMRG(mrgURL)
+        const mrg = await importEnv.resolveMRG(mrgURL)
 
         // Set import MRG scopedir and scopetag values to the (non-relative) scope's scopedir and scopetag
         mrg.terminology.scopedir = scope.scopedir
@@ -108,7 +108,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
  * @param scopedir The scopedir of the scope from which the MRG Importer is called.
  */
 export class Interpreter {
-  public saf!: SAF
+  public saf!: Promise<SAF>
 
   public constructor({ scopedir }: { scopedir: string }) {
     this.saf = this.resolveSAF(path.join(scopedir, "saf.yaml"))
@@ -119,10 +119,10 @@ export class Interpreter {
    * @param safURL The URL of the SAF map.
    * @returns A promise that resolves to the SAF map.
    */
-  private resolveSAF(safURL: string): SAF {
+  private async resolveSAF(safURL: string): Promise<SAF> {
     const safPath = this.localize(safURL)
 
-    return new SafBuilder({ scopedir: path.dirname(safPath) }).saf
+    return new SafBuilder({ scopedir: path.dirname(await safPath) }).saf
   }
 
   /**
@@ -130,19 +130,19 @@ export class Interpreter {
    * @param mrgURL The URL of the MRG map.
    * @returns A promise that resolves to the MRG map.
    */
-  public resolveMRG(mrgURL: string): MRG {
-    const mrgPath = this.localize(mrgURL)
+  public async resolveMRG(mrgURL: string): Promise<MRG> {
+    const mrgPath = await this.localize(mrgURL)
 
     return new MrgBuilder({ mrgpath: mrgPath }).mrg
   }
 
-  public localize(fileURL: string): string {
+  public async localize(fileURL: string): Promise<string> {
     let filePath = fileURL
     // If the `fileURL` is a remote URL, download it to a temporary file
     try {
       const parsedURL = new URL(fileURL)
       const tempPath = path.join(os.tmpdir(), path.basename(fileURL))
-      download(parsedURL, tempPath)
+      await download(parsedURL, tempPath)
       filePath = tempPath
     } catch (err) {
       if (err.message.includes("Invalid URL") || err.message.includes("Unsupported protocol")) {
@@ -160,7 +160,7 @@ export class Interpreter {
 
   public async prune(): Promise<void> {
     log.info(`\x1b[1;37mPruning MRGs of scopes that are not in administered the SAF...`)
-    const saf = this.saf
+    const saf = await this.saf
     const glossaryfiles = path.join(saf.scope.localscopedir, saf.scope.glossarydir, `mrg.*.yaml`)
     // get all mrg files that match the glossaryfiles pattern
     const mrgfiles = await glob(glossaryfiles)
