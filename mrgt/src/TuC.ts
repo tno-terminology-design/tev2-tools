@@ -198,6 +198,8 @@ export class TuCBuilder {
   }
 
   private addMrgEntry(instruction: string): void {
+    // <key> <identifier><scopetag>:<vsntag>
+    // examples: '* @tev2:v1', 'term[actor,party]@tev2:v1'
     const regex =
       /^(?<key>[^[@]+)(?:\[(?<values>.+?)?\])?(?:(?<identifier>@)(?<scopetag>[a-z0-9_-]+?)?)?(?::(?<vsntag>.+)?)?$/
     const match = instruction.replace(/\s/g, "").match(regex)
@@ -223,46 +225,19 @@ export class TuCBuilder {
         entries = this.getCtextEntries()
       } else {
         // add all terms in the MRG for either the current or the specified scope and version
-        const mrgfile = `mrg.${scopetag ?? generator.saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
-        source = `'${mrgfile}'`
+        source = `mrg.${scopetag ?? generator.saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
 
-        const mrgMap = getMRGinstance(generator.saf.scope.localscopedir, generator.saf.scope.glossarydir, mrgfile)
+        const mrgMap = getMRGinstance(generator.saf.scope.localscopedir, generator.saf.scope.glossarydir, source)
         entries = mrgMap.entries
       }
 
       if (key !== "*") {
-        entries = entries.filter((entry) => {
-          // if the entry has a field with the same name as the key
-          if (entry[key] !== undefined) {
-            // and both the values list and key entry property is empty
-            if (!values && (entry[key] === "" || entry[key] === null)) {
-              return true // then include the entry
-            } else if (!values) {
-              // if the values list is empty
-              return false // then exclude the entry
-            }
-            // or the value of that field is in the values list
-            for (const value of valuelist) {
-              if (typeof entry[key] === "string") {
-                // if the entry[key] is a string
-                if (entry[key] === value) {
-                  return true // then include the entry
-                }
-              } else {
-                if ((entry[key] as string[])?.includes(value)) {
-                  // if the entry[key] is an array
-                  return true // then include the entry
-                }
-              }
-            }
-          }
-          // else, exclude the entry
-          return false
-        })
+        entries = entries.filter((entry) => entryFilter(entry, key, valuelist))
       }
 
       log.info(`\tTermselection (${source}): \t'${instruction}'`)
 
+      const overwritten = []
       if (entries.length > 0) {
         // add entries to TuC and overwrite existing entries with the same termid
         for (const newEntry of entries) {
@@ -272,10 +247,8 @@ export class TuCBuilder {
           const existingIndex = this.tuc.entries.findIndex((entry) => entry.termid === newEntry.termid)
           if (existingIndex !== -1 && newEntry.termid != null) {
             // If an entry with the same termid already exists, replace it with the new entry
-            log.warn(
-              `\t\tOverwrote duplicate termid (${newEntry.termid}) from '${this.tuc.entries[existingIndex].locator}' with '${newEntry.locator}'`
-            )
             this.tuc.entries[existingIndex] = { ...newEntry } // Create a shallow copy of the new entry
+            overwritten.push(this.tuc.entries[existingIndex].termid)
           } else {
             // If no entry with the same term exists, add a shallow copy of the new entry to this.entries
             this.tuc.entries.push({ ...newEntry }) // Create a shallow copy of the new entry
@@ -304,6 +277,13 @@ export class TuCBuilder {
         } else {
           log.trace(`\t\tAdded ${entries.length} entr${entries.length > 1 ? "ies" : "y"} from ${source}`)
         }
+        if (overwritten.length > 0) {
+          log.warn(
+            `\t\tOverwrote ${overwritten.length} entr${overwritten.length > 1 ? "ies" : "y"} with termid${
+              overwritten.length > 1 ? "s" : ""
+            }: ${overwritten.join(", ")}`
+          )
+        }
       } else {
         log.warn(`\t\tSelection matched 0 entries`)
       }
@@ -314,6 +294,8 @@ export class TuCBuilder {
   }
 
   private removeMrgEntry(instruction: string): void {
+    // <key> <values>
+    // example: '-term[actor,party]'
     const regex = /^(?<key>[^[]+)(?:\[(?<values>.+?)?\])?$/
     const match = instruction.replace(/\s/g, "").match(regex)
 
@@ -328,36 +310,7 @@ export class TuCBuilder {
     instruction = `-${key}[${valuelist ? valuelist.join(", ") : ""}]`
 
     try {
-      this.tuc.entries = this.tuc.entries.filter((entry) => {
-        // if the entry has a field with the same name as the key
-        if (entry[key] !== undefined) {
-          // and both the values list and key entry property is empty
-          if (!values && (entry[key] === "" || entry[key] === null)) {
-            removed.push(entry)
-            return false
-          } else if (!values) {
-            return true
-          }
-          // or the value of that field is in the value list
-          for (const value of valuelist) {
-            if (typeof entry[key] === "string") {
-              // if the entry[key] is a string
-              if (entry[key] === value) {
-                removed.push(entry)
-                return false // then exclude the entry
-              }
-            } else {
-              if ((entry[key] as string[])?.includes(value)) {
-                // if the entry[key] is an array
-                removed.push(entry)
-                return true // then exclude the entry
-              }
-            }
-          }
-        }
-        // else, keep the entry
-        return true
-      })
+      this.tuc.entries = this.tuc.entries.filter((entry) => !entryFilter(entry, key, valuelist))
 
       log.info(`\tTermselection (provisional): \t'${instruction}'`)
       if (removed.length === 0) {
@@ -384,6 +337,8 @@ export class TuCBuilder {
   }
 
   private renameMrgEntry(instruction: string): void {
+    // <term><fieldmodifierlist>
+    // example: 'rename party [ status:accepted, hoverText:"A natural person or a legal person" ]'
     const regex = /^(?<term>[^[]+)(?:\[(?<fieldmodifierlist>.+?)?\])?$/
     const match = instruction.match(regex)
 
@@ -415,7 +370,7 @@ export class TuCBuilder {
       }
 
       // Find the entries with the term
-      const entries = this.tuc.entries.filter((entry) => entry.term === term)
+      const entries = this.tuc.entries.filter((entry) => entryFilter(entry, "term", [term]))
       const renamed: string[] = []
 
       if (entries?.length > 0) {
@@ -439,6 +394,38 @@ export class TuCBuilder {
       log.error(`\t\tInstruction caused an error: ${err.message}`)
     }
   }
+}
+
+function entryFilter(entry: Entry, key: string, values: string[]): boolean {
+  // if the entry has a field with the same name as the key
+  if (entry[key] !== undefined) {
+    // and both the values list and key entry property is empty
+    if (!values && (entry[key] === "" || entry[key] === null)) {
+      return true
+    } else if (!values) {
+      // if the values list is empty
+      return false
+    }
+    // or the value of that field is in the value list
+    for (const value of values) {
+      if (typeof entry[key] === "string") {
+        // if the entry[key] is a string
+        if (entry[key] === value) {
+          return true
+        } else {
+          if (key === "term") {
+            return entryFilter(entry, "altterms", values)
+          }
+        }
+      } else {
+        if ((entry[key] as string[])?.includes(value)) {
+          // if the entry[key] is an array
+          return true
+        }
+      }
+    }
+  }
+  return false
 }
 
 /**
