@@ -3,7 +3,7 @@
 import { log, report } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 
-import { SAF, MRG, Scope, Terminology } from "@tno-terminology-design/utils"
+import { type SAF, type MRG, SafBuilder, MrgBuilder } from "@tno-terminology-design/utils"
 import { download, writeFile } from "./Handler.js"
 
 import os from "os"
@@ -19,7 +19,7 @@ import { AxiosError } from "axios"
 export async function initialize({ scopedir, prune }: { scopedir: string; prune: boolean }) {
   // read the SAF of the 'own' scope
   const env = new Interpreter({ scopedir: scopedir })
-  const saf = await env.saf
+  const saf = env.saf
 
   if (!saf.scopes) {
     log.warn(`No import scopes found in SAF at '${path.join(scopedir, "saf.yaml")}'`)
@@ -40,7 +40,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
     log.info(`\tHandling import scope '${scope.scopetag}'`)
     // read the SAF of the import scope
     const importEnv = new Interpreter({ scopedir: scope.scopedir })
-    const importSaf = await importEnv.saf
+    const importSaf = importEnv.saf
 
     if (!importSaf.versions) {
       log.warn(`No maintained MRG files found in import scope '${scope.scopetag}'`)
@@ -61,7 +61,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
           importSaf.scope.glossarydir,
           `mrg.${importSaf.scope.scopetag}.${version.vsntag}.yaml`
         )
-        const mrg = await importEnv.getMrgMap(mrgURL)
+        const mrg = importEnv.resolveMRG(mrgURL)
 
         // Set import MRG scopedir and scopetag values to the (non-relative) scope's scopedir and scopetag
         mrg.terminology.scopedir = scope.scopedir
@@ -108,13 +108,10 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
  * @param scopedir The scopedir of the scope from which the MRG Importer is called.
  */
 export class Interpreter {
-  public scopedir: string
-  public saf!: Promise<SAF>
+  public saf!: SAF
 
   public constructor({ scopedir }: { scopedir: string }) {
-    this.scopedir = scopedir
-
-    this.saf = this.getSafMap(path.join(this.scopedir, "saf.yaml"))
+    this.saf = this.resolveSAF(path.join(scopedir, "saf.yaml"))
   }
 
   /**
@@ -122,55 +119,10 @@ export class Interpreter {
    * @param safURL The URL of the SAF map.
    * @returns A promise that resolves to the SAF map.
    */
-  private async getSafMap(safURL: string): Promise<SAF> {
-    let saf = {} as SAF
-    let safPath = safURL
+  private resolveSAF(safURL: string): SAF {
+    const safPath = this.localize(safURL)
 
-    try {
-      // If the `safURL` is a remote URL, download it to a temporary file
-      try {
-        const parsedURL = new URL(safURL)
-        const tempPath = path.join(os.tmpdir(), `saf.yaml`)
-        await download(parsedURL, tempPath)
-        safPath = tempPath
-      } catch (err) {
-        if (err.message.includes("Invalid URL") || err.message.includes("Unsupported protocol")) {
-          // `safURL` is not a valid URL, so assume it's a local path
-        } else {
-          // Handle other errors if needed
-          throw err
-        }
-      }
-
-      // Try to load the SAF map from the `safPath`
-      const safContent = await fs.promises.readFile(safPath, "utf8")
-      saf = yaml.load(safContent) as SAF
-
-      saf.scope.localscopedir = path.dirname(safURL)
-
-      // Check for missing required properties in SAF
-      type ScopeProperty = keyof Scope
-      const requiredProperties: ScopeProperty[] = ["scopetag", "scopedir", "curatedir"]
-      const missingProperties = requiredProperties.filter((prop) => !saf.scope[prop])
-
-      if (missingProperties.length > 0) {
-        log.error(`E002 Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
-        process.exit(1)
-      }
-    } catch (err) {
-      if (err instanceof AxiosError && err.response) {
-        log.error(`E004 SAF request of '${new URL(safURL)}' failed with status code ${err.response.status}`)
-        process.exit(1)
-      } else if (err instanceof yaml.YAMLException) {
-        log.error(`E005 SAF interpretation of '${new URL(safURL)}' failed due to a YAML parsing error: ${err.message}`)
-        process.exit(1)
-      } else {
-        // Handle other errors if needed
-        throw err
-      }
-    }
-
-    return saf
+    return new SafBuilder({ scopedir: path.dirname(safPath) }).saf
   }
 
   /**
@@ -178,45 +130,37 @@ export class Interpreter {
    * @param mrgURL The URL of the MRG map.
    * @returns A promise that resolves to the MRG map.
    */
-  public async getMrgMap(mrgURL: string): Promise<MRG> {
-    let mrg = {} as Promise<MRG>
-    let mrgPath = mrgURL
+  public resolveMRG(mrgURL: string): MRG {
+    const mrgPath = this.localize(mrgURL)
 
-    // If the `mrgURL` is a remote URL, download it to a temporary file
+    return new MrgBuilder({ mrgpath: mrgPath }).mrg
+  }
+
+  public localize(fileURL: string): string {
+    let filePath = fileURL
+    // If the `fileURL` is a remote URL, download it to a temporary file
     try {
-      const parsedURL = new URL(mrgURL)
-      const tempPath = path.join(os.tmpdir(), path.basename(mrgURL))
-      await download(parsedURL, tempPath)
-      mrgPath = tempPath
+      const parsedURL = new URL(fileURL)
+      const tempPath = path.join(os.tmpdir(), path.basename(fileURL))
+      download(parsedURL, tempPath)
+      filePath = tempPath
     } catch (err) {
-      if (err instanceof TypeError && err.message.includes("Invalid URL")) {
-        // `mrgURL` is not a valid URL, so assume it's a local path
+      if (err.message.includes("Invalid URL") || err.message.includes("Unsupported protocol")) {
+        // `fileURL` is not a valid URL, so assume it's a local path
+      } else if (err instanceof AxiosError && err.response) {
+        throw new Error(`Request of '${new URL(fileURL)}' failed with status code ${err.response.status}`)
       } else {
         // Handle other errors if needed
         throw err
       }
     }
 
-    // Try to load the MRG map from the `mrgPath`
-    const mrgfile = fs.readFileSync(mrgPath, "utf8")
-    mrg = yaml.load(mrgfile) as Promise<MRG>
-
-    // Check for missing required properties in MRG
-    type TerminologyProperty = keyof Terminology
-    const requiredProperties: TerminologyProperty[] = ["scopetag", "scopedir", "curatedir", "vsntag"]
-    const terminology = (await mrg).terminology
-    const missingProperties = requiredProperties.filter((prop) => !terminology[prop])
-
-    if (missingProperties.length > 0) {
-      throw new Error(`Missing required property in MRG at '${mrgURL}': '${missingProperties.join("', '")}'`)
-    }
-
-    return mrg
+    return filePath
   }
 
   public async prune(): Promise<void> {
     log.info(`\x1b[1;37mPruning MRGs of scopes that are not in administered the SAF...`)
-    const saf = await this.saf
+    const saf = this.saf
     const glossaryfiles = path.join(saf.scope.localscopedir, saf.scope.glossarydir, `mrg.*.yaml`)
     // get all mrg files that match the glossaryfiles pattern
     const mrgfiles = await glob(glossaryfiles)

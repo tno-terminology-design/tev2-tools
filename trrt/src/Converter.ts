@@ -59,7 +59,11 @@ export class Converter {
 
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
-    return template({ ...evaluatedEntry, ...term })
+    const output = template({ ...evaluatedEntry, ...term })
+    if (output === "") {
+      throw new Error(`resulted in an empty string, check the converter template`)
+    }
+    return output
   }
 
   getType(): string {

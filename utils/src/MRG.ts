@@ -46,8 +46,8 @@ export interface Entry {
  * Returns an MRG class instance.
  * @returns The MRG class instance.
  */
-export function getMRGinstance(scopedir: string, glossarydir: string, filename: string): MRG | undefined {
-  let mrg: MRG | undefined
+export function getMRGinstance(scopedir: string, glossarydir: string, filename: string): MRG {
+  let mrg: MRG
 
   // Check if an MRG class instance with the `filename` property of `mrgFile` has already been loaded
   for (const instance of MrgBuilder.instances) {
@@ -62,6 +62,27 @@ export function getMRGinstance(scopedir: string, glossarydir: string, filename: 
   }
 
   return mrg
+}
+
+export function getMRGenty(entries: Entry[], origin: string, id: string, type?: string): Entry {
+  let entry: Entry
+
+  // Find the matching entry in mrg.entries based on the term
+  let matches = entries.filter((entry) => entry.term === id || entry.altterms?.includes(id))
+  if (matches.length > 1 && type != null) {
+    matches = matches.filter((entry) => entry.termType === type)
+  }
+
+  if (matches.length === 1) {
+    entry = matches[0]
+  } else if (matches.length === 0) {
+    throw new Error(`could not be matched with an MRG entry in '${origin}`)
+  } else if (matches.length > 1) {
+    const matchingTermIds = matches.map((entry) => entry.termid).join("', '")
+    throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`)
+  }
+
+  return entry
 }
 
 /**

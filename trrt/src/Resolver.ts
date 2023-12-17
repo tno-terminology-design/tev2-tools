@@ -1,6 +1,6 @@
 import { report, log } from "@tno-terminology-design/utils"
 import { glob } from "glob"
-import { getMRGinstance, type MRG, type Entry } from "@tno-terminology-design/utils"
+import { getMRGinstance, getMRGenty, type MRG } from "@tno-terminology-design/utils"
 import { type Interpreter, type Term } from "./Interpreter.js"
 import { type Converter } from "./Converter.js"
 import { type SAF } from "@tno-terminology-design/utils"
@@ -157,45 +157,34 @@ export class Resolver {
     let matchingEntries = mrg.entries.filter((entry) => entry.term === term.id || entry.altterms?.includes(term.id))
 
     let replacement = ""
-    let entry: Entry | undefined
     if (matchingEntries.length > 1) {
       matchingEntries = matchingEntries.filter((entry) => entry.termType === term.type)
     }
-
-    if (matchingEntries.length === 1) {
-      entry = matchingEntries[0]
-      term.id = entry.term
-      // Convert the term using the configured converter
+    try {
+      const entry = getMRGenty(mrg.entries, mrg.filename, term.id, term.type)
       replacement = this.converter.convert(entry, term)
-      if (replacement === "") {
-        const message = `Term ref '${match[0]}' > '${termRef}', resulted in an empty string, check the converter`
-        report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
+
+      // Only execute the replacement steps if the 'replacement' string is not empty
+      if (replacement.length > 0 && match.index != null) {
+        const startIndex = match.index + file.lastIndex
+        const matchLength = match[0].length
+        const textBeforeMatch = file.orig.toString().substring(0, startIndex)
+        const textAfterMatch = file.orig.toString().substring(startIndex + matchLength)
+
+        // Replace the matched term with the generated replacement in the data string
+        file.orig = `${textBeforeMatch}${replacement}${textAfterMatch}`
+
+        // Update the lastIndex to account for the length difference between the match and replacement
+        file.lastIndex += replacement.length - matchLength
+
+        // Log the converted term
+        report.termConverted(entry!.term)
+        file.converted++
       }
-    } else if (matchingEntries.length === 0) {
-      const message = `Term ref '${match[0]}' > '${termRef}', could not be matched with an MRG entry`
-      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
-    } else if (matchingEntries.length > 1) {
-      const matchingTermIds = matchingEntries.map((entry) => entry.termid).join("', '")
-      const message = `Term ref '${match[0]}' > '${termRef}', has multiple matching MRG entries in '${mrg.filename}'. Matching termids: '${matchingTermIds}'`
-      report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
-    }
-
-    // Only execute the replacement steps if the 'replacement' string is not empty
-    if (replacement.length > 0 && match.index != null) {
-      const startIndex = match.index + file.lastIndex
-      const matchLength = match[0].length
-      const textBeforeMatch = file.orig.toString().substring(0, startIndex)
-      const textAfterMatch = file.orig.toString().substring(startIndex + matchLength)
-
-      // Replace the matched term with the generated replacement in the data string
-      file.orig = `${textBeforeMatch}${replacement}${textAfterMatch}`
-
-      // Update the lastIndex to account for the length difference between the match and replacement
-      file.lastIndex += replacement.length - matchLength
-
-      // Log the converted term
-      report.termConverted(entry!.term)
-      file.converted++
+    } catch (err) {
+      const message = `Term ref '${match[0]}' > '${termRef}', ${err}`
+      const line = file.orig.toString().substring(0, match.index).split("\n").length
+      report.termHelp(file.path, line, message)
     }
 
     return file
