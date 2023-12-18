@@ -11,7 +11,7 @@ Show text to term:      [b'o(d)i'es](@)
 
 | Term | Description |
 | :--- | :---------- |
-{% hrg="" converter="| {{glossaryTerm}} | {{glossaryText}} |\n" sort="{{glossaryText}}"%}
+{% hrg="" converter="| {{glossaryTerm}} | {{glossaryText}} |\n" sorter="{{glossaryText}}"%}
 
 ---
 

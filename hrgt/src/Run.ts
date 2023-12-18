@@ -33,6 +33,10 @@ program
     "-con, --converter <template> or <predeftype>",
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-table-row`, `markdown-section-2`, `markdown-section-3`)"
   )
+  .option(
+    "-sort, --sorter <template> or <predeftype>",
+    "Type of sorter, i.e., a mustache/handlebars template, or a predifined type (`default`) by which to sort the glossary items"
+  )
   .option("-f, --force", "Allow overwriting of existing files")
   .parse(process.argv)
 
@@ -75,8 +79,9 @@ async function main(): Promise<void> {
         outputPath: resolve(options.output),
         globPattern: options.input,
         force: options.force,
+        sorter: options.sorter ?? "default",
         interpreter: options.interpreter ?? "default",
-        converter: options.converter ?? "markdowntable",
+        converter: options.converter ?? "markdown-table-row",
         saf: resolve(options.scopedir)
       })
 

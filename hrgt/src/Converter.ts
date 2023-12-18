@@ -12,6 +12,7 @@ export class Converter {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`
     // map of default templates for each type
     const map: Record<string, string> = {
+      default: "{{term}}{{termType}}",
       "markdown-table-row":
         "| [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}}) | {{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}} |\n",
       "markdown-section-2":

@@ -1,7 +1,7 @@
 export interface MRGRef {
   hrg: string
   converter: string
-  sort: string
+  sorter: string
   scopetag?: string
   vsntag?: string
 }
@@ -13,7 +13,7 @@ export class Interpreter {
   public constructor({ regex }: { regex: string }) {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
     const map: Record<string, RegExp> = {
-      default: /{%\s*hrg="(?<hrg>[^"]*)"\s*(?:converter="(?<converter>[^"]*)"\s*)?(?:sort="(?<sort>[^"]*)"\s*)?%}/g
+      default: /{%\s*hrg="(?<hrg>[^"]*)"\s*(?:converter="(?<converter>[^"]*)"\s*)?(?:sorter="(?<sorter>[^"]*)"\s*)?%}/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -44,7 +44,7 @@ export class Interpreter {
     return {
       hrg: match.groups.hrg,
       converter: match.groups.converter,
-      sort: match.groups.sort,
+      sorter: match.groups.sorter,
       scopetag: hrg.groups.scopetag,
       vsntag: hrg.groups.vsntag
     }

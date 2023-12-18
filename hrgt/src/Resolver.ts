@@ -15,6 +15,7 @@ export class Resolver {
   private readonly outputPath: string
   private readonly globPattern: string
   private readonly force: boolean
+  sorter: Converter
   interpreter: Interpreter
   converter: Converter
   saf: SAF
@@ -23,6 +24,7 @@ export class Resolver {
     outputPath,
     globPattern,
     force,
+    sorter,
     interpreter,
     converter,
     saf
@@ -30,6 +32,7 @@ export class Resolver {
     outputPath: string
     globPattern: string
     force: boolean
+    sorter: string
     interpreter: string
     converter: string
     saf: string
@@ -37,6 +40,7 @@ export class Resolver {
     this.outputPath = outputPath
     this.globPattern = globPattern
     this.force = force
+    this.sorter = new Converter({ template: sorter })
     this.interpreter = new Interpreter({ regex: interpreter })
     this.converter = new Converter({ template: converter })
     this.saf = new SafBuilder({ scopedir: saf }).saf
@@ -123,23 +127,25 @@ export class Resolver {
   }
 
   replacementHandler(match: RegExpMatchArray, mrgref: MRGRef, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
-    let converter: Converter
+    let converter = this.converter
+    let sorter = this.sorter
     const entries = [...mrg.entries]
 
-    // Sort entries according to the sort parameter in the MRGRef
-    if (mrgref.sort != null) {
-      log.info(`\tSorting entries using '${mrgref.sort}'`)
-      const sorter = new Converter({ template: mrgref.sort })
-      entries.sort((a, b) => sorter.convert(a, mrgref).localeCompare(sorter.convert(b, mrgref)))
+    // Sort entries according to the sort parameter in the MRGRef or the default
+    if (mrgref.sorter != null) {
+      sorter = new Converter({ template: mrgref.sorter })
+      log.info(`\tUsing ${sorter.type} sorter: '${sorter.template.replace(/\n/g, "\\n")}'`)
+    } else {
+      log.info(`\tUsing default set sorter (${sorter.type})`)
     }
+    entries.sort((a, b) => sorter.convert(a, mrgref).localeCompare(sorter.convert(b, mrgref)))
 
     // Check if the MRGRef has a converter specified
-    if (mrgref.converter === "" || mrgref.converter == null) {
-      converter = this.converter
-      log.info(`\tUsing default set converter (${converter.type})`)
-    } else {
+    if (mrgref.converter != null) {
       converter = new Converter({ template: mrgref.converter })
       log.info(`\tUsing ${converter.type} converter: '${converter.template.replace(/\n/g, "\\n")}'`)
+    } else {
+      log.info(`\tUsing default set converter (${converter.type})`)
     }
 
     let replacement = ""
@@ -178,6 +184,7 @@ export class Resolver {
   public async resolve(): Promise<boolean> {
     // Log information about the interpreter, converter and the files being read
     log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
+    log.info(`Using ${this.sorter.type} sorter as default: '${this.sorter.template.replace(/\n/g, "\\n")}'`)
     log.info(`Using ${this.converter.type} converter as default: '${this.converter.template.replace(/\n/g, "\\n")}'`)
     log.info(`Reading files using pattern string '${this.globPattern}'`)
 
