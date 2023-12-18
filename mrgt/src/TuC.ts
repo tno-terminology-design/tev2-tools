@@ -176,6 +176,8 @@ export class TuCBuilder {
           )
         }
 
+        const formPhrases = resolveFormPhrases(ctextYAML.formPhrases)
+
         // Extract heading IDs from markdown content
         const headingIds = extractHeadingIds(body)
 
@@ -183,6 +185,7 @@ export class TuCBuilder {
         ctextYAML.scopetag = this.tuc.terminology.scopetag
         ctextYAML.locator = ctext
         ctextYAML.navurl = navUrl.href
+        ctextYAML.formPhrases = formPhrases
         ctextYAML.headingids = headingIds
 
         if (ctextYAML.synonymOf) {
@@ -412,10 +415,6 @@ function entryFilter(entry: Entry, key: string, values: string[]): boolean {
         // if the entry[key] is a string
         if (entry[key] === value) {
           return true
-        } else {
-          if (key === "term") {
-            return entryFilter(entry, "altterms", values)
-          }
         }
       } else {
         if ((entry[key] as string[])?.includes(value)) {
@@ -426,6 +425,60 @@ function entryFilter(entry: Entry, key: string, values: string[]): boolean {
     }
   }
   return false
+}
+
+function resolveFormPhrases(formPhrases: string[]): string[] {
+  const regexMap: Record<string, string[]> = {
+    "{ss}": ["", "s", "'s", "(s)"],
+    "{yies}": ["y", "ys", "y's", "ies"],
+    "{ying}": ["y", "ier", "ying", "ies", "ied"]
+  }
+  const alternatives = formPhrases != null ? formPhrases.map((t) => t.trim()) : []
+
+  // create a new set of alternatives that includes all possible macro replacements
+  const modifiedAlternatives = new Set<string>()
+
+  for (const alternative of alternatives) {
+    const generatedAlternatives = applyMacroReplacements(alternative, regexMap)
+    for (const generatedAlternative of generatedAlternatives) {
+      modifiedAlternatives.add(generatedAlternative)
+    }
+  }
+
+  return Array.from(modifiedAlternatives)
+}
+
+/**
+ * Apply macro replacements to the given input using the provided regexMap.
+ * @param input - The input string containing macros.
+ * @param regexMap - A map of macros and their possible replacements.
+ * @returns An array of strings with all possible alternatives after macro replacements.
+ */
+function applyMacroReplacements(input: string, regexMap: Record<string, string[]>): string[] {
+  // check if the input contains a macro
+  const match = input.match(/\{(\w+)}/)
+
+  // if no macro is found, return the input as is
+  if (match == null) {
+    return [input]
+  }
+
+  const macroKey = match[1]
+  const replacements = regexMap[`{${macroKey}}`] ?? []
+
+  // split the input into prefix and suffix at the macro
+  const prefix = input.substring(0, match.index)
+  const suffix = input.substring(match.index != null ? match.index + match[0].length : match[0].length)
+
+  const result: string[] = []
+
+  // recursively apply macro replacements and use recursion to handle multiple macros
+  for (const replacement of replacements) {
+    const newAlternative = prefix + replacement + suffix
+    result.push(...applyMacroReplacements(newAlternative, regexMap))
+  }
+
+  return result
 }
 
 /**

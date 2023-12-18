@@ -153,16 +153,9 @@ export class Resolver {
       termRef = `${termRefAlt}' > '${termRef}`
     }
 
-    // Find the matching entry in mrg.entries based on the term
-    let matchingEntries = mrg.entries.filter((entry) => entry.term === term.id || entry.altterms?.includes(term.id))
-
-    let replacement = ""
-    if (matchingEntries.length > 1) {
-      matchingEntries = matchingEntries.filter((entry) => entry.termType === term.type)
-    }
     try {
       const entry = getMRGenty(mrg.entries, mrg.filename, term.id, term.type)
-      replacement = this.converter.convert(entry, term)
+      const replacement = this.converter.convert(entry, term)
 
       // Only execute the replacement steps if the 'replacement' string is not empty
       if (replacement.length > 0 && match.index != null) {

@@ -36,53 +36,8 @@ export interface Entry {
   glossaryText?: string
   synonymOf?: string
   grouptags?: string[]
-  formPhrases?: string
-  altvsntags?: string[]
-  altterms?: string[]
+  formPhrases?: string[]
   [key: string]: unknown
-}
-
-/**
- * Returns an MRG class instance.
- * @returns The MRG class instance.
- */
-export function getMRGinstance(scopedir: string, glossarydir: string, filename: string): MRG {
-  let mrg: MRG
-
-  // Check if an MRG class instance with the `filename` property of `mrgFile` has already been loaded
-  for (const instance of MrgBuilder.instances) {
-    if (instance.filename === filename) {
-      mrg = instance
-      break
-    }
-  }
-  // If no existing MRG class instance was found, build the MRG according to the `mrgpath`
-  if (mrg == null) {
-    mrg = new MrgBuilder({ mrgpath: path.join(scopedir, glossarydir, filename) }).mrg
-  }
-
-  return mrg
-}
-
-export function getMRGenty(entries: Entry[], origin: string, id: string, type?: string): Entry {
-  let entry: Entry
-
-  // Find the matching entry in mrg.entries based on the term
-  let matches = entries.filter((entry) => entry.term === id || entry.altterms?.includes(id))
-  if (matches.length > 1 && type != null) {
-    matches = matches.filter((entry) => entry.termType === type)
-  }
-
-  if (matches.length === 1) {
-    entry = matches[0]
-  } else if (matches.length === 0) {
-    throw new Error(`could not be matched with an MRG entry in '${origin}`)
-  } else if (matches.length > 1) {
-    const matchingTermIds = matches.map((entry) => entry.termid).join("', '")
-    throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`)
-  }
-
-  return entry
 }
 
 /**
@@ -98,10 +53,6 @@ export class MrgBuilder {
     this.mrg = this.getMrgMap(mrgpath)
     if (this.mrg !== undefined) {
       this.mrg.filename = path.basename(mrgpath)
-
-      if (this.mrg.entries.length > 0) {
-        this.mrg.entries = this.populateEntries(this.mrg)
-      }
 
       MrgBuilder.instances.push(this.mrg)
     }
@@ -153,77 +104,47 @@ export class MrgBuilder {
 
     return this.mrg
   }
-
-  /**
-   * Populates the runtime glossary by processing MRG entries.
-   * @param mrg - The MRG (Machine Readable Glossary) map.
-   * @returns A promise that resolves to the populated runtime glossary.
-   */
-  public populateEntries(mrg: MRG): Entry[] {
-    const entries: Entry[] = []
-    try {
-      const regexMap: Record<string, string[]> = {
-        "{ss}": ["", "s", "'s", "(s)"],
-        "{yies}": ["y", "ys", "y's", "ies"],
-        "{ying}": ["y", "ier", "ying", "ies", "ied"]
-      }
-
-      for (const entry of mrg.entries) {
-        const alternatives = entry.formPhrases != null ? entry.formPhrases.split(",").map((t) => t.trim()) : []
-
-        // create a new set of alternatives that includes all possible macro replacements
-        const modifiedAlternatives = new Set<string>()
-
-        for (const alternative of alternatives) {
-          const generatedAlternatives = applyMacroReplacements(alternative, regexMap)
-          for (const generatedAlternative of generatedAlternatives) {
-            modifiedAlternatives.add(generatedAlternative)
-          }
-        }
-
-        entry.altvsntags = mrg.terminology.altvsntags
-        entry.altterms = Array.from(modifiedAlternatives)
-
-        entries.push(entry)
-      }
-    } catch (err) {
-      throw new Error(`E006 An error occurred while attempting to process the MRG at '${mrg.filename}':`, {
-        cause: err
-      })
-    }
-    return entries
-  }
 }
 
 /**
- * Apply macro replacements to the given input using the provided regexMap.
- * @param input - The input string containing macros.
- * @param regexMap - A map of macros and their possible replacements.
- * @returns An array of strings with all possible alternatives after macro replacements.
+ * Returns an MRG class instance.
+ * @returns The MRG class instance.
  */
-function applyMacroReplacements(input: string, regexMap: Record<string, string[]>): string[] {
-  // check if the input contains a macro
-  const match = input.match(/\{(\w+)}/)
+export function getMRGinstance(scopedir: string, glossarydir: string, filename: string): MRG {
+  let mrg: MRG
 
-  // if no macro is found, return the input as is
-  if (match == null) {
-    return [input]
+  // Check if an MRG class instance with the `filename` property of `mrgFile` has already been loaded
+  for (const instance of MrgBuilder.instances) {
+    if (instance.filename === filename) {
+      mrg = instance
+      break
+    }
+  }
+  // If no existing MRG class instance was found, build the MRG according to the `mrgpath`
+  if (mrg == null) {
+    mrg = new MrgBuilder({ mrgpath: path.join(scopedir, glossarydir, filename) }).mrg
   }
 
-  const macroKey = match[1]
-  const replacements = regexMap[`{${macroKey}}`] ?? []
+  return mrg
+}
 
-  // split the input into prefix and suffix at the macro
-  const prefix = input.substring(0, match.index)
-  const suffix = input.substring(match.index != null ? match.index + match[0].length : match[0].length)
+export function getMRGenty(entries: Entry[], origin: string, id: string, type?: string): Entry {
+  let entry: Entry
 
-  const result: string[] = []
-
-  // recursively apply macro replacements and use recursion to handle multiple macros
-  for (const replacement of replacements) {
-    const newAlternative = prefix + replacement + suffix
-    result.push(...applyMacroReplacements(newAlternative, regexMap))
+  // Find the matching entry in mrg.entries based on the term
+  let matches = entries.filter((entry) => entry.term === id || entry.formPhrases?.includes(id))
+  if (matches.length > 1 && type != null) {
+    matches = matches.filter((entry) => entry.termType === type)
   }
 
-  return result
+  if (matches.length === 1) {
+    entry = matches[0]
+  } else if (matches.length === 0) {
+    throw new Error(`could not be matched with an MRG entry in '${origin}`)
+  } else if (matches.length > 1) {
+    const matchingTermIds = matches.map((entry) => entry.termid).join("', '")
+    throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`)
+  }
+
+  return entry
 }
