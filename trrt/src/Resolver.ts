@@ -230,7 +230,7 @@ export class Resolver {
     }
     if (!changes) {
       log.warn(
-        `No changes were made to any files, confirm that the MRG References exist and the interpreter is correct`
+        `No changes were made to any files, confirm that the Term References exist and the interpreter is correct`
       )
     }
 
