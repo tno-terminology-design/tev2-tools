@@ -150,7 +150,7 @@ export class Resolver {
 
     let replacement = ""
     for (const entry of entries) {
-      const hrgEntry = converter.convert(entry, mrgref)
+      const hrgEntry = converter.convert(entry, mrgref, mrg.terminology)
       if (hrgEntry == converter.getBlank()) {
         log.warn(`\t\tConversion of entry '${entry.term}' from '${mrg.filename}' did not fill in any expression`)
       }

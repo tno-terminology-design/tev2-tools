@@ -4,6 +4,7 @@ export interface MRGRef {
   sorter: string
   scopetag?: string
   vsntag?: string
+  [key: string]: string
 }
 
 export class Interpreter {
@@ -34,14 +35,14 @@ export class Interpreter {
   }
 
   interpret(match: RegExpMatchArray): MRGRef {
-    // added as feedback from Michiel, should not happen as it would not be a match if there are no groups
     if (match.groups == undefined) {
-      throw new Error("Error in evaluating regex pattern. No groups provided")
+      throw new Error("Error in evaluating regex pattern: no groups provided")
     }
 
     const hrg: RegExpMatchArray = match.groups.hrg.match(/(?:@)?(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?/)
 
     return {
+      ...match.groups,
       hrg: match.groups.hrg,
       converter: match.groups.converter,
       sorter: match.groups.sorter,

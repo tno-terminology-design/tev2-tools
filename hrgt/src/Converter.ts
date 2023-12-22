@@ -1,5 +1,5 @@
 import Handlebars, { type HelperOptions } from "handlebars"
-import { type Entry } from "@tno-terminology-design/utils"
+import { type Terminology, type Entry } from "@tno-terminology-design/utils"
 import { type MRGRef } from "./Interpreter.js"
 import { type SAF } from "@tno-terminology-design/utils"
 
@@ -40,10 +40,10 @@ export class Converter {
     }
   }
 
-  convert(entry: Entry, mrgref: MRGRef): string {
+  convert(entry: Entry, mrgref: MRGRef, terminology?: Terminology): string {
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
-    return template({ ...entry, ...mrgref })
+    return template({ mrg: { terminology: terminology }, ...entry, ...mrgref })
   }
 
   getBlank(): string {

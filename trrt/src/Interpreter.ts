@@ -8,6 +8,7 @@ export interface Term {
   trait?: string
   scopetag?: string
   vsntag?: string
+  [key: string]: string
 }
 
 /**
@@ -49,12 +50,12 @@ export class Interpreter {
   }
 
   interpret(match: RegExpMatchArray, saf: SAF): Term {
-    // added as feedback from Michiel, should not happen as it would not be a match if there are no groups
     if (match.groups === undefined) {
-      throw new Error("Error in evaluating regex pattern. No groups provided")
+      throw new Error("Error in evaluating regex pattern: No groups provided")
     }
 
     return {
+      ...match.groups,
       showtext: match.groups.showtext,
       id:
         match.groups.id?.length > 0

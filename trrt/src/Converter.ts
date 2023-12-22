@@ -1,7 +1,7 @@
 import Handlebars, { type HelperOptions } from "handlebars"
 import { log } from "@tno-terminology-design/utils"
 import { resolver } from "./Run.js"
-import { type Entry } from "@tno-terminology-design/utils"
+import { type Entry, type Terminology } from "@tno-terminology-design/utils"
 import { type Term } from "./Interpreter.js"
 
 /**
@@ -46,7 +46,7 @@ export class Converter {
     log.info(`Using ${this.type} template: '${this.template.replace(/\n/g, "\\n")}'`)
   }
 
-  convert(entry: Entry, term: Term): string {
+  convert(entry: Entry, term: Term, terminology?: Terminology): string {
     // Evaluate the properties inside the entry object
     const evaluatedEntry: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(entry)) {
@@ -59,7 +59,7 @@ export class Converter {
 
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
-    const output = template({ ...evaluatedEntry, ...term })
+    const output = template({ mrg: { terminology: terminology }, ...evaluatedEntry, ...term })
     if (output === "") {
       throw new Error(`resulted in an empty string, check the converter template`)
     }

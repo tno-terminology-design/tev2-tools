@@ -155,7 +155,7 @@ export class Resolver {
 
     try {
       const entry = getMRGenty(mrg.entries, mrg.filename, term.id, term.type)
-      const replacement = this.converter.convert(entry, term)
+      const replacement = this.converter.convert(entry, term, mrg.terminology)
 
       // Only execute the replacement steps if the 'replacement' string is not empty
       if (replacement.length > 0 && match.index != null) {
