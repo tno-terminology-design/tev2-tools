@@ -25,9 +25,7 @@ export class TuCBuilder {
   public constructor({ vsn }: { vsn: Version }) {
     this.tuc = {
       terminology: {
-        scopetag: generator.saf.scope.scopetag,
-        scopedir: generator.saf.scope.scopedir,
-        curatedir: generator.saf.scope.curatedir,
+        ...generator.saf.scope,
         vsntag: vsn.vsntag,
         altvsntags: vsn.altvsntags
       },
