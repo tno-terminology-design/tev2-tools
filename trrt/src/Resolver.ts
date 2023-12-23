@@ -9,7 +9,11 @@ import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
 
-type GrayMatterFile = matter.GrayMatterFile<string> & { path: string; lastIndex: number; converted: number }
+type GrayMatterFile = matter.GrayMatterFile<string> & {
+  path: string
+  lastIndex: number
+  converted: Map<string, number>
+}
 
 /**
  * The Resolver class handles the resolution of term references in files.
@@ -100,7 +104,6 @@ export class Resolver {
     }
 
     file.lastIndex = 0
-    file.converted = 0
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
@@ -123,7 +126,7 @@ export class Resolver {
         report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
       }
     }
-    if (file.converted > 0) {
+    if (file.converted.size > 0) {
       return file.orig.toString()
     } else {
       return undefined
@@ -172,7 +175,7 @@ export class Resolver {
 
         // Log the converted term
         report.termConverted(entry!.term)
-        file.converted++
+        file.converted.set(entry!.termid, (file.converted.get(entry!.termid) || 0) + 1)
       }
     } catch (err) {
       const message = `Term ref '${match[0]}' > '${termRef}', ${err}`
