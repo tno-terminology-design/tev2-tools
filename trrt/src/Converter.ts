@@ -1,5 +1,4 @@
 import Handlebars, { type HelperOptions } from "handlebars"
-import { log } from "@tno-terminology-design/utils"
 import { resolver } from "./Run.js"
 import { type Entry, type Terminology } from "@tno-terminology-design/utils"
 import { type Term } from "./Interpreter.js"
@@ -11,8 +10,8 @@ import { type Term } from "./Interpreter.js"
  * Helper functions are registered with Handlebars to allow for more complex conversions.
  */
 export class Converter {
-  private readonly type: string
-  private readonly template: string
+  public type: string
+  public template: string
 
   public constructor({ template }: { template: string }) {
     // map of default templates for each type
@@ -43,7 +42,6 @@ export class Converter {
       this.type = "custom"
       this.template = template.replace(/\\n/g, "\n")
     }
-    log.info(`Using ${this.type} template: '${this.template.replace(/\n/g, "\\n")}'`)
   }
 
   convert(entry: Entry, term: Term, terminology?: Terminology): string {
@@ -64,10 +62,6 @@ export class Converter {
       throw new Error(`resulted in an empty string, check the converter template`)
     }
     return output
-  }
-
-  getType(): string {
-    return this.type
   }
 }
 
@@ -98,7 +92,7 @@ function noRefsHelper(text: string, options: HelperOptions): string {
     // switch on element of type to determine which regex to use
     switch (element.toLowerCase()) {
       case "interpreter":
-        regex = resolver.interpreter.getRegex()
+        regex = resolver.interpreter.regex
         break
       case "html":
         regex = /<a\b[^>]*?>(?<showtext>.*?)<\/a>/g

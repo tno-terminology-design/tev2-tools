@@ -95,11 +95,11 @@ export class Resolver {
    */
   private async matchIterator(file: GrayMatterFile): Promise<string | undefined> {
     // Get the matches of the regex in the file.orig string
-    const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.getRegex()))
+    const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.regex))
     if (file.matter != null) {
       // If the file has frontmatter, get the matches of the regex in the frontmatter string
       // remove count of frontmatter matches from the front of the matches array
-      const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.getRegex()))
+      const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.regex))
       matches.splice(0, frontmatter.length)
     }
 
@@ -193,6 +193,8 @@ export class Resolver {
   public async resolve(): Promise<boolean> {
     // Log information about the interpreter, converter and the files being read
     log.info(`Reading files using pattern string '${this.globPattern}'`)
+    log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
+    log.info(`Using ${this.converter.type} template: '${this.converter.template.replace(/\n/g, "\\n")}'`)
 
     // Get the list of files based on the glob pattern
     const files = await glob(this.globPattern)

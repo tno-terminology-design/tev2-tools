@@ -30,80 +30,107 @@ program
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
   // If interpreters or converters are added/removed, please adjust the documentation in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
   .option(
-    "-int, --interpreter <regex> or <predeftype>",
+    "--int, --interpreter <regex> or <predeftype>",
     "Type of interpreter, i.e., a regex, or a predefined type (`default`, `alt`)"
   ) // `basic` is deprecated
   .option(
-    "-con, --converter <template> or <predeftype>",
+    "--con, --converter <template> or <predeftype>",
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-link`, `html-link`, `html-hovertext-link`, `html-glossarytext-link`)"
   )
   .option("-f, --force", "Allow overwriting of existing files")
+  .allowUnknownOption(true)
   .parse(process.argv)
 
-program.parse()
-
 async function main(): Promise<void> {
-  try {
-    // Parse command line parameters
-    let options = program.opts()
-    if (program.args[0] != null) {
-      options.input = program.args[0]
-    }
+  console.log(chalk.red(figlet.textSync("trrt-cli", { horizontalLayout: "full" })))
+  let options = program.opts()
 
-    console.log(chalk.red(figlet.textSync("trrt-cli", { horizontalLayout: "full" })))
-
-    if (options.config != null) {
-      try {
-        const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
-
-        // Overwrite command line options with config options and trrt specific config options
-        const { trrt, ...rest } = config
-        options = { ...rest, ...trrt, ...options }
-      } catch (err) {
-        throw new Error(`E011 Failed to read or parse the config file '${options.config}':`, { cause: err })
+  // Process command line converter options
+  for (const [key, value] of Object.entries(process.argv.slice(2))) {
+    const match = value.match(/^--con(?:verter)?(?:\[(?<n>\d+)\])?$/)
+    if (match) {
+      const template = process.argv[parseInt(key) + 3]
+      const i = program.args.indexOf(value)
+      if (match.groups.n == null || match.groups.n == "0") {
+        options.converter = template
+      } else {
+        options[`converter[${match.groups.n}]`] = template
+      }
+      if (i !== -1) {
+        program.args.splice(i, 2)
       }
     }
+  }
 
-    // Check if required options are provided
-    if (options.output == null || options.scopedir == null || options.input == null) {
-      program.addHelpText(
-        "after",
-        "\nRequired options are missing\n" +
-          "Provide at least the following options: output <path>, scopedir <path> and input <globpattern>\n"
-      )
-      program.help()
-      process.exit(1)
-    } else {
-      // Create an interpreter, converter and glossary with the provided options
-      const interpreter = new Interpreter({ regex: options.interpreter ?? "default" })
-      const converter = new Converter({ template: options.converter ?? "markdown" })
-      const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+  // Use the remaining arguments as input
+  if (program.args[0] != null) {
+    options.input = program.args
+  }
 
-      // Create a resolver with the provided options
-      resolver = new Resolver({
-        outputPath: resolve(options.output),
-        globPattern: options.input,
-        force: options.force,
-        interpreter,
-        converter,
-        saf
-      })
+  if (options.config != null) {
+    try {
+      const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
 
-      // Resolve terms
-      await resolver.resolve()
-      log.info("Resolution complete...")
-      report.print()
-      process.exit(0)
+      // Overwrite command line options with config options and trrt specific config options
+      const { trrt, ...rest } = config
+      options = { ...rest, ...trrt, ...options }
+    } catch (err) {
+      throw new Error(`E011 Failed to read or parse the config file '${options.config}':`, { cause: err })
     }
-  } catch (err) {
-    if ((err as Error).cause != null) {
-      log.error(err)
-      process.exit(1)
-    } else {
-      log.error("E012 Something unexpected went wrong while resoluting terms:", err)
-      process.exit(1)
+  }
+
+  // Process converter options and populate the map
+  options.converterMap = new Map<number, Converter>()
+  for (const [key, value] of Object.entries(options)) {
+    const match = key.match(/^converter(?:\[(?<n>\d+)\])?$/)
+    if (match) {
+      const template = value as string
+      const converter = new Converter({ template })
+      options.converterMap.set(parseInt(match.groups?.n) || 0, converter)
     }
+  }
+
+  // Check if required options are provided
+  if (options.output == null || options.scopedir == null || options.input == null) {
+    program.addHelpText(
+      "after",
+      "\nRequired options are missing\n" +
+        "Provide at least the following options: output <path>, scopedir <path> and input <globpattern>\n"
+    )
+    program.help()
+    process.exit(1)
+  } else {
+    // Create an interpreter, converter and glossary with the provided options
+    const interpreter = new Interpreter({ regex: options.interpreter ?? "default" })
+    const converter = new Converter({ template: options.converter ?? "markdown" })
+    const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+
+    // Create a resolver with the provided options
+    resolver = new Resolver({
+      outputPath: resolve(options.output),
+      globPattern: options.input,
+      force: options.force,
+      interpreter,
+      converter,
+      saf
+    })
+
+    // Resolve terms
+    await resolver.resolve()
+    log.info("Resolution complete...")
+    report.print()
+    process.exit(0)
   }
 }
 
-await main()
+try {
+  await main()
+} catch (err) {
+  if ((err as Error).cause != null) {
+    log.error(err)
+    process.exit(1)
+  } else {
+    log.error("E012 Something unexpected went wrong while resoluting terms:", err)
+    process.exit(1)
+  }
+}

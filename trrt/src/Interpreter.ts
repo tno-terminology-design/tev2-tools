@@ -1,4 +1,3 @@
-import { log } from "@tno-terminology-design/utils"
 import { type SAF } from "@tno-terminology-design/utils"
 
 export interface Term {
@@ -18,8 +17,8 @@ export interface Term {
  * The `interpret` method returns a map of the term properties.
  */
 export class Interpreter {
-  private readonly type: string
-  private readonly regex: RegExp
+  public type: string
+  public regex: RegExp
 
   public constructor({ regex }: { regex: string }) {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
@@ -42,11 +41,6 @@ export class Interpreter {
       // Remove leading and trailing slashes, and flags
       this.regex = new RegExp(regex.replace(/^\/|\/[a-z]*$/g, ""), "g")
     }
-    log.info(`Using ${this.type} interpreter: '${this.regex}'`)
-  }
-
-  getRegex(): RegExp {
-    return this.regex
   }
 
   interpret(match: RegExpMatchArray, saf: SAF): Term {
