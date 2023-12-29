@@ -1,4 +1,4 @@
-import { report, log } from "@tno-terminology-design/utils"
+import { report, log, writeFile } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { getMRGinstance, getMRGenty, type MRG } from "@tno-terminology-design/utils"
 import { type Interpreter, type Term } from "./Interpreter.js"
@@ -53,39 +53,6 @@ export class Resolver {
     this.interpreter = interpreter
     this.converter = converter
     this.saf = saf
-  }
-
-  /**
-   * Creates directory tree and writes data to a file.
-   * @param fullPath - The full file path.
-   * @param data - The data to write.
-   * @param force - Whether to overwrite existing files.
-   */
-  private writeFile(fullPath: string, data: string, force: boolean = false): void {
-    const dirPath = path.dirname(fullPath)
-    const file = path.basename(fullPath)
-    // Check if the directory path doesn't exist
-    if (!fs.existsSync(dirPath)) {
-      // Create the directory and any necessary parent directories recursively
-      try {
-        fs.mkdirSync(dirPath, { recursive: true })
-      } catch (err) {
-        log.error(`E007 Error creating directory '${dirPath}':`, err)
-        return // Stop further execution if directory creation failed
-      }
-    } else if (!force && fs.existsSync(path.join(dirPath, file))) {
-      // If the file already exists and force is not enabled, don't overwrite
-      log.error(`E013 File '${path.join(dirPath, file)}' already exists. Use --force to overwrite`)
-      return // Stop further execution if force is not enabled and file exists
-    }
-
-    const filepath = path.join(dirPath, file)
-    try {
-      fs.writeFileSync(filepath, data)
-      report.fileWritten(filepath)
-    } catch (err) {
-      log.error(`E008 Error writing file '${filepath}':`, err)
-    }
   }
 
   /**
@@ -225,7 +192,7 @@ export class Resolver {
 
       // Write the converted data to the output file
       if (convertedData != null) {
-        this.writeFile(
+        writeFile(
           path.join(this.outputPath, path.dirname(filePath), path.basename(filePath)),
           convertedData,
           this.force

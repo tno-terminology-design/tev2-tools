@@ -1,10 +1,10 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
-import { log, report } from "@tno-terminology-design/utils"
+import { log, report, writeFile } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 
 import { type SAF, type MRG, SafBuilder, MrgBuilder } from "@tno-terminology-design/utils"
-import { download, writeFile } from "./Handler.js"
+import { download } from "./Handler.js"
 
 import os from "os"
 import fs = require("fs")
@@ -73,8 +73,8 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
         // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
         mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`)
         const mrgdump = yaml.dump(mrg, { forceQuotes: true, quotingType: '"', noRefs: true })
-        writeFile(mrgURL, mrgdump)
         log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`)
+        writeFile(mrgURL, mrgdump)
 
         if (version.altvsntags || version.vsntag === importSaf.scope.defaultvsn) {
           log.info(`\tCreating duplicates...`)
@@ -83,8 +83,8 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
         // if the version is the default version, create a duplicate {mrg.{import-scopetag}.yaml}
         if (version.vsntag === importSaf.scope.defaultvsn || version.altvsntags?.includes(importSaf.scope.defaultvsn)) {
           const defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`)
-          writeFile(defaultmrgURL, mrgdump)
           log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default)`)
+          writeFile(defaultmrgURL, mrgdump)
         }
 
         // Create a duplicate for every altvsntag
@@ -93,8 +93,8 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
         }
         version.altvsntags?.forEach((altvsntag) => {
           const altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`)
-          writeFile(altmrgURL, mrgdump)
           log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
+          writeFile(altmrgURL, mrgdump)
         })
       } catch (err) {
         report.onNotExistError(err as Error)

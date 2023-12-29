@@ -1,7 +1,6 @@
-import { log } from "@tno-terminology-design/utils"
+import { log, writeFile } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { TuCBuilder } from "./TuC.js"
-import { writeFile } from "./Handler.js"
 import { type SAF, type Version } from "@tno-terminology-design/utils"
 import { type Entry } from "@tno-terminology-design/utils"
 import { getMRGinstance, getMRGenty } from "@tno-terminology-design/utils"
@@ -117,10 +116,14 @@ export class Generator {
         })
 
         // output the modified tuc.entries array to a file
-        writeFile(
-          path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir, instance.tuc.filename),
-          yaml.dump(instance.output(), { forceQuotes: true, quotingType: '"', noRefs: true })
-        )
+        try {
+          writeFile(
+            path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir, instance.tuc.filename),
+            yaml.dump(instance.output(), { forceQuotes: true, quotingType: '"', noRefs: true })
+          )
+        } catch (err) {
+          log.error(err)
+        }
       })
   }
 

@@ -1,7 +1,5 @@
-import { log } from "@tno-terminology-design/utils"
-
-import path = require("path")
 import fs = require("fs")
+import path = require("path")
 
 /**
  * Creates directory tree and writes data to a file.
@@ -9,7 +7,7 @@ import fs = require("fs")
  * @param data - The data to write.
  * @param force - Whether to overwrite existing files.
  */
-export function writeFile(fullPath: string, data: string, force: boolean = true) {
+export function writeFile(fullPath: string, data: string, force: boolean = false): void {
   const dirPath = path.dirname(fullPath)
   const file = path.basename(fullPath)
   // Check if the directory path doesn't exist
@@ -18,16 +16,17 @@ export function writeFile(fullPath: string, data: string, force: boolean = true)
     try {
       fs.mkdirSync(dirPath, { recursive: true })
     } catch (err) {
-      log.error(`\tE007 Error creating directory '${dirPath}':`, err)
-      return // Stop further execution if directory creation failed
+      throw new Error(`E007 Error creating directory '${dirPath}'`, { cause: err })
     }
   } else if (!force && fs.existsSync(path.join(dirPath, file))) {
-    return // Stop further execution if force is not enabled and file exists
+    // If the file already exists and force is not enabled, don't overwrite
+    throw new Error(`E013 File '${path.join(dirPath, file)}' already exists. Use --force to overwrite`)
   }
 
+  const filepath = path.join(dirPath, file)
   try {
-    fs.writeFileSync(path.join(dirPath, file), data)
+    fs.writeFileSync(filepath, data)
   } catch (err) {
-    log.error(`\tE008 Error writing file '${path.join(dirPath, file)}':`, err)
+    throw new Error(`E008 Error writing file '${filepath}'`, { cause: err })
   }
 }
