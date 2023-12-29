@@ -1,9 +1,8 @@
-import { report, log, writeFile } from "@tno-terminology-design/utils"
 import { glob } from "glob"
-import { getMRGinstance, type MRG } from "@tno-terminology-design/utils"
 import { Interpreter, type MRGRef } from "./Interpreter.js"
 import { Converter } from "./Converter.js"
-import { type SAF, SafBuilder } from "@tno-terminology-design/utils"
+import { SAF, MRG } from "@tno-terminology-design/utils"
+import { report, log, writeFile } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
 import fs = require("fs")
@@ -18,7 +17,7 @@ export class Resolver {
   sorter: Converter
   interpreter: Interpreter
   converter: Converter
-  saf: SAF
+  saf: SAF.Type
 
   public constructor({
     outputPath,
@@ -43,7 +42,7 @@ export class Resolver {
     this.sorter = new Converter({ template: sorter })
     this.interpreter = new Interpreter({ regex: interpreter })
     this.converter = new Converter({ template: converter })
-    this.saf = new SafBuilder({ scopedir: saf }).saf
+    this.saf = new SAF.Builder({ scopedir: saf }).saf
 
     Converter.saf = this.saf
   }
@@ -55,11 +54,11 @@ export class Resolver {
    */
   private async matchIterator(file: GrayMatterFile): Promise<string | undefined> {
     // Get the matches of the regex in the file.orig string
-    const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.getRegex()))
+    const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.regex))
     if (file.matter != null) {
       // If the file has frontmatter, get the matches of the regex in the frontmatter string
       // remove count of frontmatter matches from the front of the matches array
-      const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.getRegex()))
+      const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.regex))
       matches.splice(0, frontmatter.length)
     }
 
@@ -77,7 +76,7 @@ export class Resolver {
       const mrgfile = `mrg.${mrgref.scopetag || this.saf.scope.scopetag}${
         mrgref.vsntag ? "." + mrgref.vsntag : ""
       }.yaml`
-      const mrg = getMRGinstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
+      const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
       log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`)
 
       if (mrg !== undefined && mrg.entries.length > 0) {
@@ -93,7 +92,7 @@ export class Resolver {
     }
   }
 
-  replacementHandler(match: RegExpMatchArray, mrgref: MRGRef, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
+  replacementHandler(match: RegExpMatchArray, mrgref: MRGRef, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
     let converter = this.converter
     let sorter = this.sorter
     const entries = [...mrg.entries]

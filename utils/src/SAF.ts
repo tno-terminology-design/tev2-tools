@@ -2,7 +2,7 @@ import fs = require("fs")
 import path = require("path")
 import yaml = require("js-yaml")
 
-export interface SAF {
+export interface Type {
   scope: Scope
   scopes: Scopes[]
   versions: Version[]
@@ -38,11 +38,11 @@ export interface Version {
  * The SafBuilder class handles the retrieval and processing of a SAF (Scope Administration File).
  * A SAF is retrieved based on the `scopedir` and processed into a SAF object.
  */
-export class SafBuilder {
-  saf: SAF
+export class Builder {
+  saf: Type
 
   public constructor({ scopedir }: { scopedir: string }) {
-    this.saf = this.setSafMap(path.join(scopedir, "saf.yaml"))
+    this.saf = this.setMap(path.join(scopedir, "saf.yaml"))
 
     this.saf.scope.localscopedir = scopedir
   }
@@ -52,10 +52,10 @@ export class SafBuilder {
    * @param safURL - The full path of the SAF to be retrieved.
    * @returns - The SAF as a SAF object.
    */
-  private setSafMap(safURL: string): SAF {
+  private setMap(safURL: string): Type {
     try {
       // try to load the SAF map from the scopedir
-      this.saf = yaml.load(fs.readFileSync(safURL, "utf8")) as SAF
+      this.saf = yaml.load(fs.readFileSync(safURL, "utf8")) as Type
 
       // check for missing required properties in SAF
       type ScopeProperty = keyof Scope

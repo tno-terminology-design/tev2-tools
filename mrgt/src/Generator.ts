@@ -1,9 +1,7 @@
 import { log, writeFile } from "@tno-terminology-design/utils"
+import { SAF, MRG } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { TuCBuilder } from "./TuC.js"
-import { type SAF, type Version } from "@tno-terminology-design/utils"
-import { type Entry } from "@tno-terminology-design/utils"
-import { getMRGinstance, getMRGenty } from "@tno-terminology-design/utils"
 
 import path = require("path")
 import yaml = require("js-yaml")
@@ -11,9 +9,9 @@ import fs = require("fs")
 
 export class Generator {
   public vsntag: string
-  saf: SAF
+  saf: SAF.Type
 
-  public constructor({ vsntag, saf }: { vsntag: string; saf: SAF }) {
+  public constructor({ vsntag, saf }: { vsntag: string; saf: SAF.Type }) {
     this.vsntag = vsntag
     this.saf = saf
   }
@@ -66,18 +64,18 @@ export class Generator {
         /(?:(?<term>[a-z0-9_-]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
       )
       if (properties?.groups) {
-        let entry: Entry | undefined
+        let entry: MRG.Entry | undefined
         try {
           // if no identifier (@) is specified, refer to the ctextmap
           if (!properties.groups.identifier) {
-            entry = getMRGenty(TuCBuilder.cTextMap, "cTextMap", properties.groups.term)
+            entry = MRG.getEntry(TuCBuilder.cTextMap, "cTextMap", properties.groups.term)
             // if the identifier is @, refer to the MRG
           } else {
             const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
               properties.groups.vsntag ?? this.saf.scope.defaultvsn
             }.yaml`
-            const mrg = getMRGinstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
-            entry = getMRGenty(mrg.entries, mrg.filename, properties.groups.term)
+            const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
+            entry = MRG.getEntry(mrg.entries, mrg.filename, properties.groups.term)
           }
         } catch (err) {
           // log a warning and remove the synonymOf entry
@@ -127,7 +125,7 @@ export class Generator {
       })
   }
 
-  public generate(vsn: Version): void {
+  public generate(vsn: SAF.Version): void {
     const build = new TuCBuilder({ vsn: vsn })
     const output = yaml.dump(build.output(), { forceQuotes: true, quotingType: '"', noRefs: true })
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)

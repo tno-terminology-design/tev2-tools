@@ -1,9 +1,9 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
-import { log, report, writeFile } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 
-import { type SAF, type MRG, SafBuilder, MrgBuilder } from "@tno-terminology-design/utils"
+import { SAF, MRG } from "@tno-terminology-design/utils"
+import { log, report, writeFile } from "@tno-terminology-design/utils"
 import { download } from "./Handler.js"
 
 import os from "os"
@@ -108,7 +108,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
  * @param scopedir The scopedir of the scope from which the MRG Importer is called.
  */
 export class Interpreter {
-  public saf!: Promise<SAF>
+  public saf!: Promise<SAF.Type>
 
   public constructor({ scopedir }: { scopedir: string }) {
     this.saf = this.resolveSAF(path.join(scopedir, "saf.yaml"))
@@ -119,10 +119,10 @@ export class Interpreter {
    * @param safURL The URL of the SAF map.
    * @returns A promise that resolves to the SAF map.
    */
-  private async resolveSAF(safURL: string): Promise<SAF> {
+  private async resolveSAF(safURL: string): Promise<SAF.Type> {
     const safPath = this.localize(safURL)
 
-    return new SafBuilder({ scopedir: path.dirname(await safPath) }).saf
+    return new SAF.Builder({ scopedir: path.dirname(await safPath) }).saf
   }
 
   /**
@@ -130,10 +130,10 @@ export class Interpreter {
    * @param mrgURL The URL of the MRG map.
    * @returns A promise that resolves to the MRG map.
    */
-  public async resolveMRG(mrgURL: string): Promise<MRG> {
+  public async resolveMRG(mrgURL: string): Promise<MRG.Type> {
     const mrgPath = await this.localize(mrgURL)
 
-    return new MrgBuilder({ mrgpath: mrgPath }).mrg
+    return new MRG.Builder({ mrgpath: mrgPath }).mrg
   }
 
   public async localize(fileURL: string): Promise<string> {

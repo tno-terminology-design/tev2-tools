@@ -30,10 +30,6 @@ export class Interpreter {
     }
   }
 
-  getRegex(): RegExp {
-    return this.regex
-  }
-
   interpret(match: RegExpMatchArray): MRGRef {
     if (match.groups == undefined) {
       throw new Error("Error in evaluating regex pattern: no groups provided")
@@ -49,9 +45,5 @@ export class Interpreter {
       scopetag: hrg.groups.scopetag,
       vsntag: hrg.groups.vsntag
     }
-  }
-
-  getType(): string {
-    return this.type
   }
 }

@@ -1,9 +1,8 @@
 import { report, log, writeFile } from "@tno-terminology-design/utils"
 import { glob } from "glob"
-import { getMRGinstance, getMRGenty, type MRG } from "@tno-terminology-design/utils"
+import { MRG, SAF } from "@tno-terminology-design/utils"
 import { type Interpreter, type Term } from "./Interpreter.js"
 import { type Converter } from "./Converter.js"
-import { type SAF } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
 import fs = require("fs")
@@ -30,7 +29,7 @@ export class Resolver {
   private readonly force: boolean
   interpreter: Interpreter
   converter: Converter
-  saf: SAF
+  saf: SAF.Type
 
   public constructor({
     outputPath,
@@ -45,7 +44,7 @@ export class Resolver {
     force: boolean
     interpreter: Interpreter
     converter: Converter
-    saf: SAF
+    saf: SAF.Type
   }) {
     this.outputPath = outputPath
     this.globPattern = globPattern
@@ -77,11 +76,11 @@ export class Resolver {
       // Interpret the match using the interpreter
       const term: Term = this.interpreter.interpret(match, this.saf)
 
-      let mrg: MRG | undefined
+      let mrg: MRG.Type | undefined
       const mrgfile = term.vsntag != null ? `mrg.${term.scopetag}.${term.vsntag}.yaml` : `mrg.${term.scopetag}.yaml`
       try {
         // Get the MRG instance based on the term
-        mrg = getMRGinstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
+        mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
       } catch (err) {
         report.mrgHelp(mrgfile, -1, err as Error)
       }
@@ -108,7 +107,7 @@ export class Resolver {
    * @param file - The file object of the file being processed.
    * @returns The file object.
    */
-  replacementHandler(match: RegExpMatchArray, term: Term, mrg: MRG, file: GrayMatterFile): GrayMatterFile {
+  replacementHandler(match: RegExpMatchArray, term: Term, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
     const termRefAlt = `${term.type || "default"}:${term.id}@${term.scopetag}:${term.vsntag || "default"}`
 
     if (!term.vsntag) {
@@ -124,8 +123,8 @@ export class Resolver {
     }
 
     try {
-      const entry = getMRGenty(mrg.entries, mrg.filename, term.id, term.type)
-      const replacement = this.converter.convert(entry, term, mrg.terminology)
+      const entry = MRG.getEntry(mrg.entries, mrg.filename, term.id, term.type)
+      const replacement = this.converter.convert(entry, term, mrg.terminology, this.interpreter)
 
       // Only execute the replacement steps if the 'replacement' string is not empty
       if (replacement.length > 0 && match.index != null) {

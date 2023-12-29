@@ -4,32 +4,31 @@ import { generator } from "./Run.js"
 import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
-import { type MRG, type Entry, type Terminology, getMRGinstance } from "@tno-terminology-design/utils"
-import { type Version, type Scopes } from "@tno-terminology-design/utils"
+import { MRG, SAF } from "@tno-terminology-design/utils"
 
 interface TuC {
-  terminology: Terminology
-  scopes: Set<Scopes>
-  entries: Entry[]
+  terminology: MRG.Terminology
+  scopes: Set<SAF.Scopes>
+  entries: MRG.Entry[]
   filename: string
   cText: boolean
 }
 
 export class TuCBuilder {
   static instances: TuCBuilder[] = []
-  static cTextMap: Entry[] = []
-  static synonymOf: Entry[] = []
+  static cTextMap: MRG.Entry[] = []
+  static synonymOf: MRG.Entry[] = []
 
   tuc: TuC
 
-  public constructor({ vsn }: { vsn: Version }) {
+  public constructor({ vsn }: { vsn: SAF.Version }) {
     this.tuc = {
       terminology: {
         ...generator.saf.scope,
         vsntag: vsn.vsntag,
         altvsntags: vsn.altvsntags
       },
-      scopes: new Set<Scopes>(),
+      scopes: new Set<SAF.Scopes>(),
       entries: [],
       filename: `mrg.${generator.saf.scope.scopetag}.${vsn.vsntag}.yaml`,
       cText: false
@@ -65,7 +64,7 @@ export class TuCBuilder {
     TuCBuilder.instances.push(this)
   }
 
-  public resolveInstructions(instructions: string[]): Entry[] {
+  public resolveInstructions(instructions: string[]): MRG.Entry[] {
     instructions?.forEach((instruction) => {
       if (instruction.startsWith("-")) {
         // Execute removal
@@ -82,7 +81,7 @@ export class TuCBuilder {
     return this.tuc.entries
   }
 
-  public output(): MRG {
+  public output(): MRG.Type {
     // create the MRG using terminology, scopes and entries and sort the entries by term
     const mrg = {
       terminology: this.tuc.terminology,
@@ -94,10 +93,10 @@ export class TuCBuilder {
       entry.termid = `${entry.termType ?? generator.saf.scope.defaulttype}:${entry.term}`
     }
 
-    return mrg as MRG
+    return mrg as MRG.Type
   }
 
-  private getCtextEntries(): Entry[] {
+  private getCtextEntries(): MRG.Entry[] {
     // signal use of curated texts
     this.tuc.cText = true
     // return cTextMap if it already exists
@@ -130,7 +129,7 @@ export class TuCBuilder {
         const ctextFile = matter(fs.readFileSync(ctextPath, "utf8"))
         let body = ctextFile.content
 
-        const ctextYAML = ctextFile.data as Entry
+        const ctextYAML = ctextFile.data as MRG.Entry
 
         // remove properties that match specific set of predetermined properties
         Object.keys(ctextYAML).forEach((key) => {
@@ -211,7 +210,7 @@ export class TuCBuilder {
     }
 
     const { key, values, identifier, scopetag, vsntag } = match.groups!
-    let entries: Entry[]
+    let entries: MRG.Entry[]
     let source = ``
 
     const valuelist = values?.split(",").map((v) => v.trim())
@@ -228,7 +227,7 @@ export class TuCBuilder {
         // add all terms in the MRG for either the current or the specified scope and version
         source = `mrg.${scopetag ?? generator.saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
 
-        const mrgMap = getMRGinstance(generator.saf.scope.localscopedir, generator.saf.scope.glossarydir, source)
+        const mrgMap = MRG.getInstance(generator.saf.scope.localscopedir, generator.saf.scope.glossarydir, source)
         entries = mrgMap.entries
       }
 
@@ -306,7 +305,7 @@ export class TuCBuilder {
     }
 
     const { key, values } = match.groups!
-    const removed: Entry[] = []
+    const removed: MRG.Entry[] = []
     const valuelist = values?.split(",").map((v) => v.trim())
     instruction = `-${key}[${valuelist ? valuelist.join(", ") : ""}]`
 
@@ -397,7 +396,7 @@ export class TuCBuilder {
   }
 }
 
-function entryFilter(entry: Entry, key: string, values: string[]): boolean {
+function entryFilter(entry: MRG.Entry, key: string, values: string[]): boolean {
   // if the entry has a field with the same name as the key
   if (entry[key] !== undefined) {
     // and both the values list and key entry property is empty

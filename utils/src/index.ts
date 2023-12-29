@@ -1,4 +1,6 @@
-export * from "./SAF.js"
-export * from "./MRG.js"
+export * as SAF from "./SAF.js"
+export * as MRG from "./MRG.js"
 export * from "./Report.js"
 export * from "./filesystem.js"
+export { Handlebars } from "./Handlebars.js"
+export * as helpers from "./Handlebars.js"

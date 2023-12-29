@@ -3,8 +3,8 @@
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
+import { SAF } from "@tno-terminology-design/utils"
 import { log } from "@tno-terminology-design/utils"
-import { SafBuilder } from "@tno-terminology-design/utils"
 import { Generator } from "./Generator.js"
 
 import yaml from "js-yaml"
@@ -76,7 +76,7 @@ async function main(): Promise<void> {
       }
     }
 
-    const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+    const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
     generator = new Generator({ vsntag: options.vsntag, saf: saf })
 
     // Generate MRGs

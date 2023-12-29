@@ -1,4 +1,4 @@
-import { type SAF } from "@tno-terminology-design/utils"
+import { SAF } from "@tno-terminology-design/utils"
 
 export interface Term {
   showtext: string
@@ -43,7 +43,7 @@ export class Interpreter {
     }
   }
 
-  interpret(match: RegExpMatchArray, saf: SAF): Term {
+  interpret(match: RegExpMatchArray, saf: SAF.Type): Term {
     if (match.groups === undefined) {
       throw new Error("Error in evaluating regex pattern: No groups provided")
     }
@@ -63,9 +63,5 @@ export class Interpreter {
       scopetag: match.groups.scopetag || saf.scope.scopetag,
       vsntag: match.groups.vsntag
     }
-  }
-
-  getType(): string {
-    return this.type
   }
 }

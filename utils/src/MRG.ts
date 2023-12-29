@@ -2,7 +2,7 @@ import fs = require("fs")
 import path = require("path")
 import yaml = require("js-yaml")
 
-export interface MRG {
+export interface Type {
   filename?: string
   terminology: Terminology
   scopes?: Scopes[]
@@ -46,16 +46,16 @@ export interface Entry {
  * An MRG is retrieved based on the `filename` and processed into an MRG object.
  * The MRG object with its MRG entries can then be used to populate the runtime glossary.
  */
-export class MrgBuilder {
-  static instances: MRG[] = []
-  mrg: MRG
+export class Builder {
+  static instances: Type[] = []
+  mrg: Type
 
   public constructor({ mrgpath }: { mrgpath: string }) {
-    this.mrg = this.getMrgMap(mrgpath)
+    this.mrg = this.getMap(mrgpath)
     if (this.mrg !== undefined) {
       this.mrg.filename = path.basename(mrgpath)
 
-      MrgBuilder.instances.push(this.mrg)
+      Builder.instances.push(this.mrg)
     }
   }
 
@@ -64,11 +64,11 @@ export class MrgBuilder {
    * @param mrgpath - The full path of the MRG to be retrieved.
    * @returns - The MRG as an MRG object.
    */
-  public getMrgMap(mrgpath: string): MRG {
+  public getMap(mrgpath: string): Type {
     try {
       // try to load the MRG map from the `mrgpath`
       const mrgfile = fs.readFileSync(mrgpath, "utf8")
-      this.mrg = yaml.load(mrgfile) as MRG
+      this.mrg = yaml.load(mrgfile) as Type
 
       // check for missing required properties in MRG terminology
       type TerminologyProperty = keyof Terminology
@@ -111,11 +111,11 @@ export class MrgBuilder {
  * Returns an MRG class instance.
  * @returns The MRG class instance.
  */
-export function getMRGinstance(scopedir: string, glossarydir: string, filename: string): MRG {
-  let mrg: MRG
+export function getInstance(scopedir: string, glossarydir: string, filename: string): Type {
+  let mrg: Type
 
   // Check if an MRG class instance with the `filename` property of `mrgFile` has already been loaded
-  for (const instance of MrgBuilder.instances) {
+  for (const instance of Builder.instances) {
     if (instance.filename === filename) {
       mrg = instance
       break
@@ -123,13 +123,13 @@ export function getMRGinstance(scopedir: string, glossarydir: string, filename: 
   }
   // If no existing MRG class instance was found, build the MRG according to the `mrgpath`
   if (mrg == null) {
-    mrg = new MrgBuilder({ mrgpath: path.join(scopedir, glossarydir, filename) }).mrg
+    mrg = new Builder({ mrgpath: path.join(scopedir, glossarydir, filename) }).mrg
   }
 
   return mrg
 }
 
-export function getMRGenty(entries: Entry[], origin: string, id: string, type?: string): Entry {
+export function getEntry(entries: Entry[], origin: string, id: string, type?: string): Entry {
   let entry: Entry
 
   // Find the matching entry in mrg.entries based on the term

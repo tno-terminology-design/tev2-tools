@@ -2,18 +2,17 @@
 
 import { Interpreter } from "./Interpreter.js"
 import { Converter } from "./Converter.js"
-import { SafBuilder } from "@tno-terminology-design/utils"
 import { Resolver } from "./Resolver.js"
+import { SAF } from "@tno-terminology-design/utils"
+import { report, log } from "@tno-terminology-design/utils"
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
-import { report, log } from "@tno-terminology-design/utils"
 
 import yaml from "js-yaml"
 import chalk from "chalk"
 import figlet from "figlet"
 
-export let resolver: Resolver
 const program = new Command()
 
 program
@@ -100,13 +99,13 @@ async function main(): Promise<void> {
     program.help()
     process.exit(1)
   } else {
-    // Create an interpreter, converter and glossary with the provided options
+    // Create an interpreter, converter, and saf with the provided options
     const interpreter = new Interpreter({ regex: options.interpreter ?? "default" })
     const converter = new Converter({ template: options.converter ?? "markdown" })
-    const saf = new SafBuilder({ scopedir: resolve(options.scopedir) }).saf
+    const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
 
-    // Create a resolver with the provided options
-    resolver = new Resolver({
+    // Create a resolver instance
+    const resolver = new Resolver({
       outputPath: resolve(options.output),
       globPattern: options.input,
       force: options.force,
