@@ -1,0 +1,28 @@
+scope:
+  scopetag: tev2 # identifier that curators have determined for this terminology
+  scopedir: https://github.com/aviarytech/tev2-test/tree/master # URL of the scope-directory
+  curatedir: curated-texts # directory where all curated files are located. Full URL is `scopedir`/`curatedir`
+  glossarydir: glossaries # directory where all glossary files and related stuff are located. Full URL is `scopedir`/`glossarydir`
+  defaultvsn: latest # vsntag that identifies the default terminology. MRG is located at `scopedir`/`glossarydir`/mrg.`scopetag`.`defaultvsn`.yaml
+  license: LICENSE.md # file that contains the (default) licensing conditions. Full URL is `scopedir`/`license`
+  statuses: [proposed, approved, deprecated] # list of status tags that are defined for semantic units in this scope
+  issues: https://github.com/aviarytech/tev2-test/issues # URL where issues can be raised and handled
+  curators:
+  - name: BrianR
+    email:
+      id: brian
+      at: aviary.tech
+  mrgfile: mrg.tev2.terms.yaml
+  website: https://aviarytech.github.io/tev2-test/
+  navpath: /terms
+scopes:
+# - scopetag: tev2-test # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
+#   scopedir: https://github.com/aviarytech/tev2-test/tree/master # URL of the scope-directory
+- scopetag: essiflab # definition of (scope) tag(s) that are used within this scope to refer to a specific terminology
+  vsntag: default
+  scopedir: https://github.com/Ca5e/framework/tree/master/docs # URL of the scope-directory
+versions:
+  - vsntag: terms # this version contains all terms that are curated within this scope
+    altvsntags: [latest] # alternative verstiontags
+    termselection:
+      - "*" # import all tev2 terms.

@@ -2,6 +2,7 @@
   "name": "tev2-tools",
   "private": true,
   "workspaces": [
+    "ingress",
     "mrg-import",
     "mrgt",
     "trrt",

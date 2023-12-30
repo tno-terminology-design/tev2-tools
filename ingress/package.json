@@ -1,0 +1,54 @@
+{
+  "name": "@tno-terminology-design/ingress",
+  "version": "0.1.0",
+  "description": "Ingestion tools for TEv2",
+  "main": "lib/Run.js",
+  "types": "lib/Run.d.ts",
+  "files": [
+    "lib"
+  ],
+  "bin": {
+    "ingress": "lib/Run.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build",
+    "rebuild": "npm uninstall @tno-terminology-design/ingress -g && npm run build && npm i"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tno-terminology-design/tev2-tools.git",
+    "directory": "ingress"
+  },
+  "keywords": [
+    "ctwg",
+    "tev2",
+    "ingress"
+  ],
+  "author": "Brian Richter",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tno-terminology-design/tev2-tools/issues"
+  },
+  "homepage": "https://github.com/tno-terminology-design/tev2-tools#readme",
+  "dependencies": {
+    "@types/fs-extra": "^11.0.1",
+    "@types/js-yaml": "^4.0.5",
+    "chalk": "^5.3.0",
+    "cheerio": "^1.0.0-rc.12",
+    "command-line-args": "^5.2.1",
+    "commander": "^11.0.0",
+    "figlet": "^1.6.0",
+    "js-yaml": "^4.1.0",
+    "markdown-it": "^13.0.1",
+    "simple-git": "^3.17.0",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/command-line-args": "^5.2.0",
+    "@types/figlet": "^1.5.6",
+    "@types/markdown-it": "^12.2.3",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.2.2"
+  }
+}
