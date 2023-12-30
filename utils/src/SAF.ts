@@ -63,7 +63,7 @@ export class Builder {
       const missingProperties = requiredProperties.filter((prop) => this.saf.scope[prop] == null)
 
       if (missingProperties.length > 0) {
-        throw new Error(`Missing required property in SAF at '${safURL}': '${missingProperties.join("', '")}'`)
+        throw new Error(`Missing required property: '${missingProperties.join("', '")}'`)
       }
 
       // Set default values for optional properties in SAF
@@ -83,7 +83,7 @@ export class Builder {
       // Check if there are existing versions
       if (!this.saf.versions || this.saf.versions.length === 0) {
         // log.error(`E003 No versions found in SAF at '${safURL}'`)
-        throw new Error(`No versions found in SAF at '${safURL}'`)
+        throw new Error(`No versions found`)
       }
     } catch (err) {
       throw new Error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, { cause: err })

@@ -76,13 +76,17 @@ export class Resolver {
       const mrgfile = `mrg.${mrgref.scopetag || this.saf.scope.scopetag}${
         mrgref.vsntag ? "." + mrgref.vsntag : ""
       }.yaml`
-      const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
-      log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`)
+      try {
+        const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
+        log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`)
 
-      if (mrg !== undefined && mrg.entries.length > 0) {
-        this.replacementHandler(match, mrgref, mrg, file)
-      } else {
-        continue
+        if (mrg.entries.length > 0) {
+          this.replacementHandler(match, mrgref, mrg, file)
+        } else {
+          continue
+        }
+      } catch (err) {
+        report.onNotExistError(err)
       }
     }
     if (file.converted > 0) {
@@ -118,7 +122,11 @@ export class Resolver {
     for (const entry of entries) {
       const hrgEntry = converter.convert(entry, mrgref, mrg.terminology)
       if (hrgEntry == converter.getBlank()) {
-        log.warn(`\t\tConversion of entry '${entry.term}' from '${mrg.filename}' did not fill in any expression`)
+        log.warn(
+          `\t\tConversion of entry '${entry.term}${
+            entry.termType ? ":" + entry.termType : ""
+          }' did not fill in any expression`
+        )
       }
       replacement += hrgEntry
     }
@@ -147,7 +155,7 @@ export class Resolver {
    * Calles matchIterator() on files based on `this.globPattern`.
    * @returns A Promise that resolves to true if the resolution was successful.
    */
-  public async resolve(): Promise<boolean> {
+  public async resolve(): Promise<void> {
     // Log information about the interpreter, converter and the files being read
     log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
     log.info(`Using ${this.sorter.type} sorter as default: '${this.sorter.template.replace(/\n/g, "\\n")}'`)
@@ -157,6 +165,12 @@ export class Resolver {
     // Get the list of files based on the glob pattern
     const files = await glob(this.globPattern)
     let changes: boolean
+
+    if (files.length === 0) {
+      throw new Error(`Check input (glob pattern)`, {
+        cause: `No files found using pattern string '${this.globPattern}'`
+      })
+    }
 
     // Process each file
     for (const filePath of files) {
@@ -198,7 +212,5 @@ export class Resolver {
         `No changes were made to any files, confirm that the MRG References exist and the interpreter is correct`
       )
     }
-
-    return true
   }
 }

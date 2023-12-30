@@ -77,7 +77,7 @@ export class Builder {
       const missingProperties = requiredProperties.filter((prop) => terminology[prop] == null)
 
       if (missingProperties.length > 0) {
-        throw new Error(`Missing required property in MRG at '${mrgpath}': '${missingProperties.join("', '")}'`)
+        throw new Error(`Missing required property: '${missingProperties.join("', '")}'`)
       }
 
       const requiredEntryProperties = ["term", "scopetag", "locator"]
@@ -94,13 +94,13 @@ export class Builder {
             .join(", ")
 
           throw new Error(
-            `MRG entry missing required property: '${missingProperties.join("', '")}'. 
+            `Entry missing required property: '${missingProperties.join("', '")}'. 
             Entry starts with values ${reference}`
           )
         }
       }
     } catch (err) {
-      throw new Error(`E005 An error occurred while attempting to load an MRG: ${err}`)
+      throw new Error(`E005 An error occurred while attempting to load an MRG at ${mrgpath}`, { cause: err })
     }
 
     return this.mrg

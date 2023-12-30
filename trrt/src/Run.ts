@@ -62,11 +62,11 @@ async function main(): Promise<void> {
   }
 
   // Use the remaining arguments as input
-  if (program.args[0] != null) {
+  if (program.args[0]) {
     options.input = program.args
   }
 
-  if (options.config != null) {
+  if (options.config) {
     try {
       const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
 
@@ -98,38 +98,37 @@ async function main(): Promise<void> {
     )
     program.help()
     process.exit(1)
-  } else {
-    // Create an interpreter, converter, and saf with the provided options
-    const interpreter = new Interpreter({ regex: options.interpreter ?? "default" })
-    const converter = new Converter({ template: options.converter ?? "markdown" })
-    const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
-
-    // Create a resolver instance
-    const resolver = new Resolver({
-      outputPath: resolve(options.output),
-      globPattern: options.input,
-      force: options.force,
-      interpreter,
-      converter,
-      saf
-    })
-
-    // Resolve terms
-    await resolver.resolve()
-    log.info("Resolution complete...")
-    report.print()
-    process.exit(0)
   }
+
+  // Create an interpreter, converter, and saf with the provided options
+  const interpreter = new Interpreter({ regex: options.interpreter ?? "default" })
+  const converter = new Converter({ template: options.converter ?? "markdown" })
+  const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
+
+  // Create a resolver instance
+  const resolver = new Resolver({
+    outputPath: resolve(options.output),
+    globPattern: options.input,
+    force: options.force,
+    interpreter,
+    converter,
+    saf
+  })
+
+  // Resolve terms
+  await resolver.resolve()
+  log.info("Resolution complete...")
+  report.print()
 }
 
 try {
   await main()
+  process.exit(0)
 } catch (err) {
   if ((err as Error).cause != null) {
     log.error(err)
-    process.exit(1)
   } else {
     log.error("E012 Something unexpected went wrong while resoluting terms:", err)
-    process.exit(1)
   }
+  process.exit(1)
 }

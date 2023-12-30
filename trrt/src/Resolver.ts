@@ -191,12 +191,17 @@ export class Resolver {
 
       // Write the converted data to the output file
       if (convertedData != null) {
-        writeFile(
-          path.join(this.outputPath, path.dirname(filePath), path.basename(filePath)),
-          convertedData,
-          this.force
-        )
-        changes = true
+        try {
+          writeFile(
+            path.join(this.outputPath, path.dirname(filePath), path.basename(filePath)),
+            convertedData,
+            this.force
+          )
+          changes = true
+        } catch (err) {
+          log.error(err)
+          continue
+        }
       }
     }
     if (!changes) {

@@ -127,6 +127,21 @@ class Report {
         break
     }
   }
+
+  public setOnNotExist(onNotExist: string | undefined): void {
+    if (!onNotExist) {
+      return
+    }
+    const normalizedValue = onNotExist.toLowerCase() as "throw" | "warn" | "log" | "ignore"
+
+    if (["throw", "warn", "log", "ignore"].includes(normalizedValue)) {
+      this.onNotExist = normalizedValue
+    } else {
+      throw new Error(`Invalid value '${onNotExist}' for 'onNotExist' option.`, {
+        cause: `Valid values are: 'throw', 'warn', 'log', 'ignore'`
+      })
+    }
+  }
 }
 
 export const report = new Report()

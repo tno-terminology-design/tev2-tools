@@ -80,7 +80,7 @@ export class Generator {
         } catch (err) {
           // log a warning and remove the synonymOf entry
           TuCBuilder.synonymOf.splice(index, 1)
-          log.warn(`\tSynonymOf field of '${synonymOf.termid}' (${synonymOf.synonymOf}) was removed:`)
+          log.warn(`\tSynonymOf field of '${synonymOf.termid}' (${synonymOf.synonymOf}) was removed:`, err)
         }
 
         if (entry) {

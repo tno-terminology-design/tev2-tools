@@ -29,7 +29,6 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
     env.prune()
   }
   // for each scope in the scopes-section of the 'own' SAF
-  // if saf.scopes.length > 0 then log.info with import scopes instead of scope
   log.info(
     `\x1b[1;37mFound ${saf.scopes.length} import scope${saf.scopes.length > 1 ? "s" : ""} in scopedir '${
       saf.scope.scopedir
