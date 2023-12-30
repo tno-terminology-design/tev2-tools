@@ -1,12 +1,11 @@
 // Read the SAF of the scope from which the MRG Importer is called.
 
-import { glob } from "glob"
-
 import { SAF, MRG } from "@tno-terminology-design/utils"
 import { log, report, writeFile } from "@tno-terminology-design/utils"
 import { download } from "./Handler.js"
 
 import os from "os"
+import { glob } from "glob"
 import fs = require("fs")
 import path = require("path")
 import yaml = require("js-yaml")

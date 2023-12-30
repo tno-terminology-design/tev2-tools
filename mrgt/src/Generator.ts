@@ -126,7 +126,7 @@ export class Generator {
   }
 
   public generate(vsn: SAF.Version): void {
-    const build = new TuCBuilder({ vsn: vsn })
+    const build = new TuCBuilder({ vsn: vsn, saf: this.saf })
     const output = yaml.dump(build.output(), { forceQuotes: true, quotingType: '"', noRefs: true })
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)
 

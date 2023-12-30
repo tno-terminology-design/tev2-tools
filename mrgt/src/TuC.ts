@@ -1,10 +1,9 @@
 import { log } from "@tno-terminology-design/utils"
-import { generator } from "./Run.js"
+import { MRG, SAF } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
-import { MRG, SAF } from "@tno-terminology-design/utils"
 
 interface TuC {
   terminology: MRG.Terminology
@@ -19,18 +18,20 @@ export class TuCBuilder {
   static cTextMap: MRG.Entry[] = []
   static synonymOf: MRG.Entry[] = []
 
+  saf: SAF.Type
   tuc: TuC
 
-  public constructor({ vsn }: { vsn: SAF.Version }) {
+  public constructor({ vsn, saf }: { vsn: SAF.Version; saf: SAF.Type }) {
+    this.saf = saf
     this.tuc = {
       terminology: {
-        ...generator.saf.scope,
+        ...saf.scope,
         vsntag: vsn.vsntag,
         altvsntags: vsn.altvsntags
       },
       scopes: new Set<SAF.Scopes>(),
       entries: [],
-      filename: `mrg.${generator.saf.scope.scopetag}.${vsn.vsntag}.yaml`,
+      filename: `mrg.${saf.scope.scopetag}.${vsn.vsntag}.yaml`,
       cText: false
     }
 
@@ -51,9 +52,7 @@ export class TuCBuilder {
         continue
       }
       // find the corresponding scope in the SAF's scope section
-      const SAFscope = generator.saf.scopes?.find(
-        (SAFscope: { scopetag: string }) => SAFscope.scopetag === scope.scopetag
-      )
+      const SAFscope = this.saf.scopes?.find((SAFscope: { scopetag: string }) => SAFscope.scopetag === scope.scopetag)
       if (SAFscope) {
         scope.scopedir = SAFscope.scopedir
       } else {
@@ -90,7 +89,7 @@ export class TuCBuilder {
     }
     for (const entry of mrg.entries) {
       entry.vsntag = entry.vsntag ?? this.tuc.terminology.vsntag
-      entry.termid = `${entry.termType ?? generator.saf.scope.defaulttype}:${entry.term}`
+      entry.termid = `${entry.termType ?? this.saf.scope.defaulttype}:${entry.term}`
     }
 
     return mrg as MRG.Type
@@ -103,7 +102,7 @@ export class TuCBuilder {
     if (TuCBuilder.cTextMap.length > 0) {
       return TuCBuilder.cTextMap
     }
-    const curatedir = path.join(generator.saf.scope.localscopedir, generator.saf.scope.curatedir)
+    const curatedir = path.join(this.saf.scope.localscopedir, this.saf.scope.curatedir)
 
     // Get all the curated texts from the curatedir and their subdirectories
     let curatedirContent = []
@@ -139,7 +138,7 @@ export class TuCBuilder {
         })
 
         // construct navurl from website, navpath and ctext name, or bodyFile
-        const navUrl = new URL(generator.saf.scope.website)
+        const navUrl = new URL(this.saf.scope.website)
         const pathname = navUrl.pathname
         if (ctextYAML.bodyFile) {
           // If the bodyFile property is set, then use that to construct the navurl
@@ -147,17 +146,17 @@ export class TuCBuilder {
           navUrl.pathname = path.join(pathname, bodyFilePath.dir, bodyFilePath.name)
           try {
             const bodyFile = matter(
-              fs.readFileSync(path.join(generator.saf.scope.localscopedir, ctextYAML.bodyFile), "utf8")
+              fs.readFileSync(path.join(this.saf.scope.localscopedir, ctextYAML.bodyFile), "utf8")
             )
             body = bodyFile.content
 
             // if the bodyFile has a `bodyFileID` property, then use that to construct the navurl
-            if (generator.saf.scope.bodyFileID) {
-              if (bodyFile.data[generator.saf.scope.bodyFileID]) {
+            if (this.saf.scope.bodyFileID) {
+              if (bodyFile.data[this.saf.scope.bodyFileID]) {
                 navUrl.pathname = path.join(
                   pathname,
                   bodyFilePath.dir,
-                  path.parse(bodyFile.data[generator.saf.scope.bodyFileID]).name
+                  path.parse(bodyFile.data[this.saf.scope.bodyFileID]).name
                 )
               }
             }
@@ -165,12 +164,7 @@ export class TuCBuilder {
             throw new Error(`While loading the bodyFile '${ctextYAML.bodyFile}': ${err.message}`)
           }
         } else {
-          navUrl.pathname = path.join(
-            pathname,
-            generator.saf.scope.navpath,
-            path.parse(ctext).dir,
-            path.parse(ctext).name
-          )
+          navUrl.pathname = path.join(pathname, this.saf.scope.navpath, path.parse(ctext).dir, path.parse(ctext).name)
         }
 
         const formPhrases = resolveFormPhrases(ctextYAML.formPhrases)
@@ -225,9 +219,9 @@ export class TuCBuilder {
         entries = this.getCtextEntries()
       } else {
         // add all terms in the MRG for either the current or the specified scope and version
-        source = `mrg.${scopetag ?? generator.saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
+        source = `mrg.${scopetag ?? this.saf.scope.scopetag}.${vsntag ? vsntag + "." : ""}yaml`
 
-        const mrgMap = MRG.getInstance(generator.saf.scope.localscopedir, generator.saf.scope.glossarydir, source)
+        const mrgMap = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, source)
         entries = mrgMap.entries
       }
 
@@ -242,7 +236,7 @@ export class TuCBuilder {
         // add entries to TuC and overwrite existing entries with the same termid
         for (const newEntry of entries) {
           if (!newEntry.termid) {
-            newEntry.termid = `${newEntry.termType ?? generator.saf.scope.defaulttype}:${newEntry.term}`
+            newEntry.termid = `${newEntry.termType ?? this.saf.scope.defaulttype}:${newEntry.term}`
           }
           const existingIndex = this.tuc.entries.findIndex((entry) => entry.termid === newEntry.termid)
           if (existingIndex !== -1 && newEntry.termid != null) {

@@ -13,6 +13,7 @@ import figlet from "figlet"
 
 export let generator: Generator
 export let onNotExist: string = "throw"
+
 const program = new Command()
 
 program

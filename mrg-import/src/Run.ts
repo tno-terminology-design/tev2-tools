@@ -9,6 +9,7 @@ import { initialize } from "./Interpreter.js"
 import yaml from "js-yaml"
 import chalk from "chalk"
 import figlet from "figlet"
+
 const program = new Command()
 
 program
