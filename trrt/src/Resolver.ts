@@ -28,29 +28,29 @@ export class Resolver {
   private readonly globPattern: string
   private readonly force: boolean
   interpreter: Interpreter
-  converter: Converter
+  converterMap: Map<number, Converter>
   saf: SAF.Type
 
   public constructor({
     outputPath,
     globPattern,
     force,
+    converterMap,
     interpreter,
-    converter,
     saf
   }: {
     outputPath: string
     globPattern: string
     force: boolean
+    converterMap: Map<number, Converter>
     interpreter: Interpreter
-    converter: Converter
     saf: SAF.Type
   }) {
     this.outputPath = outputPath
     this.globPattern = globPattern
     this.force = force
     this.interpreter = interpreter
-    this.converter = converter
+    this.converterMap = converterMap
     this.saf = saf
   }
 
@@ -124,7 +124,7 @@ export class Resolver {
 
     try {
       const entry = MRG.getEntry(mrg.entries, mrg.filename, term.id, term.type)
-      const replacement = this.converter.convert(entry, term, mrg.terminology, this.interpreter)
+      const replacement = this.converterMap.get(0).convert(entry, term, mrg.terminology, this.interpreter)
 
       // Only execute the replacement steps if the 'replacement' string is not empty
       if (replacement.length > 0 && match.index != null) {
@@ -160,7 +160,13 @@ export class Resolver {
     // Log information about the interpreter, converter and the files being read
     log.info(`Reading files using pattern string '${this.globPattern}'`)
     log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
-    log.info(`Using ${this.converter.type} template: '${this.converter.template.replace(/\n/g, "\\n")}'`)
+    for (const [key, value] of this.converterMap) {
+      log.info(
+        `Using ${value.type} template as converter${
+          this.converterMap.size > 1 ? `[${key}]` : ""
+        }: '${value.template.replace(/\n/g, "\\n")}'`
+      )
+    }
 
     // Get the list of files based on the glob pattern
     const files = await glob(this.globPattern)

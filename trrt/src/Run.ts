@@ -50,7 +50,7 @@ async function main(): Promise<void> {
     if (match) {
       const template = process.argv[parseInt(key) + 3]
       const i = program.args.indexOf(value)
-      if (match.groups.n == null || match.groups.n == "0") {
+      if (match.groups.n == null || match.groups.n === "0") {
         options.converter = template
       } else {
         options[`converter[${match.groups.n}]`] = template
@@ -79,13 +79,13 @@ async function main(): Promise<void> {
   }
 
   // Process converter options and populate the map
-  options.converterMap = new Map<number, Converter>()
+  const converterMap = new Map<number, Converter>()
   for (const [key, value] of Object.entries(options)) {
     const match = key.match(/^converter(?:\[(?<n>\d+)\])?$/)
     if (match) {
       const template = value as string
       const converter = new Converter({ template })
-      options.converterMap.set(parseInt(match.groups?.n) || 0, converter)
+      converterMap.set(parseInt(match.groups?.n) || 0, converter)
     }
   }
 
@@ -102,7 +102,6 @@ async function main(): Promise<void> {
 
   // Create an interpreter, converter, and saf with the provided options
   const interpreter = new Interpreter({ regex: options.interpreter ?? "default" })
-  const converter = new Converter({ template: options.converter ?? "markdown" })
   const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
 
   // Create a resolver instance
@@ -110,8 +109,8 @@ async function main(): Promise<void> {
     outputPath: resolve(options.output),
     globPattern: options.input,
     force: options.force,
+    converterMap,
     interpreter,
-    converter,
     saf
   })
 
