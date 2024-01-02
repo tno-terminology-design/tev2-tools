@@ -12,12 +12,14 @@ import chalk from "chalk"
 import figlet from "figlet"
 
 const program = new Command()
+const name = "mrgt"
+const version = "0.1.7"
 
 program
-  .name("mrgt")
-  .version("0.1.7")
+  .name(name)
   .usage("[ <paramlist> ]\n" + "- <paramlist> (optional) is a list of key-value pairs")
   .description("The CLI for the Machine Readable Glossary (Generation) Tool")
+  .version(version, "-V, --version", "Output the version number")
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-s, --scopedir <path>", "Path of the scope directory from which the tool is called")
   .option("-v, --vsntag <vsntag>", "Versiontag for which the MRG needs to be (re)generated")
@@ -32,7 +34,8 @@ async function main(): Promise<void> {
     options.input = program.args
   }
 
-  console.log(chalk.red(figlet.textSync("mrgt-cli", { horizontalLayout: "full" })))
+  console.log(chalk.red(figlet.textSync(name + "-cli", { horizontalLayout: "full" })))
+  console.log(`Version: ${version}\n`)
 
   if (options.config) {
     try {

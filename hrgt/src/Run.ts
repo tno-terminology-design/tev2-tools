@@ -11,16 +11,18 @@ import chalk from "chalk"
 import figlet from "figlet"
 
 const program = new Command()
+const name = "hrgt"
+const version = "0.1.5"
 
 program
-  .name("hrgt")
-  .version("0.1.5")
+  .name(name)
   .usage(
     "[ <paramlist> ] [ <globpattern> ]\n" +
       "- <paramlist> (optional) is a list of key-value pairs\n" +
       "- <globpattern> (optional) specifies a set of (input) files that are to be processed"
   )
   .description("The CLI for the Human Readable Glossary Generation Tool")
+  .version(version, "-V, --version", "Output the version number")
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-o, --output <dir>", "(Root) directory for output files to be written")
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
@@ -34,11 +36,12 @@ program
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-table-row`, `markdown-section-2`, `markdown-section-3`)"
   )
   .option(
-    "-sort, --sorter <template> or <predeftype>",
+    "--sort, --sorter <template> or <predeftype>",
     "Type of sorter, i.e., a mustache/handlebars template, or a predifined type (`default`) by which to sort the glossary items"
   )
   .option("-o, --onNotExist <action>", "The action in case an MRG file unexpectedly does not exist")
   .option("-f, --force", "Allow overwriting of existing files")
+  .option("-h, --help", "Display help for command")
   .parse(process.argv)
 
 async function main(): Promise<void> {
@@ -48,7 +51,8 @@ async function main(): Promise<void> {
     options.input = program.args
   }
 
-  console.log(chalk.red(figlet.textSync("hrgt-cli", { horizontalLayout: "full" })))
+  console.log(chalk.red(figlet.textSync(name + "-cli", { horizontalLayout: "full" })))
+  console.log(`Version: ${version}\n`)
 
   if (options.config) {
     try {

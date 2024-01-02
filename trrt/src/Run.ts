@@ -14,16 +14,18 @@ import chalk from "chalk"
 import figlet from "figlet"
 
 const program = new Command()
+const name = "trrt"
+const version = "1.0.11"
 
 program
-  .name("trrt")
-  .version("1.0.11")
+  .name(name)
   .usage(
     "[ <paramlist> ] [ <globpattern> ]\n" +
       "- <paramlist> (optional) is a list of key-value pairs\n" +
       "- <globpattern> (optional) specifies a set of (input) files that are to be processed"
   )
   .description("The CLI for the Term Reference Resolution Tool")
+  .version(version, "-V, --version", "Output the version number")
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-o, --output <dir>", "(Root) directory for output files to be written")
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
@@ -41,8 +43,10 @@ program
   .parse(process.argv)
 
 async function main(): Promise<void> {
-  console.log(chalk.red(figlet.textSync("trrt-cli", { horizontalLayout: "full" })))
   let options = program.opts()
+
+  console.log(chalk.red(figlet.textSync(name + "-cli", { horizontalLayout: "full" })))
+  console.log(`Version: ${version}\n`)
 
   // Process command line converter options
   for (const [key, value] of Object.entries(process.argv.slice(2))) {
