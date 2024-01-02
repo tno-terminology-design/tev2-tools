@@ -32,7 +32,7 @@
     "chalk": "^4.1.2",
     "commander": "10.0.0",
     "figlet": "^1.6.0",
-    "glob": "^10.2.6",
+    "glob": "^10.3.10",
     "gray-matter": "^4.0.3",
     "handlebars": "^4.7.7",
     "js-yaml": "^4.1.0"

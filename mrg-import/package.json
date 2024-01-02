@@ -34,6 +34,7 @@
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
     "git-url-parse": "^13.1.0",
+    "glob": "^10.3.10",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
