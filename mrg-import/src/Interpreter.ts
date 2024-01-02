@@ -72,7 +72,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
         mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`)
         const mrgdump = yaml.dump(mrg, { forceQuotes: true, quotingType: '"', noRefs: true })
         log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`)
-        writeFile(mrgURL, mrgdump)
+        writeFile(mrgURL, mrgdump, true)
 
         if (version.altvsntags || version.vsntag === importSaf.scope.defaultvsn) {
           log.info(`\tCreating duplicates...`)
@@ -82,7 +82,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
         if (version.vsntag === importSaf.scope.defaultvsn || version.altvsntags?.includes(importSaf.scope.defaultvsn)) {
           const defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`)
           log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default)`)
-          writeFile(defaultmrgURL, mrgdump)
+          writeFile(defaultmrgURL, mrgdump, true)
         }
 
         // Create a duplicate for every altvsntag
@@ -92,7 +92,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
         version.altvsntags?.forEach((altvsntag) => {
           const altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`)
           log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
-          writeFile(altmrgURL, mrgdump)
+          writeFile(altmrgURL, mrgdump, true)
         })
       } catch (err) {
         report.onNotExistError(err as Error)
