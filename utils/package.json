@@ -1,6 +1,6 @@
 {
   "name": "@tno-terminology-design/utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utility functions for TNO Terminology Design tools",
   "files": [
     "lib"

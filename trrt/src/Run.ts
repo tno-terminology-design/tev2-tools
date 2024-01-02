@@ -15,7 +15,7 @@ import figlet from "figlet"
 
 const program = new Command()
 const name = "trrt"
-const version = "1.0.12"
+const version = "1.0.13"
 
 program
   .name(name)
