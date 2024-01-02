@@ -64,7 +64,7 @@ async function main(): Promise<void> {
 }
 
 try {
-  main()
+  await main()
   process.exit(0)
 } catch (err) {
   if ((err as Error).cause) {

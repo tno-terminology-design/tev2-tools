@@ -36,5 +36,5 @@ export async function download(url: URL, localPath: string): Promise<void> {
 
   log.trace(`\tRequesting '${rawUrl}'`)
   const response = await axios.get(rawUrl.href, { responseType: "arraybuffer" })
-  writeFile(localPath, response.data)
+  writeFile(localPath, response.data, true)
 }

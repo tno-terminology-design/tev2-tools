@@ -17,7 +17,7 @@ hrgt:
     {{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n
   force: true
   input:
-    - "__tests__/content/**/*.md"
+    - "__tests__/content/**/mockup*"
 
 ## Term Reference Resolution Tool
 trrt:
@@ -28,6 +28,8 @@ trrt:
     href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}"
     hovertext="{{#if hoverText}}{{hoverText}}{{else}}{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}"
     >{{showtext}}</a>
+  converter[7]: This converter is used on and after the 7th occurrence of a term reference, in this case {{term}}:{{termType}}
   force: true # toggle overwriting of existing files
   input: # glob pattern strings for files to be processed by the TRRT
-    - "__tests__/content/**/*.md"
+    - "__tests__/output/**/mockup*"
+  output: .

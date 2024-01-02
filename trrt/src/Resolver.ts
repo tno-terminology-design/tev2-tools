@@ -158,7 +158,6 @@ export class Resolver {
    */
   public async resolve(): Promise<boolean> {
     // Log information about the interpreter, converter and the files being read
-    log.info(`Reading files using pattern string '${this.globPattern}'`)
     log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
     for (const [key, value] of this.converterMap) {
       log.info(
@@ -167,6 +166,7 @@ export class Resolver {
         }: '${value.template.replace(/\n/g, "\\n")}'`
       )
     }
+    log.info(`Reading files using pattern string '${this.globPattern}'`)
 
     // Get the list of files based on the glob pattern
     const files = await glob(this.globPattern)
@@ -181,6 +181,7 @@ export class Resolver {
       try {
         file = matter(fs.readFileSync(filePath, "utf8")) as GrayMatterFile
         file.path = filePath
+        file.converted = new Map()
       } catch (err) {
         log.error(`E009 Could not read file '${filePath}':`, err)
         continue
@@ -203,6 +204,7 @@ export class Resolver {
             convertedData,
             this.force
           )
+          report.fileWritten(filePath)
           changes = true
         } catch (err) {
           log.error(err)

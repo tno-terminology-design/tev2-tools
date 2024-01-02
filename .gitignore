@@ -96,4 +96,6 @@ Thumbs.db
 
 # Ignore built files
 __tests__/output
+glossaries/
+!mrg.tev2-tools.yaml
 lib
