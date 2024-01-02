@@ -12,7 +12,7 @@ import figlet from "figlet"
 
 const program = new Command()
 const name = "mrg-import"
-const version = "1.0.0"
+const version = "1.0.1"
 
 program
   .name(name)
