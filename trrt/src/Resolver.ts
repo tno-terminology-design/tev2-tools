@@ -124,7 +124,14 @@ export class Resolver {
 
     try {
       const entry = MRG.getEntry(mrg.entries, mrg.filename, term.id, term.type)
-      const replacement = this.converterMap.get(0).convert(entry, term, mrg.terminology, this.interpreter)
+      // get the this.converMap that is higher than or the same as the number of times the term has been converted
+      let converter = this.converterMap.get(0)
+      for (const [key, value] of this.converterMap) {
+        if (file.converted.get(`${entry.termid}`) + 1 >= key) {
+          converter = value
+        }
+      }
+      const replacement = converter.convert(entry, term, mrg.terminology, this.interpreter)
 
       // Only execute the replacement steps if the 'replacement' string is not empty
       if (replacement.length > 0 && match.index != null) {
