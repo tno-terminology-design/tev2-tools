@@ -39,6 +39,7 @@ program
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-link`, `html-link`, `html-hovertext-link`, `html-glossarytext-link`)"
   )
   .option("-f, --force", "Allow overwriting of existing files")
+  .option("-h, --help", "Display help for command")
   .allowUnknownOption(true)
   .parse(process.argv)
 

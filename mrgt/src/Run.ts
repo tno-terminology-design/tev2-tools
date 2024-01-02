@@ -25,6 +25,7 @@ program
   .option("-v, --vsntag <vsntag>", "Versiontag for which the MRG needs to be (re)generated")
   .option("-o, --onNotExist <action>", "The action in case a `vsntag` was specified, but wasn't found in the SAF")
   .option("-p, --prune", "Prune MRGs of the local scope that are not in the SAF")
+  .option("-h, --help", "Display help for command")
   .parse(process.argv)
 
 async function main(): Promise<void> {
