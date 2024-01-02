@@ -13,7 +13,7 @@ import figlet from "figlet"
 
 const program = new Command()
 const name = "mrgt"
-const version = "0.1.7"
+const version = "1.0.0"
 
 program
   .name(name)

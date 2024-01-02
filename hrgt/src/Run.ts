@@ -12,7 +12,7 @@ import figlet from "figlet"
 
 const program = new Command()
 const name = "hrgt"
-const version = "0.1.5"
+const version = "1.0.0"
 
 program
   .name(name)
