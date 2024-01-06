@@ -52,12 +52,11 @@ export class Interpreter {
       ...match.groups,
       showtext: match.groups.showtext,
       id:
-        match.groups.id?.length > 0
-          ? match.groups.id
-          : match.groups.showtext
-              .toLowerCase()
-              .replace(/['()]+/g, "")
-              .replace(/[^a-z0-9_-]+/g, "-"),
+        match.groups.id ||
+        match.groups.showtext
+          .toLowerCase()
+          .replace(/['()]+/g, "")
+          .replace(/[^a-z0-9_-]+/g, "-"),
       type: match.groups.type || saf.scope.defaulttype,
       trait: match.groups.trait,
       scopetag: match.groups.scopetag || saf.scope.scopetag,

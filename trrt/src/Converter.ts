@@ -1,4 +1,4 @@
-import { MRG, Handlebars, helpers } from "@tno-terminology-design/utils"
+import { MRG, Handlebars } from "@tno-terminology-design/utils"
 import { Interpreter, type Term } from "./Interpreter.js"
 
 /**
@@ -41,7 +41,8 @@ export class Converter {
     const evaluatedEntry: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(entry)) {
       if (typeof value === "string") {
-        evaluatedEntry[key] = helpers.evaluateExpressions(value, { ...entry, term })
+        const template = Handlebars.compile(value, { noEscape: true, compat: true })
+        evaluatedEntry[key] = template({ mrg: { terminology: terminology }, interpreter, ...entry, ...term })
       } else {
         evaluatedEntry[key] = value
       }

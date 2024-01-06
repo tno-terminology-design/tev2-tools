@@ -19,17 +19,6 @@ interface env {
 }
 
 /**
- * Helper function to evaluate Handlebars expressions inside MRG Entry properties
- * @param input - The string to be evaluated
- * @param data - The data to be used in the evaluation
- * @returns The evaluated string
- */
-export function evaluateExpressions(input: string, data: Record<string, unknown>): string {
-  const template = Handlebars.compile(input, { noEscape: true, compat: true })
-  return template(data)
-}
-
-/**
  * Helper function to capitalize the first letter of every word in a string
  * @param text - The string to be capitalized
  * @returns The capitalized string
