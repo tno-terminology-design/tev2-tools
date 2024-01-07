@@ -8,7 +8,12 @@ import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
 
-type GrayMatterFile = matter.GrayMatterFile<string> & { path: string; lastIndex: number; converted: number }
+type GrayMatterFile = matter.GrayMatterFile<string> & {
+  path: string
+  lastIndex: number
+  output: string
+  converted: number
+}
 
 export class Resolver {
   private readonly outputPath: string
@@ -64,6 +69,7 @@ export class Resolver {
 
     file.lastIndex = 0
     file.converted = 0
+    file.output = file.orig.toString()
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
@@ -90,7 +96,7 @@ export class Resolver {
       }
     }
     if (file.converted > 0) {
-      return file.orig.toString()
+      return file.output
     } else {
       return undefined
     }
@@ -135,11 +141,11 @@ export class Resolver {
     if (replacement.length > 0 && match.index != null) {
       const startIndex = match.index + file.lastIndex
       const matchLength = match[0].length
-      const textBeforeMatch = file.orig.toString().substring(0, startIndex)
-      const textAfterMatch = file.orig.toString().substring(startIndex + matchLength)
+      const textBeforeMatch = file.output.substring(0, startIndex)
+      const textAfterMatch = file.output.substring(startIndex + matchLength)
 
       // Replace the reference with the generated replacement
-      file.orig = `${textBeforeMatch}${replacement}${textAfterMatch}`
+      file.output = `${textBeforeMatch}${replacement}${textAfterMatch}`
 
       // Update the lastIndex to account for the length difference between the reference and replacement
       file.lastIndex += replacement.length - matchLength
