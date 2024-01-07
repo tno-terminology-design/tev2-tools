@@ -22,7 +22,9 @@ program
   .usage(
     "[ <paramlist> ] [ <globpattern> ]\n" +
       "- <paramlist> (optional) is a list of key-value pairs\n" +
-      "- <globpattern> (optional) specifies a set of (input) files that are to be processed"
+      "- <globpattern> (optional) specifies a set of (input) files that are to be processed\n" +
+      "\n" +
+      "*Multiple converters may be specified by appending a number to the option, e.g., `--converter[1] <template> --converter[2] <template>`, where `n` is the termid occurrence count from which to start using a specific converter during resolution of a file. Using `--converter`, without a number, is equal to using `--converter[0]`\n"
   )
   .description("The CLI for the Term Reference Resolution Tool")
   .version(version, "-V, --version", "Output the version number")
@@ -35,7 +37,7 @@ program
     "Type of interpreter, i.e., a regex, or a predefined type (`default`, `alt`)"
   ) // `basic` is deprecated
   .option(
-    "--con, --converter <template> or <predeftype>",
+    "--con[n], --converter[n] <template> or <predeftype>*",
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-link`, `html-link`, `html-hovertext-link`, `html-glossarytext-link`)"
   )
   .option("-f, --force", "Allow overwriting of existing files")
@@ -51,11 +53,11 @@ async function main(): Promise<void> {
 
   // Process command line converter options
   for (const [key, value] of Object.entries(process.argv.slice(2))) {
-    const match = value.match(/^--con(?:verter)?(?:\[(?<n>\d+)\])?$/)
+    const match = value.match(/^--con(?:verter)?(?:\[(?<n>\d+)?\])?$/)
     if (match) {
       const template = process.argv[parseInt(key) + 3]
       const i = program.args.indexOf(value)
-      if (match.groups.n == null || match.groups.n === "0") {
+      if (match.groups.n == null || parseInt(match.groups.n) < 1) {
         options.converter = template
       } else {
         options[`converter[${match.groups.n}]`] = template
@@ -99,7 +101,7 @@ async function main(): Promise<void> {
     program.addHelpText(
       "after",
       "\nRequired options are missing\n" +
-        "Provide at least the following options: output <path>, scopedir <path> and input <globpattern>\n"
+        "Provide at least the following options: output <path>, scopedir <path>, input <globpattern>\n"
     )
     program.help()
     process.exit(1)
