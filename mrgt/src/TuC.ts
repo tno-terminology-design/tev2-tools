@@ -422,7 +422,9 @@ function resolveFormPhrases(formPhrases: string[]): string[] {
   const regexMap: Record<string, string[]> = {
     "{ss}": ["", "s", "'s", "(s)"],
     "{yies}": ["y", "ys", "y's", "ies"],
-    "{ying}": ["y", "ier", "ying", "ies", "ied"]
+    "{ying}": ["y", "ying", "ies", "ied"],
+    "{es}": ["e", "es", "ed", "ing"],
+    "{able}": [ "able", "ability" ]
   }
   const alternatives = formPhrases != null ? formPhrases.map((t) => t.trim()) : []
 
