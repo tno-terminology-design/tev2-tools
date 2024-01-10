@@ -61,21 +61,21 @@ export class Generator {
     TuCBuilder.synonymOf?.forEach((synonymOf, index) => {
       // wrangle the synonymOf field using a regex
       const properties = synonymOf.synonymOf!.match(
-        /(?:(?<term>[a-z0-9_-]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
+        /(?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[a-z0-9_-]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
       )
       if (properties?.groups) {
         let entry: MRG.Entry | undefined
         try {
           // if no identifier (@) is specified, refer to the ctextmap
           if (!properties.groups.identifier) {
-            entry = MRG.getEntry(TuCBuilder.cTextMap, "cTextMap", properties.groups.term)
+            entry = MRG.getEntry(TuCBuilder.cTextMap, "cTextMap", properties.groups.term, properties.groups.type)
             // if the identifier is @, refer to the MRG
           } else {
             const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
               properties.groups.vsntag ?? this.saf.scope.defaultvsn
             }.yaml`
             const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
-            entry = MRG.getEntry(mrg.entries, mrg.filename, properties.groups.term)
+            entry = MRG.getEntry(mrg.entries, mrg.filename, properties.groups.term, properties.groups.type)
           }
         } catch (err) {
           // log a warning and remove the synonymOf entry
