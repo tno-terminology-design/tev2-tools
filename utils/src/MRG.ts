@@ -129,23 +129,19 @@ export function getInstance(scopedir: string, glossarydir: string, filename: str
   return mrg
 }
 
-export function getEntry(entries: Entry[], origin: string, id: string, type?: string): Entry {
-  let entry: Entry
-
+export function getEntry(entries: Entry[], origin: string, term: string, type: string): Entry {
   // Find the matching entry in mrg.entries based on the term
-  let matches = entries.filter((entry) => entry.term === id || entry.formPhrases?.includes(id))
+  let matches = entries.filter((entry) => entry.term === term || entry.formPhrases?.includes(term))
   if (matches.length > 1 && type != null) {
     matches = matches.filter((entry) => entry.termType === type)
   }
 
   if (matches.length === 1) {
-    entry = matches[0]
+    return matches[0]
   } else if (matches.length === 0) {
     throw new Error(`could not be matched with an MRG entry in '${origin}`)
   } else if (matches.length > 1) {
     const matchingTermIds = matches.map((entry) => entry.termid).join("', '")
     throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`)
   }
-
-  return entry
 }

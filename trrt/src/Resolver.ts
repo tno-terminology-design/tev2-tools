@@ -1,7 +1,7 @@
 import { report, log, writeFile } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { MRG, SAF } from "@tno-terminology-design/utils"
-import { type Interpreter, type Term } from "./Interpreter.js"
+import { type Interpreter, type TermRef } from "./Interpreter.js"
 import { type Converter } from "./Converter.js"
 
 import matter from "gray-matter"
@@ -75,20 +75,24 @@ export class Resolver {
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
-      // Interpret the match using the interpreter
-      const term: Term = this.interpreter.interpret(match, this.saf)
-
       let mrg: MRG.Type | undefined
-      const mrgfile = term.vsntag != null ? `mrg.${term.scopetag}.${term.vsntag}.yaml` : `mrg.${term.scopetag}.yaml`
+
+      // Interpret the match using the interpreter
+      const termref: TermRef = this.interpreter.interpret(match)
+      const scopetag = termref.scopetag || this.saf.scope.scopetag
+      const vsnvag = termref.vsntag ? `.${termref.vsntag}` : ""
+
+      const mrgfile = `mrg.${scopetag}${vsnvag}.yaml`
+
       try {
-        // Get the MRG instance based on the term
+        // Get the MRG instance based on the mrgfile
         mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
       } catch (err) {
         report.mrgHelp(mrgfile, -1, err as Error)
       }
 
       if (mrg !== undefined && mrg.entries.length > 0) {
-        this.replacementHandler(match, term, mrg, file)
+        this.replacementHandler(match, termref, mrg, file)
       } else {
         const message = `Term ref '${match[0]}', could not be converted due to an MRG error`
         report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
@@ -109,23 +113,24 @@ export class Resolver {
    * @param file - The file object of the file being processed.
    * @returns The file object.
    */
-  replacementHandler(match: RegExpMatchArray, term: Term, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
-    const termRefAlt = `${term.type || "default"}:${term.id}@${term.scopetag}:${term.vsntag || "default"}`
+  replacementHandler(match: RegExpMatchArray, termref: TermRef, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
+    termref.term = termref.term || termref.showtext.toLocaleLowerCase().trim().replace(/\s/g, "-")
 
-    if (!term.vsntag) {
-      term.vsntag = mrg.terminology.vsntag
-    }
-    if (!term.type) {
-      term.type = this.saf.scope.defaulttype
-    }
+    const defaults = `${termref.type ? termref.type + ":" : "default:"}${termref.term}@${
+      termref.scopetag || "default"
+    }${termref.vsntag ? `:${termref.vsntag}` : ":default"}`
 
-    let termRef = `${term.type}:${term.id}@${term.scopetag}:${term.vsntag}`
-    if (termRefAlt !== termRef) {
-      termRef = `${termRefAlt}' > '${termRef}`
+    termref.type = termref.type || this.saf.scope.defaulttype
+    termref.scopetag = termref.scopetag || this.saf.scope.scopetag
+    termref.vsntag = termref.vsntag || mrg.terminology.vsntag
+
+    let reference = `${termref.type}:${termref.term}@${termref.scopetag}:${termref.vsntag}`
+    if (defaults !== reference) {
+      reference = `${defaults}' > '${reference}`
     }
 
     try {
-      const entry = MRG.getEntry(mrg.entries, mrg.filename, term.id, term.type)
+      const entry = MRG.getEntry(mrg.entries, mrg.filename, termref.term, termref.type)
       // get the this.converMap that is higher than or the same as the number of times the term has been converted
       let converter = this.converterMap.get(0)
       for (const [key, value] of this.converterMap) {
@@ -133,7 +138,7 @@ export class Resolver {
           converter = value
         }
       }
-      const replacement = converter.convert(entry, term, mrg.terminology, this.interpreter)
+      const replacement = converter.convert(entry, termref, mrg.terminology, this.interpreter)
 
       // Only execute the replacement steps if the 'replacement' string is not empty
       if (replacement.length > 0 && match.index != null) {
@@ -153,7 +158,7 @@ export class Resolver {
         file.converted.set(entry!.termid, (file.converted.get(entry!.termid) || 0) + 1)
       }
     } catch (err) {
-      const message = `Term ref '${match[0]}' > '${termRef}', ${err}`
+      const message = `Term ref '${match[0]}' > '${reference}', ${err}`
       const line = file.orig.toString().substring(0, match.index).split("\n").length
       report.termHelp(file.path, line, message)
     }

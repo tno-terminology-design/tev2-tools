@@ -1,5 +1,5 @@
 import { MRG, Handlebars } from "@tno-terminology-design/utils"
-import { Interpreter, type Term } from "./Interpreter.js"
+import { Interpreter, type TermRef } from "./Interpreter.js"
 
 /**
  * The Converter class handles the conversion of a glossary entry to a specific format.
@@ -36,13 +36,13 @@ export class Converter {
     }
   }
 
-  convert(entry: MRG.Entry, term: Term, terminology?: MRG.Terminology, interpreter?: Interpreter): string {
+  convert(entry: MRG.Entry, termref: TermRef, terminology?: MRG.Terminology, interpreter?: Interpreter): string {
     // Evaluate the properties inside the entry object
     const evaluatedEntry: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(entry)) {
       if (typeof value === "string") {
         const template = Handlebars.compile(value, { noEscape: true, compat: true })
-        evaluatedEntry[key] = template({ mrg: { terminology: terminology }, interpreter, ...entry, ...term })
+        evaluatedEntry[key] = template({ mrg: { terminology: terminology }, interpreter, ...entry, ...termref })
       } else {
         evaluatedEntry[key] = value
       }
@@ -50,7 +50,7 @@ export class Converter {
 
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
-    const output = template({ mrg: { terminology: terminology }, interpreter, ...evaluatedEntry, ...term })
+    const output = template({ mrg: { terminology: terminology }, interpreter, ...evaluatedEntry, ...termref })
     if (output === "") {
       throw new Error(`resulted in an empty string, check the converter template`)
     }

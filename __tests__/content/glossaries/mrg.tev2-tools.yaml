@@ -30,7 +30,16 @@ entries:
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "action"
-    formPhrases: "action{ss}, acting, activit{yies}"
+    formPhrases:
+      - "action"
+      - "actions"
+      - "action's"
+      - "action(s)"
+      - "acting"
+      - "activity"
+      - "activitys"
+      - "activity's"
+      - "activities"
     status: "draft"
     grouptags: null
     hoverText: "Action: something that is actually done (a 'unit of work' that is executed) by a single Actor (on behalf of a given Party), as a single operation, in a specific context."
@@ -38,7 +47,6 @@ entries:
     glossaryText: "something that is actually done (a 'unit of work' that is executed) by a single [actor](@) (on behalf of a given [party](@)), as a single operation, in a specific context."
     date: 20220324
     scopetag: "termdsn"
-    termid: "concept:action"
     locator: "action.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/action"
     headingids:
@@ -47,12 +55,21 @@ entries:
       - "purpose"
       - "criterion"
       - "notes"
+    termid: "concept:action"
     vsntag: "default"
   - id: "actor"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "actor"
-    formPhrases: "actor{ss}, digital-actor{ss}"
+    formPhrases:
+      - "actor"
+      - "actors"
+      - "actor's"
+      - "actor(s)"
+      - "digital-actor"
+      - "digital-actors"
+      - "digital-actor's"
+      - "digital-actor(s)"
     status: "draft"
     grouptags: null
     hoverText: "Actor: Entity that can act (do things/execute Actions), e.g. people, machines, but not Organizations."
@@ -60,7 +77,6 @@ entries:
     glossaryText: "entity that can act (do things/execute [action](@)), e.g. people, machines, but not [organization](@)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:actor"
     locator: "actor.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/actor"
     headingids:
@@ -70,12 +86,25 @@ entries:
       - "criterion"
       - "examples"
       - "related-concepts"
+    termid: "concept:actor"
     vsntag: "default"
   - id: "assertion"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "assertion"
-    formPhrases: "assertion{ss}, claim{ss}, statement{ss}"
+    formPhrases:
+      - "assertion"
+      - "assertions"
+      - "assertion's"
+      - "assertion(s)"
+      - "claim"
+      - "claims"
+      - "claim's"
+      - "claim(s)"
+      - "statement"
+      - "statements"
+      - "statement's"
+      - "statement(s)"
     status: "draft"
     grouptags: null
     hoverText: "Assertion: a declaration/statement, made by a specific Party, that something is the case."
@@ -83,7 +112,6 @@ entries:
     glossaryText: "a declaration/statement, made by a specific [party](@), that something is the case."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:assertion"
     locator: "assertion.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/assertion"
     headingids:
@@ -92,12 +120,100 @@ entries:
       - "purpose"
       - "criterion"
       - "notes"
+    termid: "concept:assertion"
     vsntag: "default"
+  - id: "author"
+    term: "author"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Author"
+    glossaryText: "a person that creates a text that is meant to be read and understood by others - usually, a particular audience."
+    hoverText: "Author: a person that creates a text that is meant to be read and understood by others - usually, a particular audience."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "author"
+      - "authors"
+      - "author's"
+      - "author(s)"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "author.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/author"
+    headingids:
+      - "author"
+    termid: "concept:author"
+    vsntag: "documentation"
+  - id: "body"
+    term: "body"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Body (of a Curated Text)"
+    glossaryText: "the part of a [curated text](@) that contains arbitrarily structured documentation about the [semantic unit](@) that the [curated text](@) documents. Bodies live either in [curated text files](@) (behind the [header](@)), or in separate so-called [body files](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "body"
+      - "bodys"
+      - "body's"
+      - "bodies"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "body.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/body"
+    headingids:
+      - "body"
+      - "here-is-where-the-header-stuff-of-the-curated-text-goes."
+      - "the-body-of-the-curated-text-starts-below-the-next-line."
+      - "curated-text"
+    termid: "concept:body"
+    vsntag: "documentation"
+  - id: "body-file"
+    term: "body-file"
+    termType: "concept"
+    isa: "curated-file"
+    bodyFile: "/spec-files/11-body-file.md"
+    glossaryTerm: "Body File"
+    glossaryText: "a file that is located somewhere within the [scopedir](@), and that contains the [body](@) of a [curated text](@). The [header](@) of that [curated text](@) has a field `bodyFile` that specifies its location within the [scopedir](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "body-file"
+      - "body-files"
+      - "body-file's"
+      - "body-file(s)"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "body-file.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-files/body-file"
+    headingids:
+      - "body-files"
+    termid: "concept:body-file"
+    vsntag: "documentation"
   - id: "community"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "community"
-    formPhrases: "communit{yies}"
+    formPhrases:
+      - "community"
+      - "communitys"
+      - "community's"
+      - "communities"
     status: "draft"
     grouptags: null
     hoverText: "Community: a Party, consisting of at least two different Parties (the members of the Community) that seek to collaborate with each other so that each of them can achieve its individual Objectives more efficiently and/or effectively."
@@ -105,7 +221,6 @@ entries:
     glossaryText: "a [party](@), consisting of at least two different [parties](@) (the members of the [community](@)) that seek to collaborate with each other so that each of them can achieve its individual [objective](@) more efficiently and/or effectively."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:community"
     locator: "community.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/community"
     headingids:
@@ -113,12 +228,17 @@ entries:
       - "short-description"
       - "purpose"
       - "criterion"
+    termid: "concept:community"
     vsntag: "default"
   - id: "compliance-objective"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "compliance-objective"
-    formPhrases: "compliance-objective{ss}"
+    formPhrases:
+      - "compliance-objective"
+      - "compliance-objectives"
+      - "compliance-objective's"
+      - "compliance-objective(s)"
     status: "draft"
     grouptags: null
     hoverText: "Compliance objective (of a Party): an Objective, owned by that Party, that aims to reach and maintain a state of affairs in which a specific set of Entities that this Party controls are in accordance with a specific set of requirements (e.g., laws, regulations, standards, etc.)."
@@ -126,7 +246,6 @@ entries:
     glossaryText: "an [objective](@), owned by a [party](@), that aims to reach and maintain a state of affairs in which a specific set of [entities](@) that this [party](@) controls are in accordance with a specific set of requirements (e.g., laws, regulations, standards, etc.)."
     date: 20220203
     scopetag: "termdsn"
-    termid: "concept:compliance-objective"
     locator: "compliance-objective.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/compliance-objective"
     headingids:
@@ -134,36 +253,75 @@ entries:
       - "short-description"
       - "purpose"
       - "criteria"
+    termid: "concept:compliance-objective"
     vsntag: "default"
-  - id: "concept"
-    displayed_sidebar: "essifLabSideBar"
+  - term: "concept"
     termType: "concept"
-    term: "concept"
-    formPhrases: "concept{ss}"
-    status: "draft"
+    isa: "semantic-unit"
+    glossaryTerm: null
+    glossaryText: "a [semantic unit](@) that captures the ideas/thoughts behind a classification of [entities](@) (what makes [entities](@) in that class 'the same')."
+    synonymOf: null
     grouptags: null
-    hoverText: "Concept: the ideas/thoughts behind a classification of Entities (what makes Entities in that class 'the same')."
-    glossaryTerm: "Concept"
-    glossaryText: "the ideas/thoughts behind a classification of [entities](@) (what makes [entities](@) in that class 'the same')."
-    date: 20210601
+    formPhrases:
+      - "concept"
+      - "concepts"
+      - "concept's"
+      - "concept(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
     scopetag: "termdsn"
-    termid: "concept:concept"
     locator: "concept.md"
-    navurl: "https://essif-lab.github.io/framework/docs/terms/concept"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/concept"
     headingids:
       - "concept"
-      - "short-description"
+      - "summary"
       - "purpose"
       - "criteria"
-      - "related-concepts"
       - "notes"
-      - "footnotes"
-    vsntag: "default"
+    termid: "concept:concept"
+    vsntag: "documentation"
+  - id: "conceptualization"
+    term: "conceptualization"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Conceptualization"
+    glossaryText: "a mental representation or abstract idea formed by a [party](@) to categorize, organize, and make sense of information, experiences, objects, or abstract notions; it allows the [party](@) to recognize similarities and differences between [entities](@) or events."
+    hoverText: "Conceptualization: a mental representation or abstract idea formed by a party to categorize, organize, and make sense of information, experiences, objects, or abstract notions; it allows the party to recognize similarities and differences between entities or events."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "conceptualization"
+      - "conceptualizations"
+      - "conceptualization's"
+      - "conceptualization(s)"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "conceptualization.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/conceptualization"
+    headingids:
+      - "conceptualization"
+      - "summary"
+      - "background"
+    termid: "concept:conceptualization"
+    vsntag: "documentation"
   - id: "control"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "control"
-    formPhrases: "control{ss}"
+    formPhrases:
+      - "control"
+      - "controls"
+      - "control's"
+      - "control(s)"
     status: "draft"
     grouptags: null
     hoverText: "Control (of a Party): the combination of resources (e.g. people, tools, budgets, time) and processes that are tasked to realize a specific Control Objective of that Party."
@@ -171,7 +329,6 @@ entries:
     glossaryText: "the combination of resources (e.g. people, tools, budgets, time) and processes that are tasked to realize a specific [control objective](@) of a particular [party](@)."
     date: 20220212
     scopetag: "termdsn"
-    termid: "concept:control"
     locator: "control.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/control"
     headingids:
@@ -180,12 +337,17 @@ entries:
       - "purpose"
       - "criteria"
       - "notes"
+    termid: "concept:control"
     vsntag: "default"
   - id: "control-objective"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "control-objective"
-    formPhrases: "control-objective{ss}"
+    formPhrases:
+      - "control-objective"
+      - "control-objectives"
+      - "control-objective's"
+      - "control-objective(s)"
     status: "draft"
     grouptags: null
     hoverText: "Control objective (of a Party): an Objective, owned by that Party, that aims to contribute to the realization of another (set of) Objective(s) of that Party, by producing results that this Party needs to realize these other Objective(s)."
@@ -193,7 +355,6 @@ entries:
     glossaryText: "an [objective](@), owned by a [party](@), that aims to contribute to the realization of another (set of) [objective](@) of that [party](@), by producing results that this [party](@) needs to realize these other [objective](@)."
     date: 20220203
     scopetag: "termdsn"
-    termid: "concept:control-objective"
     locator: "control-objective.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/control-objective"
     headingids:
@@ -202,12 +363,107 @@ entries:
       - "purpose"
       - "criteria"
       - "notes"
+    termid: "concept:control-objective"
     vsntag: "default"
+  - id: "converter"
+    term: "converter"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Converter"
+    glossaryText: "a specification, in the form of a [handlebars expression](@), for constructing a text that a particular [text conversion tool](@) uses to create its output."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "converter"
+      - "converters"
+      - "converter's"
+      - "converter(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "converter.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/converter"
+    headingids:
+      - "converter"
+    termid: "concept:converter"
+    vsntag: "documentation"
+  - id: "converter-profile"
+    term: "converter-profile"
+    termType: "concept"
+    glossaryTerm: "Converter Profile"
+    glossaryText: "the set of [moustache variables](@) that are (made) available to [converters](@) of a particular [TEv2 tool](@), enabling them to produce the texts by which the [TEv2 tool](@) will replace the text constructs that are located by the [interpreter](@)."
+    grouptags: null
+    formPhrases:
+      - "converter-profile"
+      - "converter-profiles"
+      - "converter-profile's"
+      - "converter-profile(s)"
+      - "profile"
+      - "profiles"
+      - "profile's"
+      - "profile(s)"
+    status: "proposed"
+    created: 20231218
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "converter-profile.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/converter-profile"
+    headingids:
+      - "converter-profile"
+    termid: "concept:converter-profile"
+    vsntag: "documentation"
+  - term: "corpus"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "the documentation that describes the [knowledge](@) around a set of [terms](@) and [concepts](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "corpus"
+      - "corpora"
+      - "corpus-of-terminology"
+      - "corpus-of-a-terminology"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "corpus.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/corpus"
+    headingids:
+      - "corpus"
+      - "short-description"
+      - "purpose"
+      - "acknowledgements"
+    termid: "concept:corpus"
+    vsntag: "documentation"
   - id: "credential"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "credential"
-    formPhrases: "credential{ss}, verifiable-credential{ss}, attribute-based-credential{ss}"
+    formPhrases:
+      - "credential"
+      - "credentials"
+      - "credential's"
+      - "credential(s)"
+      - "verifiable-credential"
+      - "verifiable-credentials"
+      - "verifiable-credential's"
+      - "verifiable-credential(s)"
+      - "attribute-based-credential"
+      - "attribute-based-credentials"
+      - "attribute-based-credential's"
+      - "attribute-based-credential(s)"
     status: "draft"
     grouptags: null
     hoverText: "Credential: data, representing a set of Assertions (claims, statements), authored and signed by, or on behalf of, a specific Party."
@@ -215,7 +471,6 @@ entries:
     glossaryText: "data, representing a set of [assertion](@) (claims, statements), authored and signed by, or on behalf of, a specific [party](@)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:credential"
     locator: "credential.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/credential"
     headingids:
@@ -227,12 +482,315 @@ entries:
       - "notes"
       - "related-concepts"
       - "references:"
+    termid: "concept:credential"
     vsntag: "default"
+  - id: "curate"
+    term: "curate"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Curate"
+    glossaryText: "to select, organize, and present [terms](@), [definitions](@), and other, related content in a thoughtful and purposeful manner to establish shared understanding among a [community](@) working together on a particular set of [objectives](@)."
+    synonymOf: null
+    grouptags:
+      - "terminology"
+      - "cm-party-actor-action"
+    formPhrases:
+      - "curates"
+      - "curated"
+      - "curating"
+      - "curation"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "curate.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/curate"
+    headingids:
+      - "curate"
+      - "notes"
+    termid: "concept:curate"
+    vsntag: "documentation"
+  - term: "curated-file"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Curated File"
+    glossaryText: "a file that is located in the [scopedir](@) of a specific [scope](@), and is (therefore) [curated](@) by (one of) the [curators](@) of that [scope](@)."
+    grouptags: null
+    formPhrases:
+      - "curated-file"
+      - "curated-files"
+      - "curated-file's"
+      - "curated-file(s)"
+    status: "proposed"
+    created: 20231009
+    updated: 20231009
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "curated-file.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/curated-file"
+    headingids:
+      - "curated-files"
+    termid: "concept:curated-file"
+    vsntag: "documentation"
+  - term: "curated-text"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Curated Text"
+    glossaryText: "a text that documents a [concept](@) or other [semantic unit](@) of a particular [party](@), and specifies, e.g., the [term(s)](@) by which the [party](@) refers thereto, its [definition](@), and any other relevant information."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "curated-text"
+      - "curated-texts"
+      - "curated-text's"
+      - "curated-text(s)"
+      - "ctext"
+      - "ctexts"
+      - "ctext's"
+      - "ctext(s)"
+    status: "proposed"
+    created: 20220602
+    updated: 20220804
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "curated-text.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/curated-text"
+    headingids:
+      - "curated-text"
+      - "purpose"
+      - "notes"
+    termid: "concept:curated-text"
+    vsntag: "documentation"
+  - term: "curated-text-file"
+    termType: "concept"
+    isa: "curated-file"
+    bodyFile: "/spec-files/10-curated-text-file.md"
+    glossaryTerm: "Curated Text File"
+    glossaryText: "a file that contains either a (complete) [curated text](@), or the [header](@) of that [curated text](@) and a reference to the [file](body-file@) that contains its [body](@)."
+    grouptags: null
+    formPhrases:
+      - "curated-text-file"
+      - "curated-text-files"
+      - "curated-text-file's"
+      - "curated-text-file(s)"
+      - "ctext-file"
+      - "ctext-files"
+      - "ctext-file's"
+      - "ctext-file(s)"
+    status: "proposed"
+    created: 20231009
+    updated: 20231009
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "curated-text-file.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-files/curated-text-file"
+    headingids:
+      - "curated-text-files"
+      - "docusaurus-front-matter"
+      - "tev2-curated-text-header"
+      - "tev2-curation-status"
+      - "origins/acknowledgements"
+      - "curated-text"
+      - "header-structure-{#header}"
+      - "predefined-tev2-header-fields-{#header-fields}"
+    termid: "concept:curated-text-file"
+    vsntag: "documentation"
+  - term: "curatedir"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Curatedir"
+    glossaryText: "a directory within a [scopedir](@) within which every file contains a [curated text](@) for that [scope](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "curatedir"
+      - "curatedirs"
+      - "curatedir's"
+      - "curatedir(s)"
+      - "curate-directory"
+      - "curate-directorys"
+      - "curate-directory's"
+      - "curate-directories"
+    status: "proposed"
+    created: 20220729
+    updated: 20220729
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "curatedir.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/curatedir"
+    headingids:
+      - "curatedir"
+    termid: "concept:curatedir"
+    vsntag: "documentation"
+  - id: "curator"
+    term: "curator"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Curator (of a Scope)"
+    glossaryText: "a person responsible for curating, managing, and maintaining the [terminologies](@), to ensure shared understanding among a [community](@) working together on a particular set of [objectives](@)."
+    hoverText: "Curator: {{noRefs glossaryText}}"
+    synonymOf: null
+    grouptags:
+      - "terminology"
+    formPhrases:
+      - "curator"
+      - "curators"
+      - "curator's"
+      - "curator(s)"
+      - "terminology-curator"
+      - "terminology-curators"
+      - "terminology-curator's"
+      - "terminology-curator(s)"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "curator.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/curator"
+    headingids:
+      - "curator-(of-a-scope)"
+      - "examples"
+      - "notes"
+    termid: "concept:curator"
+    vsntag: "documentation"
+  - term: "current-scope"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Current Scope"
+    glossaryText: "the [scope](@) that is the context within which a [curator](@) is acting, or a tool is being called."
+    grouptags: null
+    formPhrases:
+      - "current-scope"
+      - "current-scopes"
+      - "current-scope's"
+      - "current-scope(s)"
+    status: "proposed"
+    created: 20231009
+    updated: 20231009
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "current-scope.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/current-scope"
+    headingids:
+      - "current-scope"
+    termid: "concept:current-scope"
+    vsntag: "documentation"
+  - id: "define"
+    term: "define"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Define"
+    glossaryText: "to provide a criterion and a [term](@), where the criterion can be used by people to determine whether or not something is an instance/example of a [concept](@) (or other [semantic unit](@)), and the [term](@) is used to refer to that [concept](@), or an arbitrary instance thereof."
+    synonymOf: null
+    grouptags:
+      - "terminology"
+    formPhrases:
+      - "defines"
+      - "defined"
+      - "defining"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "define.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/define"
+    headingids:
+      - "define"
+      - "examples"
+      - "notes"
+    termid: "concept:define"
+    vsntag: "documentation"
+  - term: "definition"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "the combination of a [term](@) and a descriptive text, where the [term](@) refers to a [concept](@) or other [semantic unit](@), and the descriptive text enables a set of [parties](@) to have the same understanding about that [concept](@). Ideally, the descriptive text is a criterion that such [parties](@) can use to determine what is, and what is not, an instance (or example) of that [concept](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "definition"
+      - "definitions"
+      - "definition's"
+      - "definition(s)"
+      - "good-definition"
+      - "good-definitions"
+      - "good-definition's"
+      - "good-definition(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "definition.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/definition"
+    headingids:
+      - "definition"
+      - "summary"
+      - "purpose"
+      - "criteria"
+      - "examples"
+      - "notes"
+    termid: "concept:definition"
+    vsntag: "documentation"
+  - term: "dictionary"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "an alphabetically sorted list of [terms](@) with various meanings that they may have in different contexts."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "dictionary"
+      - "dictionarys"
+      - "dictionary's"
+      - "dictionaries"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "dictionary.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/dictionary"
+    headingids:
+      - "dictionary"
+      - "summary"
+      - "purpose"
+      - "criteria"
+      - "examples"
+    termid: "concept:dictionary"
+    vsntag: "documentation"
   - id: "entity"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "entity"
-    formPhrases: "entit{yies}"
+    formPhrases:
+      - "entity"
+      - "entitys"
+      - "entity's"
+      - "entities"
     status: "draft"
     grouptags: null
     hoverText: "Entity: someone or something that is known to exist."
@@ -240,7 +798,6 @@ entries:
     glossaryText: "someone or something that is known to exist."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:entity"
     locator: "entity.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/entity"
     headingids:
@@ -249,12 +806,17 @@ entries:
       - "purpose"
       - "criterion"
       - "related-concepts"
+    termid: "concept:entity"
     vsntag: "default"
   - id: "expectation"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "expectation"
-    formPhrases: "expectation{ss}"
+    formPhrases:
+      - "expectation"
+      - "expectations"
+      - "expectation's"
+      - "expectation(s)"
     status: "draft"
     grouptags: null
     hoverText: "Expectation (of a Party): an Objective that is Owned by that Party for having a specific (set of) result(s) produced, where the actual production thereof is (going to be) outsourced to another Party."
@@ -262,18 +824,232 @@ entries:
     glossaryText: "an [objective](@) that is [owned](@) by a [party](@) for having a specific (set of) result(s) produced, where the actual production thereof is (going to be) outsourced to another [party](@)."
     date: 20220908
     scopetag: "termdsn"
-    termid: "concept:expectation"
     locator: "expectation.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/expectation"
     headingids:
       - "expectation"
       - "short-description"
+    termid: "concept:expectation"
     vsntag: "default"
+  - id: "form-phrase"
+    term: "form-phrase"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Form Phrase (for a Term)"
+    glossaryText: "a word or phrase that occurs in oral or written texts and that refers to a particular [semantic unit](@), yet is not (necessarily) the  [term](@) that is used in the [definition](@) of that [semantic unit](@). Form phrases can be, e.g., plural forms, possessive extensions, verb-conjugation forms, abbreviations, and other variations."
+    formPhrases:
+      - "formphrase"
+      - "formphrases"
+      - "formphrase's"
+      - "formphrase(s)"
+      - "form-phrase"
+      - "form-phrases"
+      - "form-phrase's"
+      - "form-phrase(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "form-phrase.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/form-phrase"
+    headingids:
+      - "form-phrase"
+      - "purpose"
+      - "specifying-form-phrases"
+      - "form-phrases-in-[mrgs](@)"
+      - "using-form-phrases"
+      - "guidance-for-choosing-form-phrases"
+    termid: "concept:form-phrase"
+    vsntag: "documentation"
+  - id: "form-phrase-macro"
+    term: "form-phrase-macro"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Form Phrase Macro"
+    glossaryText: "a sequence of characters (the macro name) that [identifies](@) a set of character strings that specify typical variations of a [form phrase](@), such as plural forms, possessie extensions, verb-conjugation forms, etc."
+    formPhrases:
+      - "formphrase macro"
+      - "formphrase macros"
+      - "formphrase macro's"
+      - "formphrase macro(s)"
+      - "form-phrase macro"
+      - "form-phrase macros"
+      - "form-phrase macro's"
+      - "form-phrase macro(s)"
+    status: "proposed"
+    created: 20240108
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "form-phrase-macro.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/form-phrase-macro"
+    headingids:
+      - "form-phrase-macro"
+      - "purpose"
+      - "predefined-[form-phrase-macros](@)-{#predefineds}"
+      - "custom-[form-phrase-macros](@)"
+    termid: "concept:form-phrase-macro"
+    vsntag: "documentation"
+  - id: "formatted-text"
+    term: "formatted-text"
+    termType: "concept"
+    isa: "text-format"
+    glossaryTerm: "Formatted Text"
+    glossaryText: "a text that has been processed and arranged to have a specific layout, style, and presentation, making it visually appealing and easy to read."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "formatted-text"
+      - "formatted-texts"
+      - "formatted-text's"
+      - "formatted-text(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "formatted-text.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/formatted-text"
+    headingids:
+      - "formatted-text"
+      - "examples"
+      - "notes"
+      - "miscellaneous"
+    termid: "concept:formatted-text"
+    vsntag: "documentation"
+  - term: "glossary"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "an alphabetically sorted list of [terms](@) with the (single) meaning it has in (at least) one context."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "glossary"
+      - "glossarys"
+      - "glossary's"
+      - "glossaries"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "glossary.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/glossary"
+    headingids:
+      - "glossary"
+      - "summary"
+      - "purpose"
+      - "criteria"
+      - "examples"
+    termid: "concept:glossary"
+    vsntag: "documentation"
+  - term: "glossarydir"
+    termType: "concept"
+    isa: "scopedir"
+    glossaryTerm: "Glossarydir"
+    glossaryText: "a directory within a [scopedir](@) within which the different versions of its ([machine readable](mrg@) and [human readable](hrg@)) [glossaries](@) are created and maintained."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "glossarydir"
+      - "glossarydirs"
+      - "glossarydir's"
+      - "glossarydir(s)"
+      - "glossary-directory"
+      - "glossary-directorys"
+      - "glossary-directory's"
+      - "glossary-directories"
+    status: "proposed"
+    created: 20220729
+    updated: 20220729
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "glossarydir.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/glossarydir"
+    headingids:
+      - "glossarydir"
+      - "summary"
+    termid: "concept:glossarydir"
+    vsntag: "documentation"
+  - id: "glossaryterm"
+    term: "glossaryterm"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Glossary Term"
+    glossaryText: "a human readable text that will be used as the [term](@) in a [definition](@) as presented in a [HRG](@)."
+    formPhrases:
+      - "glossaryterm"
+      - "glossaryterms"
+      - "glossaryterm's"
+      - "glossaryterm(s)"
+      - "glossary-term"
+      - "glossary-terms"
+      - "glossary-term's"
+      - "glossary-term(s)"
+    scopetag: "termdsn"
+    locator: "glossaryterm.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/glossaryterm"
+    headingids:
+      - "glossary-term"
+    termid: "concept:glossaryterm"
+    vsntag: "documentation"
+  - id: "glossarytext"
+    term: "glossarytext"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Glossary Text"
+    glossaryText: "a human readable text that will be used as the [definition](@) for a particular [term](@), as presented in a [HRG](@)."
+    formPhrases:
+      - "glossarytext"
+      - "glossarytexts"
+      - "glossarytext's"
+      - "glossarytext(s)"
+      - "glossary-text"
+      - "glossary-texts"
+      - "glossary-text's"
+      - "glossary-text(s)"
+    scopetag: "termdsn"
+    locator: "glossarytext.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/glossarytext"
+    headingids:
+      - "glossary-text"
+    termid: "concept:glossarytext"
+    vsntag: "documentation"
   - id: "governance"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "governance"
-    formPhrases: "governance, govern, governs, governed, governed-by, governing, governing-part{yies}, governor{ss}, government{ss}"
+    formPhrases:
+      - "governance"
+      - "govern"
+      - "governs"
+      - "governed"
+      - "governed-by"
+      - "governing"
+      - "governing-party"
+      - "governing-partys"
+      - "governing-party's"
+      - "governing-parties"
+      - "governor"
+      - "governors"
+      - "governor's"
+      - "governor(s)"
+      - "government"
+      - "governments"
+      - "government's"
+      - "government(s)"
     status: "draft"
     grouptags: null
     hoverText: "Governance: the act or process of governing or overseeing the realization of (the results associated with) a set of Objectives by the Owner of these Objectives, in order to ensure they will be fit for the purposes that this Owner intends to use them for."
@@ -281,19 +1057,426 @@ entries:
     glossaryText: "the [act](action@) or process of governing or overseeing the realization of (the results associated with) a set of [objective](@) by the [owner](@) of these [objective](@), in order to ensure they will be fit for the purposes that this [owner](@) intends to use them for."
     date: 20210830
     scopetag: "termdsn"
-    termid: "concept:governance"
     locator: "governance.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/governance"
     headingids:
       - "governance"
       - "short-description"
       - "purpose"
+    termid: "concept:governance"
     vsntag: "default"
+  - term: "grouptag"
+    termType: "concept"
+    isa: "tag"
+    glossaryTerm: null
+    glossaryText: "a [tag](@) that is used to group [terms](@) within a specific [scope](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "grouptag"
+      - "grouptags"
+      - "grouptag's"
+      - "grouptag(s)"
+      - "group-tag"
+      - "group-tags"
+      - "group-tag's"
+      - "group-tag(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220728
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "grouptag.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/grouptag"
+    headingids:
+      - "grouptag"
+      - "summary"
+      - "criteria"
+      - "examples"
+    termid: "concept:grouptag"
+    vsntag: "documentation"
+  - id: "handlebars-expression"
+    term: "handlebars-expression"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Handlebars Expression"
+    glossaryText: "a specific syntax used in the popular templating engine 'Handlebars', which enables one to specify texts (e.g., HTML templates) in which dynamic data (as provided, e.g., by [moustache variables](@)) is placed. See [handlebars](https://handlebarsjs.com/guide/#what-is-handlebars) for further details."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "handlebar-expression"
+      - "handlebar-expressions"
+      - "handlebar-expression's"
+      - "handlebar-expression(s)"
+      - "handlebars-expression"
+      - "handlebars-expressions"
+      - "handlebars-expression's"
+      - "handlebars-expression(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "handlebars-expression.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/handlebars-expression"
+    headingids:
+      - "handlebars-expression"
+    termid: "concept:handlebars-expression"
+    vsntag: "documentation"
+  - id: "header"
+    term: "header"
+    termType: "concept"
+    isa: null
+    bodyFile: "/spec-files/10-curated-text-file.md"
+    glossaryTerm: "Header (of a Curated Text)"
+    glossaryText: "the part of a [curated text](@), which is at the beginning of that text, that starts with a line that (only) contains three subsequent '-'characters, and that ends with a second occurrence of such a line. Headers live in [curated text files](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "header"
+      - "headers"
+      - "header's"
+      - "header(s)"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "header.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-files/curated-text-file"
+    headingids:
+      - "curated-text-files"
+      - "docusaurus-front-matter"
+      - "tev2-curated-text-header"
+      - "tev2-curation-status"
+      - "origins/acknowledgements"
+      - "curated-text"
+      - "header-structure-{#header}"
+      - "predefined-tev2-header-fields-{#header-fields}"
+    termid: "concept:header"
+    vsntag: "documentation"
+  - id: "hrd"
+    term: "hrd"
+    termType: "concept"
+    isa: "dictionary"
+    glossaryTerm: "Human Readable Dictionary (HRD)"
+    glossaryText: "a [dictionary](@) that presents terms and their meanings in a format that is easily understandable and accessible to humans, typically organized alphabetically."
+    synonymOf: null
+    grouptags:
+      - "dictionary"
+      - "reference-materials"
+    formPhrases:
+      - "hrd"
+      - "hrds"
+      - "hrd's"
+      - "hrd(s)"
+      - "human-readable-dictionary"
+      - "human-readable-dictionarys"
+      - "human-readable-dictionary's"
+      - "human-readable-dictionaries"
+      - "human-readable-dictionary-hrd"
+      - "human-readable-dictionary-hrds"
+      - "human-readable-dictionary-hrd's"
+      - "human-readable-dictionary-hrd(s)"
+      - "human-readable-dictionarys-hrd"
+      - "human-readable-dictionarys-hrds"
+      - "human-readable-dictionarys-hrd's"
+      - "human-readable-dictionarys-hrd(s)"
+      - "human-readable-dictionary's-hrd"
+      - "human-readable-dictionary's-hrds"
+      - "human-readable-dictionary's-hrd's"
+      - "human-readable-dictionary's-hrd(s)"
+      - "human-readable-dictionaries-hrd"
+      - "human-readable-dictionaries-hrds"
+      - "human-readable-dictionaries-hrd's"
+      - "human-readable-dictionaries-hrd(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "hrd.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/hrd"
+    headingids:
+      - "hrd---human-readable-dictionary"
+      - "examples"
+    termid: "concept:hrd"
+    vsntag: "documentation"
+  - id: "hrdt"
+    term: "hrdt"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Human Readable Dictionary Tool (HRDT)"
+    glossaryText: "a software tool designed to create, manage, and process [Human Readable Dictionaries (HRDs)](hrd@)."
+    synonymOf: null
+    grouptags:
+      - "tools"
+      - "dictionary-tools"
+    formPhrases:
+      - "human-readable-dictionary-tool"
+      - "human-readable-dictionary-tools"
+      - "human-readable-dictionary-tool's"
+      - "human-readable-dictionary-tool(s)"
+      - "hrd-tool"
+      - "hrd-tools"
+      - "hrd-tool's"
+      - "hrd-tool(s)"
+      - "hrdt"
+      - "hrdts"
+      - "hrdt's"
+      - "hrdt(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "hrdt.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/hrdt"
+    headingids:
+      - "hrdt---human-readable-dictionary-tool"
+    termid: "concept:hrdt"
+    vsntag: "documentation"
+  - id: "hrg"
+    term: "hrg"
+    termType: "concept"
+    isa: "glossary"
+    glossaryTerm: "Human Readable Glossary (HRG)"
+    glossaryText: "a [glossary](@) that is designed to be easily understandable and accessible to humans. HRGs present terms and their meanings in a format that prioritizes human comprehension and may include additional contextual information to aid understanding."
+    synonymOf: null
+    grouptags:
+      - "glossaries"
+      - "data-structures"
+    formPhrases:
+      - "hrg"
+      - "hrgs"
+      - "hrg's"
+      - "hrg(s)"
+      - "human-readable-glossary"
+      - "human-readable-glossarys"
+      - "human-readable-glossary's"
+      - "human-readable-glossaries"
+      - "human-readable-glossary-hrg"
+      - "human-readable-glossary-hrgs"
+      - "human-readable-glossary-hrg's"
+      - "human-readable-glossary-hrg(s)"
+      - "human-readable-glossarys-hrg"
+      - "human-readable-glossarys-hrgs"
+      - "human-readable-glossarys-hrg's"
+      - "human-readable-glossarys-hrg(s)"
+      - "human-readable-glossary's-hrg"
+      - "human-readable-glossary's-hrgs"
+      - "human-readable-glossary's-hrg's"
+      - "human-readable-glossary's-hrg(s)"
+      - "human-readable-glossaries-hrg"
+      - "human-readable-glossaries-hrgs"
+      - "human-readable-glossaries-hrg's"
+      - "human-readable-glossaries-hrg(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "hrg.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/hrg"
+    headingids:
+      - "hrg---human-readable-glossary"
+    termid: "concept:hrg"
+    vsntag: "documentation"
+  - id: "hrg-entry"
+    term: "hrg-entry"
+    termType: "concept"
+    isa: "glossary-entry"
+    glossaryTerm: "HRG Entry"
+    glossaryText: "A specific kind of (human-readable) rendering of the combination of a [term](@) and a means that helps [readers](@) to understand the meaning of that [term](@) when it is used in a sentence."
+    synonymOf: null
+    grouptags:
+      - "glossary-entries"
+      - "reference-materials"
+    formPhrases:
+      - "hrg-entry"
+      - "hrg-entrys"
+      - "hrg-entry's"
+      - "hrg-entries"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "hrg-entry.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/hrg-entry"
+    headingids:
+      - "hrg-entry"
+      - "purpose"
+    termid: "concept:hrg-entry"
+    vsntag: "documentation"
+  - id: "hrg-list"
+    term: "hrg-list"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "HRG List"
+    glossaryText: "a list of alphabetically sorted [HRG entries](@) that can be further processed by tools such as the [TRRT](@), as well as rendering tools such as GitHub pages, Docusaurus, etc."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "hrg-list"
+      - "hrg-lists"
+      - "hrg-list's"
+      - "hrg-list(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "hrg-list.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/hrg-list"
+    headingids:
+      - "hrg-list"
+    termid: "concept:hrg-list"
+    vsntag: "documentation"
+  - id: "hrgt"
+    term: "hrgt"
+    termType: "concept"
+    isa: null
+    bodyFile: "/spec-tools/22-hrgt.md"
+    glossaryTerm: "Human Readable Glossary Tool"
+    glossaryAlias: "HRGT"
+    glossaryText: "a software tool designed to create, manage, and process [Human Readable Glossaries (HRGs)](@), as [specified by TEv2](/docs/spec-tools/hrgt). HRGTs offer features for selecting [terms](@) that are [curated](@) within the [scope](@) it is run in, or from other [scopes](@)."
+    synonymOf: null
+    grouptags:
+      - "tools"
+      - "glossary-tools"
+    formPhrases:
+      - "hrgt"
+      - "hrgts"
+      - "hrgt's"
+      - "hrgt(s)"
+      - "human-readable-glossary-tool"
+      - "human-readable-glossary-tools"
+      - "human-readable-glossary-tool's"
+      - "human-readable-glossary-tool(s)"
+      - "human-readable-glossary-tool-hrgt"
+      - "human-readable-glossary-tool-hrgts"
+      - "human-readable-glossary-tool-hrgt's"
+      - "human-readable-glossary-tool-hrgt(s)"
+      - "human-readable-glossary-tools-hrgt"
+      - "human-readable-glossary-tools-hrgts"
+      - "human-readable-glossary-tools-hrgt's"
+      - "human-readable-glossary-tools-hrgt(s)"
+      - "human-readable-glossary-tool's-hrgt"
+      - "human-readable-glossary-tool's-hrgts"
+      - "human-readable-glossary-tool's-hrgt's"
+      - "human-readable-glossary-tool's-hrgt(s)"
+      - "human-readable-glossary-tool(s)-hrgt"
+      - "human-readable-glossary-tool(s)-hrgts"
+      - "human-readable-glossary-tool(s)-hrgt's"
+      - "human-readable-glossary-tool(s)-hrgt(s)"
+      - "hrgt-human-readable-glossary-tool"
+      - "hrgt-human-readable-glossary-tools"
+      - "hrgt-human-readable-glossary-tool's"
+      - "hrgt-human-readable-glossary-tool(s)"
+      - "hrgts-human-readable-glossary-tool"
+      - "hrgts-human-readable-glossary-tools"
+      - "hrgts-human-readable-glossary-tool's"
+      - "hrgts-human-readable-glossary-tool(s)"
+      - "hrgt's-human-readable-glossary-tool"
+      - "hrgt's-human-readable-glossary-tools"
+      - "hrgt's-human-readable-glossary-tool's"
+      - "hrgt's-human-readable-glossary-tool(s)"
+      - "hrgt(s)-human-readable-glossary-tool"
+      - "hrgt(s)-human-readable-glossary-tools"
+      - "hrgt(s)-human-readable-glossary-tool's"
+      - "hrgt(s)-human-readable-glossary-tool(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "hrgt.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-tools/hrgt"
+    headingids:
+      - "human-readable-glossary-generator-tool-(hrgt)"
+      - "installing-the-tool"
+      - "calling-the-tool"
+      - "hrg-generation-{#what-it-does}"
+      - "hrgt-interpreter-profile-{#interpreter-profile}"
+      - "hrgt-predefined-interpreters-{#predefined-interpreters}"
+      - "processing-{#processing}"
+      - "finding-the-[mrg](@)-associated-with-an-[mrgref](@)-"
+      - "sorting-the-[hrg-list](@)"
+      - "hrgt-converter-profile-{#converter-profile}"
+      - "hrgt-predefined-converters-{#predefined-converters}"
+      - "hrgt-predefined-sorters-{#predefined-sorters}"
+      - "example"
+      - "processing,-errors-and-warnings"
+      - "deploying-the-tool"
+    termid: "concept:hrgt"
+    vsntag: "documentation"
+  - id: "ict"
+    term: "ict"
+    termType: "acronym"
+    isa: null
+    bodyFile: "/spec-tools-envisaged/11-ict.md"
+    glossaryTerm: "Integrity Checker Tool"
+    glossaryAlias: "ICT"
+    glossaryText: "a software tool designed to check the integrity and conformity of various files used in the curation and management of [glossaries](@), [dictionaries](@), [curated texts](@), and other data within a terminology project. The ICT verifies that the files adhere to the [TEv2 file specifications](/docs-spec-files), ensuring the consistency and accuracy of the terminology data."
+    synonymOf: null
+    grouptags:
+      - "tools"
+      - "quality-assurance"
+    formPhrases:
+      - "ict"
+      - "integrity-checker"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "ict.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-tools-envisaged/ict"
+    headingids:
+      - "integrity-checker-tool-(ict)"
+      - "integrity-checker-tool-(ict)"
+      - "installing-the-tool"
+      - "calling-the-tool"
+      - "parameters-(command-line-arguments)"
+      - "integrity-checks"
+      - "saf-integrity"
+      - "mrg-integrity"
+      - "header-fields-for-`termtype:-relation`"
+      - "curated-text-integrity"
+      - "concepts"
+      - "patterns"
+      - "processing,-errors-and-warnings"
+      - "deploying-the-tool"
+      - "discussion-notes"
+    termid: "acronym:ict"
+    vsntag: "documentation"
   - id: "pattern-identification"
     displayed_sidebar: "essifLabSideBar"
     termType: "pattern"
     term: "identification"
-    formPhrases: "identification"
+    formPhrases:
+      - "identification"
     status: "reviewable"
     grouptags: null
     glossaryTerm: "Identification Pattern"
@@ -301,7 +1484,6 @@ entries:
     hoverText: "The eSSIF-Lab Identification Pattern describes mechanisms that a Party uses to Identify Entities, and mechanisms for communicating with another Party such that both Parties can identify an entity and know whether or not they identify the same entity."
     date: 20210803
     scopetag: "termdsn"
-    termid: "pattern:identification"
     locator: "pattern-identification.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/pattern-identification"
     headingids:
@@ -313,12 +1495,44 @@ entries:
       - "identification-in-it-and/or-administrative-contexts"
       - "formalized-model---information-realm"
       - "formalized-model---data-realm"
+    termid: "pattern:identification"
     vsntag: "default"
+  - term: "identifier"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "a character string that is being used for the identification of some [entity](@) (yet may refer to 0, 1, or more [entities](@), depending on the context within which it is being used)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "identifier"
+      - "identifiers"
+      - "identifier's"
+      - "identifier(s)"
+    status: "proposed"
+    created: 20210601
+    updated: 20210601
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "identifier.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/identifier"
+    headingids:
+      - "identifier"
+      - "short-description"
+      - "purpose"
+      - "criterion"
+      - "examples"
+      - "notes"
+      - "discussion---scope-of-identification"
+    termid: "concept:identifier"
+    vsntag: "documentation"
   - id: "pattern-identifier"
     displayed_sidebar: "essifLabSideBar"
     termType: "pattern"
     term: "identifier"
-    formPhrases: null
+    formPhrases: []
     status: "reviewable"
     grouptags: null
     glossaryTerm: "Identifier Pattern"
@@ -326,7 +1540,6 @@ entries:
     hoverText: "The eSSIF-Lab Identifier Pattern describes how Identifiers are defined and used for Identification purposes."
     date: 20210830
     scopetag: "termdsn"
-    termid: "pattern:identifier"
     locator: "pattern-identifier.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/pattern-identifier"
     headingids:
@@ -335,31 +1548,64 @@ entries:
       - "introduction"
       - "formalized-model"
       - "references"
+    termid: "pattern:identifier"
     vsntag: "default"
-  - id: "identify"
-    displayed_sidebar: "essifLabSideBar"
+  - term: "identify"
     termType: "concept"
-    term: "identify"
-    formPhrases: "identify, identifies, identifying, identified, identifiable"
-    status: "draft"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "an [act](action@), by or on behalf of a [party](@), that results in the selection of either&#10;- a single [partial identity](@) that the party [owns](@), given some (observed or received) data, or&#10;- a single [entity](@) from a given set of entities that is the [subject](@) of a specified [partial identity](@) that the party [owns](@)."
+    synonymOf: null
     grouptags: null
-    hoverText: "Identify: an Act, by or on behalf of a Party, that results in the selection of either (a) a single Partial identity that the party Owns, given some (observed or received) data, or (b) a single Entity from a given set of entities that is the Subject of a specified Partial identity that the party Owns."
-    glossaryTerm: "Identify"
-    glossaryText: "an [act](action@), by or on behalf of a [party](@), that results in the selection of either\n- a single [partial identity](@) that the party [owns](@), given some (observed or received) data, or\n- a single [entity](@) from a given set of entities that is the [subject](@) of a specified [partial identity](@) that the party [owns](@)."
-    date: 20210812
+    formPhrases:
+      - "identify"
+      - "identifying"
+      - "identifies"
+      - "identified"
+      - "identifiable"
+      - "identification"
+    status: "proposed"
+    created: 20210601
+    updated: 20210601
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
     scopetag: "termdsn"
-    termid: "concept:identify"
     locator: "identify.md"
-    navurl: "https://essif-lab.github.io/framework/docs/terms/identify"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/identify"
     headingids:
       - "identify"
       - "short-description"
+    termid: "concept:identify"
+    vsntag: "documentation"
+  - id: "identity"
+    displayed_sidebar: "essifLabSideBar"
+    termType: "concept"
+    term: "identity"
+    formPhrases:
+      - "identity"
+      - "identitys"
+      - "identity's"
+      - "identities"
+    status: "draft"
+    grouptags: null
+    hoverText: "Identity (of an Entity): the combined Knowledge about that Entity of all Parties, i.e. the union of all Partial Identities of which that Entity is the Subject."
+    glossaryTerm: "Identity"
+    glossaryText: "the combined [knowledge](@) about that [entity](@) of all [parties](@), i.e. the union of all [partial identities](partial-identity@) of which that [entity](@) is the [subject](@)."
+    date: 20210803
+    scopetag: "termdsn"
+    locator: "identity.md"
+    navurl: "https://essif-lab.github.io/framework/docs/terms/identity"
+    headingids:
+      - "identity"
+      - "short-description"
+    termid: "concept:identity"
     vsntag: "default"
   - id: "pattern-identity"
     displayed_sidebar: "essifLabSideBar"
     termType: "pattern"
     term: "identity"
-    formPhrases: null
+    formPhrases: []
     status: "reviewable"
     grouptags: null
     glossaryTerm: "Identity Pattern"
@@ -367,7 +1613,6 @@ entries:
     hoverText: "The eSSIF-Lab Identity Pattern shows how digital identities work, how this relates to (attributes in) credentials, and how all this can be made to work in SSI contexts."
     date: 20210803
     scopetag: "termdsn"
-    termid: "pattern:identity"
     locator: "pattern-identity.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/pattern-identity"
     headingids:
@@ -377,12 +1622,148 @@ entries:
       - "formalized-model"
       - "identity---information-realm"
       - "identity---data-realm"
+    termid: "pattern:identity"
+    vsntag: "default"
+  - id: "ingestion"
+    term: "ingestion"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Ingestion (Process)"
+    glossaryText: "the process that is run by a [terms-community](@), in which their members suggest, draft, and discuss [definitions](@) ([terms](@) + [criteria](@)) that are relevant for a particular [scope](@), and converting such contributions into [curated texts](@) that accurately document the [concepts](@) and other [semantic units](@) and that adhere to the [TEv2-specifications](/docs/spec-files/curated-text-file)."
+    hoverText: "Ingestion Process: {{noRefs glossaryText}}"
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "ingestion-process"
+      - "ingestion-processes"
+      - "ingest"
+      - "ingests"
+      - "ingested"
+      - "ingestion"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "ingestion-process.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/ingestion-process"
+    headingids:
+      - "ingestion-(process)"
+      - "examples"
+      - "notes"
+    termid: "concept:ingestion"
+    vsntag: "documentation"
+  - term: "ingestion-profile"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Ingestion Profile"
+    glossaryText: "the specification of a method by which files that are in a particular place and format (e.g., wiki files) are turned into a [curated text](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "ingestion-profile"
+      - "ingestion-profiles"
+      - "ingestion-profile's"
+      - "ingestion-profile(s)"
+    status: "proposed"
+    created: 20220817
+    updated: 20220817
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "ingestion-profile.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/ingestion-profile"
+    headingids:
+      - "ingestion-profile"
+      - "summary"
+      - "purpose"
+      - "notes"
+    termid: "concept:ingestion-profile"
+    vsntag: "documentation"
+  - id: "interpreter"
+    term: "interpreter"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Interpreter"
+    glossaryText: "a [regex](@) that is used to locate a particular text construct (such as a [TermRef](@) or [MRGRef](@)) in a text, and that populates [named capturing groups](@) as specified in the [interpreter profile](@) of the particular [text conversion tool](@) for which it is designed."
+    grouptags: null
+    formPhrases:
+      - "interpreter"
+      - "interpreters"
+      - "interpreter's"
+      - "interpreter(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "interpreter.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/interpreter"
+    headingids:
+      - "interpreter"
+    termid: "concept:interpreter"
+    vsntag: "documentation"
+  - term: "interpreter-profile"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Interpreter Profile"
+    glossaryText: "the set of [named capturing groups](@) that are an [interpreter](@) is expected to populate when it is used in the context of a specific [TEv2 tool](@) (such as the [TRRT](@) or [HRGT](@))."
+    grouptags: null
+    formPhrases:
+      - "interpreter-profile"
+      - "interpreter-profiles"
+      - "interpreter-profile's"
+      - "interpreter-profile(s)"
+    status: "proposed"
+    created: 20231218
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "interpreter-profile.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/interpreter-profile"
+    headingids:
+      - "interpreter-profile"
+    termid: "concept:interpreter-profile"
+    vsntag: "documentation"
+  - id: "jurisdiction"
+    displayed_sidebar: "essifLabSideBar"
+    termType: "concept"
+    term: "jurisdiction"
+    formPhrases:
+      - "jurisdiction"
+      - "jurisdictions"
+      - "jurisdiction's"
+      - "jurisdiction(s)"
+    status: "draft"
+    grouptags: null
+    hoverText: "Jurisdiction: the composition of a Legal System (legislation, enforcement thereof, and conflict resolution), a Party that governs that Legal System, a scope within which that Legal System is operational, and one or more Objectives for the purpose of which the Legal System is operated."
+    glossaryTerm: "Jurisdiction"
+    glossaryText: "the composition of a [legal system](@) (legislation, enforcement thereof, and conflict resolution), a [party](@) that governs that [legal system](@), a scope within which that [legal system](@) is operational, and one or more [objective](@) for the purpose of which the [legal system](@) is operated. See also the [Jurisdictions pattern](pattern:jurisdiction@)."
+    date: 20210601
+    scopetag: "termdsn"
+    locator: "jurisdiction.md"
+    navurl: "https://essif-lab.github.io/framework/docs/terms/jurisdiction"
+    headingids:
+      - "jurisdiction"
+      - "short-description"
+      - "purpose"
+      - "criteria"
+      - "notes"
+    termid: "concept:jurisdiction"
     vsntag: "default"
   - id: "pattern-jurisdiction"
     displayed_sidebar: "essifLabSideBar"
     termType: "pattern"
     term: "jurisdiction"
-    formPhrases: "jurisdiction"
+    formPhrases:
+      - "jurisdiction"
     status: "stable"
     grouptags: null
     glossaryTerm: "Jurisdiction Pattern"
@@ -390,7 +1771,6 @@ entries:
     hoverText: "The Jurisdictions pattern captures the Concepts and relations that explain what a generic Jurisdiction consists of, and relates it to Parties and Legal Entities."
     date: 20210601
     scopetag: "termdsn"
-    termid: "pattern:jurisdiction"
     locator: "pattern-jurisdiction.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/pattern-jurisdiction"
     headingids:
@@ -398,12 +1778,17 @@ entries:
       - "purpose"
       - "introduction"
       - "formalized-model"
+    termid: "pattern:jurisdiction"
     vsntag: "default"
   - id: "knowledge"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "knowledge"
-    formPhrases: "knowledge{ss}"
+    formPhrases:
+      - "knowledge"
+      - "knowledges"
+      - "knowledge's"
+      - "knowledge(s)"
     status: "draft"
     grouptags: null
     hoverText: "Knowledge: The (intangible) sum of what is known by a specific Party, as well as the familiarity, awareness or understanding of someone or something by that Party."
@@ -411,7 +1796,6 @@ entries:
     glossaryText: "the (intangible) sum of what is known by a specific [party](@), as well as the familiarity, awareness or understanding of someone or something by that [party](@)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:knowledge"
     locator: "knowledge.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/knowledge"
     headingids:
@@ -420,12 +1804,42 @@ entries:
       - "purpose"
       - "criterion"
       - "notes"
+    termid: "concept:knowledge"
     vsntag: "default"
+  - term: "knowledge artifact"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Knowledge Artifact"
+    glossaryText: "See: [semantic unit](@). (term is deprecated)"
+    synonymOf: "semantic-unit"
+    grouptags: null
+    formPhrases:
+      - "knowledge-artifact"
+      - "knowledge-artifacts"
+      - "knowledge-artifact's"
+      - "knowledge-artifact(s)"
+    status: "deprecated"
+    created: 20220727
+    updated: 20230926
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "knowledge-artifact.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/knowledge-artifact"
+    headingids:
+      - "knowledge-artifact"
+    termid: "concept:knowledge artifact"
+    vsntag: "documentation"
   - id: "legal-entity"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "legal-entity"
-    formPhrases: "legal-entit{yies}"
+    formPhrases:
+      - "legal-entity"
+      - "legal-entitys"
+      - "legal-entity's"
+      - "legal-entities"
     status: "draft"
     grouptags: null
     hoverText: "Legal Entity (of a Jurisdiction): an Entity that is known by, recognized to exist, and registered in that Jurisdiction."
@@ -433,7 +1847,6 @@ entries:
     glossaryText: "an [entity](@) that is known by, recognized to exist, and registered in that [jurisdiction](@)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:legal-entity"
     locator: "legal-entity.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/legal-entity"
     headingids:
@@ -443,12 +1856,24 @@ entries:
       - "criteria"
       - "examples"
       - "notes"
+    termid: "concept:legal-entity"
     vsntag: "default"
   - id: "management"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "management"
-    formPhrases: "management, manager, manage, manages, managed, managed-by, management, managing, managing-part{yies}"
+    formPhrases:
+      - "management"
+      - "manager"
+      - "manage"
+      - "manages"
+      - "managed"
+      - "managed-by"
+      - "managing"
+      - "managing-party"
+      - "managing-partys"
+      - "managing-party's"
+      - "managing-parties"
     status: "draft"
     grouptags: null
     hoverText: "Management: the act or process of managing or actually realizing of (the results associated with) a set of Objectives by the Owner of these Objectives."
@@ -456,19 +1881,456 @@ entries:
     glossaryText: "the [act](action@) or process of managing or actually realizing of (the results associated with) a set of [objective](@) by the [owner](@) of these [objective](@)."
     date: 20210830
     scopetag: "termdsn"
-    termid: "concept:management"
     locator: "management.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/management"
     headingids:
       - "management"
       - "short-description"
       - "purpose"
+    termid: "concept:management"
     vsntag: "default"
+  - term: "mental-model"
+    termType: "concept"
+    isa: "semantic-unit"
+    glossaryTerm: "Mental Model"
+    glossaryText: "a [semantic unit](@) that relates a set of [concepts](@) (ideas), [relations](@) between them, and constraints about a certain topic, into a coherent and consistent whole (sometimes called 'viewpoint', or 'way of thinking')."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "mental-model"
+      - "mental-models"
+      - "mental-model's"
+      - "mental-model(s)"
+      - "pattern"
+      - "patterns"
+      - "pattern's"
+      - "pattern(s)"
+      - "conceptual-model"
+      - "conceptual-models"
+      - "conceptual-model's"
+      - "conceptual-model(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220607
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "mental-model.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/mental-model"
+    headingids:
+      - "mental-model"
+      - "summary"
+      - "purpose"
+      - "criteria"
+      - "notes"
+      - "on-using-(existing)-mental-models"
+      - "on-the-construction-of-mental-models"
+    termid: "concept:mental-model"
+    vsntag: "documentation"
+  - id: "moustache-variable"
+    term: "moustache-variable"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Moustache Variable"
+    glossaryText: "a placeholder in the form of a 'moustache' tag, e.g.: `{{variable_name}}`, that are used by [converters](@) to produce a text by which a text construct that is located by an [interpreter](@) will be replaced. See also https://mustache.github.io/mustache.5.html"
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "moustache-variable"
+      - "moustache-variables"
+      - "moustache-variable's"
+      - "moustache-variable(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "moustache-variable.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/moustache-variable"
+    headingids:
+      - "moustache-variable"
+      - "notes"
+    termid: "concept:moustache-variable"
+    vsntag: "documentation"
+  - id: "mrd"
+    term: "mrd"
+    termType: "concept"
+    isa: "dictionary"
+    glossaryTerm: "Machine Readable Dictionary (MRD)"
+    glossaryText: "a type of [dictionary](@) that is formatted in a way that can be easily processed and interpreted by computers or software programs. It uses the YAML format to represent the [terms](@) and their [meanings](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "machine-readable-dictionary"
+      - "machine-readable-dictionarys"
+      - "machine-readable-dictionary's"
+      - "machine-readable-dictionaries"
+      - "mrd"
+      - "mrds"
+      - "mrd's"
+      - "mrd(s)"
+      - "machine-readable-dictionary-mrd"
+      - "machine-readable-dictionary-mrds"
+      - "machine-readable-dictionary-mrd's"
+      - "machine-readable-dictionary-mrd(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "mrd.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/mrd"
+    headingids:
+      - "machine-readable-dictionary"
+      - "examples"
+      - "notes"
+    termid: "concept:mrd"
+    vsntag: "documentation"
+  - id: "mrdt"
+    term: "mrdt"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Machine Readable Dictionary Tool (MRDT)"
+    glossaryText: "a software tool designed to create, manage, and process [Machine Readable Dictionaries (MRDs)](mrd@)."
+    synonymOf: null
+    grouptags:
+      - "tools"
+      - "dictionary-tools"
+    formPhrases:
+      - "machine-readable-dictionary-tool"
+      - "machine-readable-dictionary-tools"
+      - "machine-readable-dictionary-tool's"
+      - "machine-readable-dictionary-tool(s)"
+      - "mrd-tool"
+      - "mrd-tools"
+      - "mrd-tool's"
+      - "mrd-tool(s)"
+      - "mrdt"
+      - "mrdts"
+      - "mrdt's"
+      - "mrdt(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "mrdt.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/mrdt"
+    headingids:
+      - "mrdt---machine-readable-dictionary-tool"
+    termid: "concept:mrdt"
+    vsntag: "documentation"
+  - id: "mrg"
+    term: "mrg"
+    termType: "concept"
+    isa: "glossary"
+    bodyFile: "/spec-files/32-mrg.md"
+    glossaryTerm: "Machine Readable Glossary (MRG)"
+    glossaryText: "a [glossary](@) for a particular (version of a) [terminology](@) that is formatted in YAML, according to the [TEv2 MRG specifications](/docs/spec-files/mrg), to enable automated processing and integration with software systems."
+    hoverText: "MRG: {{noRefs glossaryText}}"
+    synonymOf: null
+    grouptags:
+      - "glossaries"
+      - "data-structures"
+    formPhrases:
+      - "mrg"
+      - "mrgs"
+      - "mrg's"
+      - "mrg(s)"
+      - "machine-readable-glossary"
+      - "machine-readable-glossarys"
+      - "machine-readable-glossary's"
+      - "machine-readable-glossaries"
+      - "machine-readable-glossary-mrg"
+      - "machine-readable-glossary-mrgs"
+      - "machine-readable-glossary-mrg's"
+      - "machine-readable-glossary-mrg(s)"
+      - "machine-readable-glossarys-mrg"
+      - "machine-readable-glossarys-mrgs"
+      - "machine-readable-glossarys-mrg's"
+      - "machine-readable-glossarys-mrg(s)"
+      - "machine-readable-glossary's-mrg"
+      - "machine-readable-glossary's-mrgs"
+      - "machine-readable-glossary's-mrg's"
+      - "machine-readable-glossary's-mrg(s)"
+      - "machine-readable-glossaries-mrg"
+      - "machine-readable-glossaries-mrgs"
+      - "machine-readable-glossaries-mrg's"
+      - "machine-readable-glossaries-mrg(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "mrg.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-files/mrg"
+    headingids:
+      - "machine-readable-glossary-(mrg)"
+      - "file-naming-conventions-{#file-naming-conventions}"
+      - "mrg-structure"
+      - "mrg-`terminology`-section-{#terminology}"
+      - "mrg-`scopes`-section-{#scopes}"
+      - "mrg-entries-(the-`entries`-section)-{#entries}"
+      - "footnotes"
+    termid: "concept:mrg"
+    vsntag: "documentation"
+  - term: "mrg-entry"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "MRG Entry"
+    glossaryText: "A machine-readable (and interpretable) artifact that contains (pointers to) data and meta-data about a particular  [semantic unit](@), such as the associated [term(s)](@), its [definition](@), etc., to make it easy for IT-tools to create, e.g. documentation, [glossaries](@), [dictionaries](@), whitepapers, etc. that uses such [terms](@) ([definitions](@), etc.)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "mrg-entry"
+      - "mrg-entrys"
+      - "mrg-entry's"
+      - "mrg-entries"
+    status: "proposed"
+    created: 20220811
+    updated: 20220811
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "mrg-entry.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/mrg-entry"
+    headingids:
+      - "mrg-entry"
+      - "purpose"
+    termid: "concept:mrg-entry"
+    vsntag: "documentation"
+  - id: "mrg-import"
+    term: "mrg-import"
+    termType: "concept"
+    isa: null
+    bodyFile: "/spec-tools/13-mrg-import.md"
+    glossaryTerm: "MRG Import (Tool)"
+    glossaryText: "is a tool in the [TEv2](@) toolbox that is run within a particular [scope](@) for the purpose of obtaining [MRGs](@) from other [scopes](@), as specified in the [scope's](@) [SAF](@), and putting them in the [scope's](@) [glossarydir](@)."
+    synonymOf: null
+    grouptags:
+      - "glossary-entries"
+      - "terminology-management-tools"
+    formPhrases:
+      - "mrg-import"
+      - "mrg-importer"
+      - "mrg-import-tool"
+      - "mrg-importer-tool"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "mrg-import.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-tools/mrg-import"
+    headingids:
+      - "mrg-import-tool"
+      - "mrg-files"
+      - "installing-the-tool"
+      - "calling-the-tool"
+      - "processing,-errors-and-warnings"
+      - "deploying-the-tool"
+    termid: "concept:mrg-import"
+    vsntag: "documentation"
+  - term: "mrg-ref"
+    termType: "concept"
+    isa: null
+    bodyFile: "/spec-syntax/41-mrg-ref-syntax.md"
+    glossaryTerm: "MRGRef"
+    glossaryText: "a text that is [marked up (in a specific way)](/docs/spec-syntax/mrg-ref-syntax) so that it refers to a particular [terminology](@), as well as to a specific way for creating an associated [HRG](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "mrg-ref"
+      - "mrg-refs"
+      - "mrg-ref's"
+      - "mrg-ref(s)"
+      - "mrgref"
+      - "mrgrefs"
+      - "mrgref's"
+      - "mrgref(s)"
+    status: "proposed"
+    created: 20231127
+    updated: 20231127
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "mrg-ref.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-syntax/mrg-ref-syntax"
+    headingids:
+      - "mrg-references---syntax"
+      - "default-mrgref-syntax-{#default-mrgref-syntax}"
+      - "predefined-mrgref-interpreters-{#predefined-mrgref-interpreters}"
+      - "predefined-mrgref-converters-{#predefined-mrgref-converters}"
+      - "converter-for-markdown-tables"
+      - "converter-for-essif-lab-glossary-lookalikes"
+      - "docusaurus-header-fields:"
+      - "glossary"
+      - "docusaurus-header-fields:"
+      - "glossary"
+      - "docusaurus-header-fields:"
+      - "glossary"
+      - "docusaurus-header-fields:"
+      - "glossary"
+      - "[glossary](/docs/terms/glossary)"
+      - "[curator-(of-a-scope)](/docs/terms/curator)"
+      - "[definition](/docs/terms/definition)"
+      - "custom-glossary-converters-{#custom-glossary-converters}"
+    termid: "concept:mrg-ref"
+    vsntag: "documentation"
+  - id: "mrgt"
+    term: "mrgt"
+    termType: "concept"
+    isa: null
+    bodyFile: "/spec-tools/21-mrgt.md"
+    glossaryTerm: "Machine Readable Glossary Tool"
+    glossaryAlias: "MRGT"
+    glossaryText: "a software tool designed to create, manage, and process [Machine Readable Glossaries (MRGs)](@), as [specified by TEv2](/docs/spec-tools/mrgt). MRGTs offer features for selecting [terms](@) that are [curated](@) within the [scope](@) it is run in, or from other [scopes](@)."
+    hoverText: "MRGT: {{noRefs glossaryText}}"
+    synonymOf: null
+    grouptags:
+      - "tools"
+      - "glossary-tools"
+    formPhrases:
+      - "mrgt"
+      - "mrgts"
+      - "mrgt's"
+      - "mrgt(s)"
+      - "machine-readable-glossary-tool"
+      - "machine-readable-glossary-tools"
+      - "machine-readable-glossary-tool's"
+      - "machine-readable-glossary-tool(s)"
+      - "machine-readable-glossary-tool-mrgt"
+      - "machine-readable-glossary-tool-mrgts"
+      - "machine-readable-glossary-tool-mrgt's"
+      - "machine-readable-glossary-tool-mrgt(s)"
+      - "machine-readable-glossary-tools-mrgt"
+      - "machine-readable-glossary-tools-mrgts"
+      - "machine-readable-glossary-tools-mrgt's"
+      - "machine-readable-glossary-tools-mrgt(s)"
+      - "machine-readable-glossary-tool's-mrgt"
+      - "machine-readable-glossary-tool's-mrgts"
+      - "machine-readable-glossary-tool's-mrgt's"
+      - "machine-readable-glossary-tool's-mrgt(s)"
+      - "machine-readable-glossary-tool(s)-mrgt"
+      - "machine-readable-glossary-tool(s)-mrgts"
+      - "machine-readable-glossary-tool(s)-mrgt's"
+      - "machine-readable-glossary-tool(s)-mrgt(s)"
+      - "mrgt-machine-readable-glossary-tool"
+      - "mrgt-machine-readable-glossary-tools"
+      - "mrgt-machine-readable-glossary-tool's"
+      - "mrgt-machine-readable-glossary-tool(s)"
+      - "mrgts-machine-readable-glossary-tool"
+      - "mrgts-machine-readable-glossary-tools"
+      - "mrgts-machine-readable-glossary-tool's"
+      - "mrgts-machine-readable-glossary-tool(s)"
+      - "mrgt's-machine-readable-glossary-tool"
+      - "mrgt's-machine-readable-glossary-tools"
+      - "mrgt's-machine-readable-glossary-tool's"
+      - "mrgt's-machine-readable-glossary-tool(s)"
+      - "mrgt(s)-machine-readable-glossary-tool"
+      - "mrgt(s)-machine-readable-glossary-tools"
+      - "mrgt(s)-machine-readable-glossary-tool's"
+      - "mrgt(s)-machine-readable-glossary-tool(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "mrgt.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-tools/mrgt"
+    headingids:
+      - "machine-readable-glossary-generation-tool"
+      - "installing-the-tool"
+      - "calling-the-tool"
+      - "running-the-tool"
+      - "phase-1:-constructing-a-[provisional-mrg](@)-{#constructing-provisional-mrg}"
+      - "storing-a-[provisional-mrg](@)-in-the-[glossarydir](@)-{#mrg-filenames}"
+      - "phase-2:-post-processing-synonyms-{#post-processing}"
+      - "phase-3:-post-processing-other-fields"
+      - "phase-4:-checking-the-result"
+      - "exceptions,-warnings,-and-logging-{#exceptions}"
+      - "notes"
+    termid: "concept:mrgt"
+    vsntag: "documentation"
+  - id: "named-capturing-group"
+    term: "named-capturing-group"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Named Capturing Group"
+    glossaryText: "a sub-pattern within a [regex](@) (called a '[capturing group](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Capturing_group)') that has been given a name, allowing one to refer to that sub-pattern."
+    grouptags: null
+    formPhrases:
+      - "named-capturing-group"
+      - "named-capturing-groups"
+      - "named-capturing-group's"
+      - "named-capturing-group(s)"
+      - "capturing-group"
+      - "capturing-groups"
+      - "capturing-group's"
+      - "capturing-group(s)"
+    status: "proposed"
+    created: 20231220
+    updated: 20231220
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "named-capturing-group.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/named-capturing-group"
+    headingids:
+      - "named-capturing-group"
+    termid: "concept:named-capturing-group"
+    vsntag: "documentation"
+  - term: "navpath"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "the (name of the field in the [`scope`-section](/docs/spec-files/saf#scope-section) of a [SAF](@) that contains the) path to the directory where [curated texts](@) are rendered. The (value of this field) is for the rendered versions of [curated texts](@) what [curatedir](@) is for the [curated texts](@) themselves."
+    hoverText: "the path of the directory, relative to the base URL of a static website, that contains the rendered versions of curated texts."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "navpath"
+      - "navpaths"
+      - "navpath's"
+      - "navpath(s)"
+    status: "proposed"
+    created: 20221006
+    updated: 20221006
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "navpath.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/navpath"
+    headingids:
+      - "navpath"
+    termid: "concept:navpath"
+    vsntag: "documentation"
   - id: "objective"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "objective"
-    formPhrases: "objective{ss}"
+    formPhrases:
+      - "objective"
+      - "objectives"
+      - "objective's"
+      - "objective(s)"
     status: "draft"
     grouptags: null
     hoverText: "Objective: Something toward which a Party (its Owner) directs effort (an aim, goal, or end of action)."
@@ -476,7 +2338,6 @@ entries:
     glossaryText: "something toward which a [party](@) (its [owner](@)) directs effort (an aim, goal, or end of action)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:objective"
     locator: "objective.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/objective"
     headingids:
@@ -487,12 +2348,17 @@ entries:
       - "examples"
       - "formalization"
       - "chaining,-managing-and-governing-objectives,"
+    termid: "concept:objective"
     vsntag: "default"
   - id: "obligation"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "obligation"
-    formPhrases: "obligation{ss}"
+    formPhrases:
+      - "obligation"
+      - "obligations"
+      - "obligation's"
+      - "obligation(s)"
     status: "draft"
     grouptags: null
     hoverText: "Obligation (of a Party): an Objective that is Owned by that Party for producing a specific (set of) result(s) that are to be used (consumed) by that Party and/or other Parties."
@@ -500,18 +2366,22 @@ entries:
     glossaryText: "an [objective](@) that is [owned](@) by the [party](@) for producing a specific (set of) result(s) that are to be used (consumed) by that [party](@) and/or other [parties](@)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:obligation"
     locator: "obligation.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/obligation"
     headingids:
       - "obligation"
       - "short-description"
+    termid: "concept:obligation"
     vsntag: "default"
   - id: "onboarding"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "onboarding"
-    formPhrases: "onboarding, onboard, onboards, onboarded"
+    formPhrases:
+      - "onboarding"
+      - "onboard"
+      - "onboards"
+      - "onboarded"
     status: "draft"
     grouptags: null
     hoverText: "Onboarding (of an Actor, by a Party): a process that is run for this Actor on behalf of the Party, that terminates successfully if and  only if the Party has (a) established the suitability of the Actor for executing certain kinds of Actions on its behalf, (b) ensured that their mutual rights and duties are properly specified and will be appropriately enforced, and (c) provided the circumstances/contexts within which the Actor is enabled to do so."
@@ -519,7 +2389,6 @@ entries:
     glossaryText: "a process that is run for a specific (set of) [actor](@) on behalf of a specific [party](@), that terminates successfully if and  only if the [party](@) has (a) established the suitability of the [actor](@) for executing certain kinds of [action](@) on its behalf, (b) ensured that their mutual rights and duties are properly specified and will be appropriately enforced, and (c) provided the circumstances/contexts within which the [actor](@) is enabled to do so."
     date: 20220922
     scopetag: "termdsn"
-    termid: "concept:onboarding"
     locator: "onboarding.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/onboarding"
     headingids:
@@ -527,12 +2396,17 @@ entries:
       - "short-description"
       - "examples"
       - "purpose"
+    termid: "concept:onboarding"
     vsntag: "default"
   - id: "organization"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "organization"
-    formPhrases: "organization{ss}"
+    formPhrases:
+      - "organization"
+      - "organizations"
+      - "organization's"
+      - "organization(s)"
     status: "draft"
     grouptags: null
     hoverText: "Organization: a Party that is capable of setting Objectives and making sure these are realized by Actors that it has Onboarded and/or by (vetted) Parties that are committed to contribute to these Objectives."
@@ -540,7 +2414,6 @@ entries:
     glossaryText: "a [party](@) that is capable of setting [objective](@) and making sure these are realized by [actor](@) that it has [onboarded](onboarding@) and/or by (vetted) [parties](@) that are committed to contribute to these [objective](@)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:organization"
     locator: "organization.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/organization"
     headingids:
@@ -550,12 +2423,14 @@ entries:
       - "criteria"
       - "examples"
       - "notes"
+    termid: "concept:organization"
     vsntag: "default"
   - id: "owned"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "owned"
-    formPhrases: "owned"
+    formPhrases:
+      - "owned"
     status: "draft"
     grouptags: null
     hoverText: "Owned (by an Owner, in some Jurisdiction): an Entity over which another Entity (its Owner) has the power (duty, right) to enjoy it, dispose of it and control it; that power is limited to (the scope of) that Jurisdiction, and by its rules."
@@ -563,18 +2438,26 @@ entries:
     glossaryText: "an [entity](@) over which another [entity](@) (its [owner](@)) has the power (duty, right) to enjoy it, dispose of it and control it; that power is limited to (the scope of) that [jurisdiction](@), and by its rules."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:owned"
     locator: "owned.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/owned"
     headingids:
       - "owned"
       - "related-concepts"
+    termid: "concept:owned"
     vsntag: "default"
   - id: "owner"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "owner"
-    formPhrases: "owner{ss}, own{ss}"
+    formPhrases:
+      - "owner"
+      - "owners"
+      - "owner's"
+      - "owner(s)"
+      - "own"
+      - "owns"
+      - "own's"
+      - "own(s)"
     status: "draft"
     grouptags: null
     hoverText: "Owner (of an Entity): the role that a Party performs when it is exercising its legal, rightful or natural title to control that Entity."
@@ -582,7 +2465,6 @@ entries:
     glossaryText: "the role that a [party](@) performs when it is exercising its legal, rightful or natural title to control that [entity](@)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:owner"
     locator: "owner.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/owner"
     headingids:
@@ -591,12 +2473,17 @@ entries:
       - "purpose"
       - "criteria"
       - "related-concepts"
+    termid: "concept:owner"
     vsntag: "default"
   - id: "partial-identity"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "partial-identity"
-    formPhrases: "partial-identit{yies}"
+    formPhrases:
+      - "partial-identity"
+      - "partial-identitys"
+      - "partial-identity's"
+      - "partial-identities"
     status: "draft"
     grouptags: null
     hoverText: "Partial identity (of an Entity): all Knowledge that a specific Party (= the Owner of the partial identity) has about that Entity (= the 'Subject' of the partial identity)."
@@ -604,18 +2491,22 @@ entries:
     glossaryText: "all [knowledge](@) that a specific [party](@) (= the [owner](@) of the partial identity) has about that [entity](@) (= the '[subject](@)' of the partial identity)."
     date: 20210803
     scopetag: "termdsn"
-    termid: "concept:partial-identity"
     locator: "partial-identity.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/partial-identity"
     headingids:
       - "partial-identity"
       - "short-description"
+    termid: "concept:partial-identity"
     vsntag: "default"
   - id: "party"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "party"
-    formPhrases: "part{yies}"
+    formPhrases:
+      - "party"
+      - "partys"
+      - "party's"
+      - "parties"
     status: "draft"
     grouptags: null
     hoverText: "Party: an Entity that sets its Objectives, maintains its Knowledge, and uses that Knowledge to pursue its Objectives in an autonomous (sovereign) manner. Humans and Organizations are the typical examples."
@@ -623,7 +2514,6 @@ entries:
     glossaryText: "an [entity](@) that sets its [objective](@), maintains its [knowledge](@), and uses that [knowledge](@) to pursue its [objective](@) in an autonomous (sovereign) manner. Humans and [organization](@) are the typical examples."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:party"
     locator: "party.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/party"
     headingids:
@@ -633,28 +2523,7 @@ entries:
       - "criterion"
       - "examples"
       - "related-terms"
-    vsntag: "default"
-  - id: "pattern"
-    displayed_sidebar: "essifLabSideBar"
-    termType: "concept"
-    term: "pattern"
-    formPhrases: "pattern{ss}"
-    status: "draft"
-    grouptags: null
-    hoverText: "Pattern (also: Mental Model): A description, both casual and formal, of a set of Concepts (ideas), relations between them, and constraints, that together form a coherent and consistent 'viewpoint', or 'way of thinking' about a certain topic."
-    glossaryTerm: "Pattern"
-    glossaryText: "a description, both casual and formal, of a set of [concept](@) (ideas), relations between them, and constraints, that together form a coherent and consistent 'viewpoint', or 'way of thinking' about a certain topic."
-    date: 20210804
-    scopetag: "termdsn"
-    termid: "concept:pattern"
-    locator: "pattern.md"
-    navurl: "https://essif-lab.github.io/framework/docs/terms/pattern"
-    headingids:
-      - "pattern"
-      - "short-description"
-      - "purpose"
-      - "criteria"
-      - "notes"
+    termid: "concept:party"
     vsntag: "default"
   - id: "property"
     term: "property"
@@ -663,22 +2532,137 @@ entries:
     glossaryTerm: "Property (of a Concept)"
     glossaryText: "a connection or association between a [concept](@) and a primitive data element, such as a text or a number, that represents some characteristic that instances of the [concept](@) may have."
     synonymOf: null
-    grouptags: "conceptual-modeling"
-    formPhrases: "propert{yies}"
+    grouptags:
+      - "conceptual-modeling"
+    formPhrases:
+      - "property"
+      - "propertys"
+      - "property's"
+      - "properties"
     status: "proposed"
-    created: 2023-07-31T00:00:00.000Z
-    updated: 2023-07-31T00:00:00.000Z
+    created: 20230731
+    updated: 20230731
     contributors: "RieksJ"
     attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
     originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
     scopetag: "termdsn"
-    termid: "concept:property"
     locator: "property.md"
     navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/property"
     headingids:
       - "property-(of-a-concept)"
       - "examples"
       - "notes"
+    termid: "concept:property"
+    vsntag: "documentation"
+  - id: "provisional-mrg"
+    term: "provisional-mrg"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Provisional MRG"
+    glossaryText: "a set of [provisional MRG entries](@), to which such [entries](provisional-mrg-entry@) can be added, removed or modified, as specified by [term selection instructions](@), and that are ultimately [further processed](/docs/spec-tools/mrgt#post-processing) to result in a proper [MRG](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "provisional-mrg"
+      - "provisional-mrgs"
+      - "provisional-mrg's"
+      - "provisional-mrg(s)"
+    status: "proposed"
+    created: 20231010
+    updated: 20231010
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "provisional-mrg.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/provisional-mrg"
+    headingids:
+      - "provisional-mrg"
+    termid: "concept:provisional-mrg"
+    vsntag: "documentation"
+  - id: "provisional-mrg-entry"
+    term: "provisional-mrg-entry"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Provisional MRG Entry"
+    glossaryText: "an [MRG entry](@) that is 'under construction'; it contains 'raw' data that documents (the [semantic unit](@) referred to by) a [term](@), that is obtained either from (the [header](@) of) a [curated text](@), or from an [MRG entry](@) of some existing [MRG](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "provisional-mrg-entry"
+      - "provisional-mrg-entrys"
+      - "provisional-mrg-entry's"
+      - "provisional-mrg-entries"
+    status: "proposed"
+    created: 20231010
+    updated: 20231010
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "provisional-mrg-entry.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/provisional-mrg-entry"
+    headingids:
+      - "provisional-mrg-entry"
+    termid: "concept:provisional-mrg-entry"
+    vsntag: "documentation"
+  - id: "reader"
+    term: "reader"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Reader"
+    glossaryText: "a person that reads a text that is authored by another person (its [author](@)), and that tries to understand the meaning of this text in the way its [author](@) intended."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "reader"
+      - "readers"
+      - "reader's"
+      - "reader(s)"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "reader.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/reader"
+    headingids:
+      - "reader"
+    termid: "concept:reader"
+    vsntag: "documentation"
+  - id: "regex"
+    term: "regex"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Regular Expression (Regex)"
+    glossaryText: "a sequence of characters that specifies a text pattern that can be searched for within other, larger texts, for the purpose of, e.g., replacing the text pattern with some other text. Within [TEv2](@), we use a [JavaScript flavor (ECMAScript 2022)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "regex"
+      - "regexes"
+      - "regexp"
+      - "regexps"
+      - "regexp's"
+      - "regexp(s)"
+      - "regular-expression"
+      - "regular-expressions"
+      - "regular-expression's"
+      - "regular-expression(s)"
+    status: "proposed"
+    created: 20231219
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "regex.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/regex"
+    headingids:
+      - "regular-expression-(regex)"
+    termid: "concept:regex"
     vsntag: "documentation"
   - id: "relation"
     term: "relation"
@@ -687,28 +2671,72 @@ entries:
     glossaryTerm: "Relation (between Concepts)"
     glossaryText: "a (significant) connection or association between two or more [concepts](@). These connections define the way these [concepts](@) are interrelated, providing insights into how they interact and influence each other."
     synonymOf: null
-    grouptags: "conceptual-modeling"
-    formPhrases: "relation{ss}"
+    grouptags:
+      - "conceptual-modeling"
+    formPhrases:
+      - "relation"
+      - "relations"
+      - "relation's"
+      - "relation(s)"
     status: "proposed"
-    created: 2023-07-31T00:00:00.000Z
-    updated: 2023-07-31T00:00:00.000Z
+    created: 20230731
+    updated: 20230731
     contributors: "RieksJ"
     attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
     originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
     scopetag: "termdsn"
-    termid: "concept:relation"
     locator: "relation.md"
     navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/relation"
     headingids:
       - "relation-(between-concepts)"
       - "examples"
       - "notes"
+    termid: "concept:relation"
+    vsntag: "documentation"
+  - term: "renderable-ref"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Renderable Ref"
+    glossaryText: "a text with which the [TRRT](@) replaces a [TermRef](@), that can be processed by specific third party rendering tools, the result of which is a rendering of the original [TermRef](@) that has additional characteristics that help [readers](@) to (better) understand the intention of its [author](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "renderable-ref"
+      - "renderable-refs"
+      - "renderable-ref's"
+      - "renderable-ref(s)"
+      - "renderableref"
+      - "renderablerefs"
+      - "renderableref's"
+      - "renderableref(s)"
+      - "renderable-reference"
+      - "renderable-references"
+      - "renderable-reference's"
+      - "renderable-reference(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220804
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "renderable-ref.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/renderable-ref"
+    headingids:
+      - "renderable-ref"
+      - "summary"
+      - "purpose"
+    termid: "concept:renderable-ref"
     vsntag: "documentation"
   - id: "risk"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "risk"
-    formPhrases: "risk{ss}"
+    formPhrases:
+      - "risk"
+      - "risks"
+      - "risk's"
+      - "risk(s)"
     status: "draft"
     grouptags: null
     hoverText: "Risk (of a Party's Objective): the effects that uncertainty (i.e. a lack of information, understanding or knowledge of events, their consequences or likelihoods) can have on the intended realization of that Party's Objective."
@@ -716,7 +2744,6 @@ entries:
     glossaryText: "the effects that uncertainty (i.e. a lack of information, understanding or [knowledge](@) of events, their consequences or likelihoods) can have on the intended realization of an [objective](@) of a [party](@)."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:risk"
     locator: "risk.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/risk"
     headingids:
@@ -724,12 +2751,17 @@ entries:
       - "short-description"
       - "purpose"
       - "references"
+    termid: "concept:risk"
     vsntag: "default"
   - id: "risk-objective"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "risk-objective"
-    formPhrases: "risk-objective{ss}"
+    formPhrases:
+      - "risk-objective"
+      - "risk-objectives"
+      - "risk-objective's"
+      - "risk-objective(s)"
     status: "draft"
     grouptags: null
     hoverText: "Risk objective (of a Party): an Objective, owned by that Party, that aims to reach and maintain a state of affairs in which the Risks associated with a specific set of its Objectives become, and/or remain, acceptable."
@@ -737,7 +2769,6 @@ entries:
     glossaryText: "an [objective](@), owned by a [party](@), that aims to reach and maintain a state of affairs in which the [risk](@) associated with a specific set of its [objective](@) become, and/or remain, acceptable."
     date: 20220203
     scopetag: "termdsn"
-    termid: "concept:risk-objective"
     locator: "risk-objective.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/risk-objective"
     headingids:
@@ -745,7 +2776,211 @@ entries:
       - "short-description"
       - "purpose"
       - "criteria"
+    termid: "concept:risk-objective"
     vsntag: "default"
+  - id: "saf"
+    term: "saf"
+    termType: "concept"
+    bodyFile: "/spec-files/12-saf.md"
+    glossaryTerm: "Scope Administration File (SAF)"
+    glossaryText: "a YAML file that contains essential data about a particular [scope](@) (e.g., specifying where its [curated texts](@), [glossaries](@) etc. live), the relationships this [scope](@) has with other [scopes](@), and the specifications of the different [terminologies](@) that are [curated](@) within that [scope](@). The SAF of a [scope](@) is located in its [scopedir](@)."
+    hoverText: "SAF: a YAML file that contains essential data about a particular scope, such as the locations of the scope's curated texts, glossaries, and the specifications of the curated terminologies. The SAF is located in the so-called scopedir."
+    synonymOf: null
+    grouptags:
+      - "terminology-management"
+    formPhrases:
+      - "saf"
+      - "safs"
+      - "saf's"
+      - "saf(s)"
+      - "scope-administration-file"
+      - "scope-administration-files"
+      - "scope-administration-file's"
+      - "scope-administration-file(s)"
+      - "scope-administration-file-saf"
+      - "scope-administration-file-safs"
+      - "scope-administration-file-saf's"
+      - "scope-administration-file-saf(s)"
+      - "scope-administration-files-saf"
+      - "scope-administration-files-safs"
+      - "scope-administration-files-saf's"
+      - "scope-administration-files-saf(s)"
+      - "scope-administration-file's-saf"
+      - "scope-administration-file's-safs"
+      - "scope-administration-file's-saf's"
+      - "scope-administration-file's-saf(s)"
+      - "scope-administration-file(s)-saf"
+      - "scope-administration-file(s)-safs"
+      - "scope-administration-file(s)-saf's"
+      - "scope-administration-file(s)-saf(s)"
+      - "saf-scope-administration-file"
+      - "saf-scope-administration-files"
+      - "saf-scope-administration-file's"
+      - "saf-scope-administration-file(s)"
+      - "safs-scope-administration-file"
+      - "safs-scope-administration-files"
+      - "safs-scope-administration-file's"
+      - "safs-scope-administration-file(s)"
+      - "saf's-scope-administration-file"
+      - "saf's-scope-administration-files"
+      - "saf's-scope-administration-file's"
+      - "saf's-scope-administration-file(s)"
+      - "saf(s)-scope-administration-file"
+      - "saf(s)-scope-administration-files"
+      - "saf(s)-scope-administration-file's"
+      - "saf(s)-scope-administration-file(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "saf.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-files/saf"
+    headingids:
+      - "scope-administration-file-(saf)"
+      - "scope-administration-file-field-descriptions"
+      - "saf-terminology---defining-the-scope-itself-{#scope-section}"
+      - "#-this-is-a-scope-administration-file-that-can-be-used-in-conjunction-with-tev2."
+      - "#-the-first-section-defines-meta-data-concerning-the-scope-itself,-both-for-technical-use-and-human-use."
+      - "it-shows-where-directories-and-files-live-that-ar-part-of-the-scope,-and-also"
+      - "ways-in-which-people-can-contribute,-raise-issues,-see-what's-going-on,-discuss,-etc."
+      - "scope:"
+      - "saf-scopes---mapping-scopetags-and-scopedirs-{#scopes}"
+      - "#-the-second-section-contains-a-mapping-between-scopetags-that-are-used-within-the-scope,-and-the-associated-scopedirs."
+      - "this-enables-tools-to-find-the-[saf](@)-of-these-[scopes](@),-and-from-there-all-other-directories,-files-etc."
+      - "that-live-within-them,-e.g.-to-use/import-their-data."
+      - "scopes:-#"
+      - "saf-versions---enabling-changes-and-updates-in-a-scope's-terminology-{#versions}"
+      - "#-the-third-section-specifies-the-versions-that-are-actively-maintained-by-the-curators."
+      - "for-each-version,-the-set-of-terms-is-selected-that-constitute-the-terminology."
+      - "see-the-glossary-generation-tool-(ggt)-for-details-about-the-syntax-and-semantics."
+      - "versions:"
+      - "notes"
+    termid: "concept:saf"
+    vsntag: "documentation"
+  - term: "scope"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "the extent of the [terms](@), [definitions](@) and other documentation that a [community](@) (which we call the [owner](@) of the [scope](@)) needs to express, communicate and validate its [knowledge](@) as relevant to achieving a specific subset of its [objectives](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "scope"
+      - "scopes"
+      - "scope's"
+      - "scope(s)"
+      - "scope-context"
+      - "scope-contexts"
+      - "scope-context's"
+      - "scope-context(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220804
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "scope.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/scope"
+    headingids:
+      - "scope"
+      - "summary"
+      - "purpose"
+    termid: "concept:scope"
+    vsntag: "documentation"
+  - term: "scoped-term"
+    termType: "concept"
+    isa: "term"
+    glossaryTerm: "Scoped Term"
+    glossaryText: "a [term](@) that represents (and [identifies](@)) a specific [semantic unit](@) of a particular [community](@) (or [party](@))."
+    grouptags: null
+    formPhrases:
+      - "scoped-term"
+      - "scoped-terms"
+      - "scoped-term's"
+      - "scoped-term(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220804
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "scoped-term.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/scoped-term"
+    headingids:
+      - "scoped-term"
+      - "summary"
+    termid: "concept:scoped-term"
+    vsntag: "documentation"
+  - term: "scopedir"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "a directory in a computer file system that contains all files that are either being [curated](@) within a particular [scope](@), or generated to serve some purpose within that [scope](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "scopedir"
+      - "scopedirs"
+      - "scopedir's"
+      - "scopedir(s)"
+      - "scope-directory"
+      - "scope-directorys"
+      - "scope-directory's"
+      - "scope-directories"
+    status: "proposed"
+    created: 20220729
+    updated: 20220729
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "scopedir.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/scopedir"
+    headingids:
+      - "scope-directory"
+      - "summary"
+      - "purpose"
+      - "criteria"
+    termid: "concept:scopedir"
+    vsntag: "documentation"
+  - term: "scopetag"
+    termType: "concept"
+    isa: "tag"
+    glossaryTerm: null
+    glossaryText: "a [tag](@) that is used to [identify](@) [scopes](@) from within a specific [scope](@)"
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "scopetag"
+      - "scopetags"
+      - "scopetag's"
+      - "scopetag(s)"
+      - "scope-tag"
+      - "scope-tags"
+      - "scope-tag's"
+      - "scope-tag(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220728
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "scopetag.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/scopetag"
+    headingids:
+      - "scopetag"
+      - "summary"
+      - "criteria"
+      - "examples"
+      - "notes"
+    termid: "concept:scopetag"
+    vsntag: "documentation"
   - term: "semantic-unit"
     termType: "concept"
     isa: null
@@ -754,15 +2989,18 @@ entries:
     hoverText: "a basic building block of meaning or representation that exists within the 'mind' of a party, e.g., a concept, relation, or property. Parties use terms (words/phrases) to refer to these intangible building blocks."
     synonymOf: null
     grouptags: null
-    formPhrases: "semantic-unit{ss}"
+    formPhrases:
+      - "semantic-unit"
+      - "semantic-units"
+      - "semantic-unit's"
+      - "semantic-unit(s)"
     status: "proposed"
-    created: 2022-07-27T00:00:00.000Z
-    updated: 2022-07-27T00:00:00.000Z
+    created: 20220727
+    updated: 20220727
     contributors: "RieksJ"
-    attribution: "[eSSIF-Lab](https://essif-lab.github.io/framework)"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
     originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
     scopetag: "termdsn"
-    termid: "concept:semantic-unit"
     locator: "semantic-unit.md"
     navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/semantic-unit"
     headingids:
@@ -770,12 +3008,65 @@ entries:
       - "summary"
       - "purpose"
       - "criteria"
+    termid: "concept:semantic-unit"
+    vsntag: "documentation"
+  - term: "semantics"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "a mapping between the (tangible/textual) [terms](@) and (intangible) ideas/[concepts](@) - their meaning."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "semantics"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "semantics.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/semantics"
+    headingids:
+      - "semantics"
+      - "summary"
+      - "purpose"
+      - "criteria"
+    termid: "concept:semantics"
+    vsntag: "documentation"
+  - id: "sorter"
+    term: "sorter"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Sorter"
+    glossaryText: "a specification, in the form of a predefined value or a [handlebars expression](@), of the value that is to be used for sorting a list, e.g., for sorting [HRG entries](@) within a [HRG list](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "sorter"
+      - "sorters"
+      - "sorter's"
+      - "sorter(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "sorter.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/sorter"
+    headingids:
+      - "sorter"
+    termid: "concept:sorter"
     vsntag: "documentation"
   - id: "ssi"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "ssi"
-    formPhrases: "ssi"
+    formPhrases:
+      - "ssi"
     conceptref: "essifLab:self-sovereign-identity"
     status: "draft"
     grouptags: null
@@ -784,40 +3075,531 @@ entries:
     glossaryText: "sSI (Self-Sovereign Identity) is a term that has many different interpretations, and that we use to refer to concepts/ideas, architectures, processes and technologies that aim to support (autonomous) [parties](@) as they negotiate and execute electronic [transaction](@) with one another."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:ssi"
     locator: "ssi.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/ssi"
     headingids:
       - "ssi-(self-sovereign-identity)"
       - "short-description"
+    termid: "concept:ssi"
     vsntag: "default"
-  - id: "terminology"
-    displayed_sidebar: "essifLabSideBar"
+  - term: "synonym"
     termType: "concept"
-    term: "terminology"
-    formPhrases: "terminolog{yies}"
-    status: "draft"
+    isa: "term"
+    glossaryTerm: "Synonym (of a [term](@))"
+    glossaryText: "a [term](@) that has the same (or sufficiently similar) meaning as another [term](@) (i.e., the [term](@) of which it is a [synonym](@)."
+    synonymOf: null
     grouptags: null
-    hoverText: "Terminology (in/of a Scope): the set of terms that are used within a single Scope to refer to a single Definition, enabling Parties to reason and communicate ideas they have about one or more specific topics."
-    glossaryTerm: "Terminology"
-    glossaryText: "the set of [term](@) that are used within a single [scope](@) to refer to a single [definition](@), enabling [parties](@) to reason and communicate ideas they have about one or more specific topics."
-    date: 20211101
+    formPhrases:
+      - "synonym"
+      - "synonyms"
+      - "synonym's"
+      - "synonym(s)"
+    status: "proposed"
+    created: 20221127
+    updated: 20221127
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
     scopetag: "termdsn"
-    termid: "concept:terminology"
-    locator: "terminology.md"
-    navurl: "https://essif-lab.github.io/framework/docs/terms/terminology"
+    locator: "synonym.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/synonym"
     headingids:
-      - "terminology"
-      - "short-description"
+      - "synonym"
+      - "summary"
+      - "the-`synonymof`-field-{#synonym-of}"
+      - "how-synonyms-work"
       - "purpose"
+    termid: "concept:synonym"
+    vsntag: "documentation"
+  - term: "tag"
+    termType: "concept"
+    isa: "identifier"
+    glossaryTerm: null
+    glossaryText: "an alphanumeric string that is used to identify [scopes](@) (so called 'scopetags'), group [terms](@) (so called 'grouptags'), or identify a specific version of a [terminology](@) (so called 'versiontags') from within a specific [scope](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "tag"
+      - "tags"
+      - "tag's"
+      - "tag(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "tag.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/tag"
+    headingids:
+      - "tag"
+      - "summary"
       - "criteria"
       - "examples"
-    vsntag: "default"
+      - "notes"
+    termid: "concept:tag"
+    vsntag: "documentation"
+  - term: "term"
+    termType: "concept"
+    isa: "identifier"
+    glossaryTerm: null
+    glossaryText: "a word or phrase (i.e.: text) that is used to represent ([identify](@)) a specific [semantic unit](@) (in some [scope](@))."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "term"
+      - "terms"
+      - "term's"
+      - "term(s)"
+      - "word"
+      - "words"
+      - "word's"
+      - "word(s)"
+      - "phrase"
+      - "phrases"
+      - "phrase's"
+      - "phrase(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220809
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "term.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/term"
+    headingids:
+      - "term"
+      - "summary"
+      - "purpose"
+      - "criteria"
+      - "notes"
+      - "footnotes"
+    termid: "concept:term"
+    vsntag: "documentation"
+  - term: "term-identifier"
+    termType: "concept"
+    isa: "identifier"
+    bodyFile: "/spec-syntax/21-term-identifier-syntax.md"
+    glossaryTerm: "Term Identifier"
+    glossaryText: "a [text](identifier@), of the form `<termid>@<terminology-identifier>`, that is used for [identifying](@) a [semantic unit](@) within a designated [terminology](@). If `@<terminology-identifier>` is omitted, the current (or default) [terminology](@) is assumed."
+    formPhrases:
+      - "term-identifier"
+      - "term-identifiers"
+      - "term-identifier's"
+      - "term-identifier(s)"
+    status: "proposed"
+    created: 20221124
+    updated: 20231124
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "term-identifier.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-syntax/term-identifier-syntax"
+    headingids:
+      - "term-identifier"
+      - "syntax"
+      - "semantics---looking-for-mrg-entries-{#term-identifiers-mrg-semantics}"
+      - "examples"
+    termid: "concept:term-identifier"
+    vsntag: "documentation"
+  - term: "term-ref"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "TermRef"
+    glossaryText: "a word or phrase that is [marked up (in a specific way)](/docs/spec-syntax/term-ref-syntax) so that it refers to a particular [concept](@) (or other [semantic unit](@)), enabling it to be rendered in a variety of ways for the purpose of helping [readers](@) to (better) understand the intention of its [author](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "term-ref"
+      - "term-refs"
+      - "term-ref's"
+      - "term-ref(s)"
+      - "termref"
+      - "termrefs"
+      - "termref's"
+      - "termref(s)"
+      - "term-reference"
+      - "term-references"
+      - "term-reference's"
+      - "term-reference(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220804
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "term-ref.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/term-ref"
+    headingids:
+      - "term-ref"
+      - "purpose"
+      - "example-characteristic-{#example}"
+    termid: "concept:term-ref"
+    vsntag: "documentation"
+  - id: "term-selection-instruction"
+    term: "term-selection-instruction"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Term Selection Instruction"
+    glossaryText: "an instruction that is used to select one or more [terms](scoped-term@) for the purpose of processing their documentation, e.g., to create an [MRG](@)."
+    synonymOf: null
+    grouptags:
+      - "glossary-entries"
+      - "terminology-management"
+    formPhrases:
+      - "term-selection-instruction"
+      - "term-selection-instructions"
+      - "term-selection-instruction's"
+      - "term-selection-instruction(s)"
+      - "selection-instruction"
+      - "selection-instructions"
+      - "selection-instruction's"
+      - "selection-instruction(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "term-selection-instruction.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/term-selection-instruction"
+    headingids:
+      - "term-selection-instruction"
+      - "examples"
+      - "notes"
+    termid: "concept:term-selection-instruction"
+    vsntag: "documentation"
+  - term: "term-type"
+    termType: "concept"
+    isa: "identifier"
+    glossaryTerm: "Term Type"
+    glossaryText: "a [text](identifier@) that [identifies](@) a particular *kind* of [semantic unit](@) within a particular [scope](@). Examples include `concept`, `relation`, `pattern` (or `mental-model`)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "term-type"
+      - "term-types"
+      - "term-type's"
+      - "term-type(s)"
+      - "termtype"
+      - "termtypes"
+      - "termtype's"
+      - "termtype(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20230801
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "term-type.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/term-type"
+    headingids:
+      - "term-type"
+      - "default-term-type"
+      - "recommended-term-types"
+    termid: "concept:term-type"
+    vsntag: "documentation"
+  - term: "termid"
+    termType: "concept"
+    isa: "identifier"
+    glossaryTerm: null
+    glossaryText: "a text of the form `<termType>:<term>` that serves as an unambiguous [identifier](@) for a specific [semantic unit](@) in some given [scope](@)."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "termid"
+      - "termids"
+      - "termid's"
+      - "termid(s)"
+      - "term-id"
+      - "term-ids"
+      - "term-id's"
+      - "term-id(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220809
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "termid.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/termid"
+    headingids:
+      - "term-id"
+    termid: "concept:termid"
+    vsntag: "documentation"
+  - term: "terminology"
+    termType: "concept"
+    grouptags: null
+    synonymOf: null
+    formPhrases:
+      - "terminology"
+      - "terminologys"
+      - "terminology's"
+      - "terminologies"
+    status: "proposed"
+    created: 20220606
+    updated: 20220811
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    glossaryTerm: null
+    glossaryText: "a set of [terms](scoped-term@) that are used within a single [scope](@) to refer to [concepts](@) and other [semantic units](@) of a single [party](@) (e.g. a [community](@)), enabling [parties](@) to reason and communicate ideas they have about one or more specific topics."
+    scopetag: "termdsn"
+    locator: "terminology.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/terminology"
+    headingids:
+      - "terminology"
+      - "summary"
+      - "purpose"
+    termid: "concept:terminology"
+    vsntag: "documentation"
+  - term: "terminology"
+    termType: "pattern"
+    isa: null
+    glossaryTerm: "Terminology Pattern"
+    glossaryText: "a [mental model](@) that describes the relations between a [community](@), its (intangible) [knowledge](@), and the artifacts we use to document that [knowledge](@), such as [terms](@), [definitions](@), [mental models](@), [glossaries](@), etc."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "terminology-pattern"
+      - "terminology-patterns"
+      - "terminology-pattern's"
+      - "terminology-pattern(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "patterns/pattern-terminology.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/patterns/pattern-terminology"
+    headingids:
+      - "create-and-maintain-terminologies"
+      - "introduction"
+      - "formalized-model"
+      - "white:-parties,-communities-{#white}"
+      - "green:-scopes---data-artifacts-for-referencing-and-documenting-knowledge-{#green}"
+      - "yellow:-intangible-concepts-{#yellow}"
+    termid: "pattern:terminology"
+    vsntag: "documentation"
+  - term: "terminology-identifier"
+    termType: "concept"
+    isa: "identifier"
+    bodyFile: "/spec-syntax/31-terminology-identifier-syntax.md"
+    glossaryTerm: "Terminology Identifier"
+    glossaryText: "a [text](identifier@), of the form `<scopetag>:<vsntag>`, that [identifies](@) a [terminology](@) from within a particular [scope](@), and can also be used to find the [MRG](@) file (in the [glossarydir](@) of that same [scope](@)) that contains [entries](mrg-entry@) for every [term](@) contained in that [terminology](@). If `<scopetag>` and/or `:<vsntag>` is omitted, their values are taken be the current (or default) ones."
+    hoverText: "a text (identifier), of the form `<scopetag>:<vsntag>`, that identifies a terminology from within a particular scope. If `<scopetag>` and/or `:<vsntag>` is omitted, their values are taken be the current (or default) ones."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "terminology-identifier"
+      - "terminology-identifiers"
+      - "terminology-identifier's"
+      - "terminology-identifier(s)"
+    status: "proposed"
+    created: 20230929
+    updated: 20230929
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "terminology-identifier.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-syntax/terminology-identifier-syntax"
+    headingids:
+      - "terminology-identifiers"
+      - "syntax"
+      - "finding-the-[mrg](@)-that-corresponds-with-a-[terminology-identifier](@)"
+      - "examples"
+    termid: "concept:terminology-identifier"
+    vsntag: "documentation"
+  - id: "terminology-process"
+    term: "terminology-process"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "Terminology Process"
+    glossaryText: "a method for recognizing misunderstandings as such, and creating or maintaining [definitions](@) that resolve them."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "terminology-processes"
+    status: "proposed"
+    created: 20230723
+    updated: 20230723
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "terminology-process.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/terminology-process"
+    headingids:
+      - "terminology-process"
+      - "prerequisites"
+      - "creating-or-changing-a-definition"
+      - "conflict-mediation-and-resolution"
+      - "background"
+      - "notes"
+    termid: "concept:terminology-process"
+    vsntag: "documentation"
+  - term: "terms-community"
+    termType: "concept"
+    isa: "community"
+    glossaryTerm: "Terms Community"
+    glossaryText: "a [community](@) that maintains a [terminology](@) for the purpose of avoiding misunderstandings between its members as they collaborate."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "terms-community"
+      - "terms-communitys"
+      - "terms-community's"
+      - "terms-communities"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "terms-community.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/terms-community"
+    headingids:
+      - "terms-community"
+      - "summary"
+      - "purpose"
+      - "criterion"
+      - "example"
+      - "notes"
+    termid: "concept:terms-community"
+    vsntag: "documentation"
+  - term: "tev2"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "TEv2"
+    glossaryText: "a set of specifications and [tools](@) that caters for the [curation](@) of [terminologies](@), as well as for its subsequent use in publications of different types (e.g. websites, whitepapers) and formats (e.g. html, LaTeX), as appropriate for different, individual [scopes](@)."
+    status: "proposed"
+    created: 20220919
+    updated: 20220919
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "tev2.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/tev2"
+    formPhrases: []
+    headingids:
+      - "tev2-(terminology-engine,-version-2)"
+      - "summary"
+    termid: "concept:tev2"
+    vsntag: "documentation"
+  - id: "tev2-text-conversion-tool"
+    term: "tev2-text-conversion-tool"
+    termType: "concept"
+    isa: "tev2-tool"
+    glossaryTerm: "TEv2 Text Conversion Tool"
+    glossaryText: "a [TEv2 tool](@) whose purpose is to convert particular text constructs (such as [TermRefs](@) or [MRGRefs](@)) that exist in one or more files with other texts, the contents of which consists of some fixed construct that is populated with elements derived from existing text constructs and/or other resources."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "tev2-text-conversion-tool"
+      - "tev2-text-conversion-tools"
+      - "tev2-text-conversion-tool's"
+      - "tev2-text-conversion-tool(s)"
+      - "text-conversion-tool"
+      - "text-conversion-tools"
+      - "text-conversion-tool's"
+      - "text-conversion-tool(s)"
+      - "conversion-tool"
+      - "conversion-tools"
+      - "conversion-tool's"
+      - "conversion-tool(s)"
+    status: "proposed"
+    created: 20240108
+    updated: 20240108
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "tev2-text-conversion-tool.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/tev2-text-conversion-tool"
+    headingids:
+      - "tev2-text-conversion-tools"
+    termid: "concept:tev2-text-conversion-tool"
+    vsntag: "documentation"
+  - id: "tev2-tool"
+    term: "tev2-tool"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "TEv2 Tool"
+    glossaryText: "any software application or utility designed to support and streamline various tasks related to terminology management following the TEv2 specifications."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "tev2-tool"
+      - "tev2-tools"
+      - "tev2-tool's"
+      - "tev2-tool(s)"
+      - "tool"
+      - "tools"
+      - "tool's"
+      - "tool(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "tev2-tool.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/tev2-tool"
+    headingids:
+      - "tev2-tool"
+      - "description"
+      - "examples"
+      - "notes"
+    termid: "concept:tev2-tool"
+    vsntag: "documentation"
+  - id: "tev2-toolbox"
+    term: "tev2-toolbox"
+    termType: "concept"
+    isa: null
+    glossaryTerm: "TEv2 Toolbox"
+    glossaryText: "the collection of tools designed to support and facilitate the process of terminology management following the [TEv2 specifications](/docs/overview). These tools assist [curators](@) in various tasks related to the curation, creation, and maintenance of terminological assets."
+    synonymOf: null
+    grouptags: null
+    formPhrases: []
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "tev2-toolbox.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/tev2-toolbox"
+    headingids:
+      - "tev2-toolbox"
+      - "description"
+      - "functionality"
+      - "examples"
+      - "notes"
+    termid: "concept:tev2-toolbox"
+    vsntag: "documentation"
   - id: "transaction"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "transaction"
-    formPhrases: "transaction{ss}"
+    formPhrases:
+      - "transaction"
+      - "transactions"
+      - "transaction's"
+      - "transaction(s)"
     status: "draft"
     grouptags: null
     hoverText: "Transaction: the exchange of goods, services, funds, or data between some Parties (called Participants of the Transaction)."
@@ -825,19 +3607,79 @@ entries:
     glossaryText: "the exchange of goods, services, funds, or data between some [parties](@) (called [participant](@) of the [transaction](@))."
     date: 20210601
     scopetag: "termdsn"
-    termid: "concept:transaction"
     locator: "transaction.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/transaction"
     headingids:
       - "transaction"
       - "short-description"
       - "high-level-example"
+    termid: "concept:transaction"
     vsntag: "default"
+  - id: "trrt"
+    term: "trrt"
+    termType: "concept"
+    isa: null
+    bodyFile: "/spec-tools/12-trrt.md"
+    glossaryTerm: "TermRef Rendering Tool"
+    glossaryAlias: "TRRT"
+    glossaryText: "a [TEv2 tool](@) that is designed to facilitate the visualization and rendering of [TermRefs](@)."
+    synonymOf: null
+    grouptags:
+      - "tev2-tool"
+      - "tev2-toolbox"
+    formPhrases:
+      - "trrt"
+      - "trrts"
+      - "trrt's"
+      - "trrt(s)"
+      - "termref-rendering-tool"
+      - "termref-rendering-tools"
+      - "termref-rendering-tool's"
+      - "termref-rendering-tool(s)"
+      - "term-ref-rendering-tool"
+      - "term-ref-rendering-tools"
+      - "term-ref-rendering-tool's"
+      - "term-ref-rendering-tool(s)"
+    status: "proposed"
+    created: 20230731
+    updated: 20230731
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
+    locator: "trrt.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/spec-tools/trrt"
+    headingids:
+      - "term-reference-resolution-tool-(trrt)"
+      - "installing-the-tool-{#install}"
+      - "calling-the-tool-{#call}"
+      - "term-ref-resolution-{#what-it-does}"
+      - "trrt-interpreter-profile-{#interpreter-profile}"
+      - "trrt-predefined-interpreters-{#predefined-interpreters}"
+      - "the-`default`-interpreter"
+      - "the-`alt`-(alternative)-interpreter"
+      - "processing-{#processing}"
+      - "finding-the-[mrg-entry](@)-associated-with-a-[termref](@)-{#finding-mrg-entry}"
+      - "trrt-converter-profile-{#converter-profile}"
+      - "trrt-predefined-converters-{#predefined-converters}"
+      - "the-`markdown-link`-converter"
+      - "the-`html-link`-converter"
+      - "the-`html-hovertext-link`-converter"
+      - "the-`html-glossarytext-link`-converter"
+      - "processing,-errors-and-warnings"
+      - "deploying-the-tool"
+    termid: "concept:trrt"
+    vsntag: "documentation"
   - id: "validate"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "validate"
-    formPhrases: "validate, validates, validated, validating, valid"
+    formPhrases:
+      - "validate"
+      - "validates"
+      - "validated"
+      - "validating"
+      - "valid"
     status: "draft"
     grouptags: null
     hoverText: "Validate/validation of data: the act, by or on behalf of a Party, of determining whether or not that data is valid to be used for some specific purpose(s) of that Party."
@@ -845,18 +3687,22 @@ entries:
     glossaryText: "the act, by or on behalf of a [party](@), of determining whether or not that data is valid to be used for some specific purpose(s) of that [party](@)."
     date: 20210802
     scopetag: "termdsn"
-    termid: "concept:validate"
     locator: "validate.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/validate"
     headingids:
       - "validate"
       - "short-description"
+    termid: "concept:validate"
     vsntag: "default"
   - id: "verify"
     displayed_sidebar: "essifLabSideBar"
     termType: "concept"
     term: "verify"
-    formPhrases: "verify, verifies, verified, verifying"
+    formPhrases:
+      - "verify"
+      - "verifies"
+      - "verified"
+      - "verifying"
     status: "draft"
     grouptags: null
     hoverText: "Verify/verification of data: the act, by or on behalf of a Party, of determining whether that data is authentic (i.e. originates from the Party that authored it), timely (i.e. has not expired), and conforms to other specifications that apply to its structure."
@@ -864,32 +3710,76 @@ entries:
     glossaryText: "the act, by or on behalf of a [party](@), of determining whether that data is authentic (i.e. originates from the [party](@) that authored it), timely (i.e. has not expired), and conforms to other specifications that apply to its structure."
     date: 20210802
     scopetag: "termdsn"
-    termid: "concept:verify"
     locator: "verify.md"
     navurl: "https://essif-lab.github.io/framework/docs/terms/verify"
     headingids:
       - "verify"
       - "short-description"
+    termid: "concept:verify"
     vsntag: "default"
-  - id: "vocabulary"
-    displayed_sidebar: "essifLabSideBar"
+  - term: "versiontag"
     termType: "concept"
-    term: "vocabulary"
-    formPhrases: "vocabular{yies}"
-    status: "draft"
+    isa: "tag"
+    glossaryTerm: null
+    glossaryText: "a [tag](@) that is used to [identify](@) a specific version of a [terminology](@) from within a specific [scope](@)."
+    synonymOf: null
     grouptags: null
-    hoverText: "Vocabulary: the sum or stock of words employed by a language, group, individual, or work or in a field of knowledge."
-    glossaryTerm: "Vocabulary"
-    glossaryText: "the sum or stock of words employed by a language, group, individual, or work or in a field of knowledge."
-    date: 20210601
+    formPhrases:
+      - "versiontag"
+      - "versiontags"
+      - "versiontag's"
+      - "versiontag(s)"
+      - "version-tag"
+      - "version-tags"
+      - "version-tag's"
+      - "version-tag(s)"
+      - "vsntag"
+      - "vsntags"
+      - "vsntag's"
+      - "vsntag(s)"
+    status: "proposed"
+    created: 20220606
+    updated: 20220728
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
     scopetag: "termdsn"
-    termid: "concept:vocabulary"
+    locator: "versiontag.md"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/versiontag"
+    headingids:
+      - "versiontag"
+      - "summary"
+      - "criteria"
+      - "examples"
+      - "notes"
+    termid: "concept:versiontag"
+    vsntag: "documentation"
+  - term: "vocabulary"
+    termType: "concept"
+    isa: null
+    glossaryTerm: null
+    glossaryText: "the sum or stock of words employed by a language, group, individual, or work or in a field of knowledge."
+    synonymOf: null
+    grouptags: null
+    formPhrases:
+      - "vocabulary"
+      - "vocabularys"
+      - "vocabulary's"
+      - "vocabularies"
+    status: "proposed"
+    created: 20220606
+    updated: 20220606
+    contributors: "RieksJ"
+    attribution: "[TNO Terminology Design](https://tno-terminology-design.github.io/tev2-specifications/docs)"
+    originalLicense: "[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1)"
+    scopetag: "termdsn"
     locator: "vocabulary.md"
-    navurl: "https://essif-lab.github.io/framework/docs/terms/vocabulary"
+    navurl: "https://tno-terminology-design.github.io/tev2-specifications/docs/terms/vocabulary"
     headingids:
       - "vocabulary"
-      - "short-description"
+      - "summary"
       - "purpose"
       - "criteria"
       - "examples"
-    vsntag: "default"
+    termid: "concept:vocabulary"
+    vsntag: "documentation"

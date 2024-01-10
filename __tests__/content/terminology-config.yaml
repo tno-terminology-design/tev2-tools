@@ -21,8 +21,7 @@ hrgt:
 
 ## Term Reference Resolution Tool
 trrt:
-  interpreter: # type of interpreter, either: a regex, "alt", or "basic"
-    (?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<id>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)
+  interpreter: default
   converter: >- # Type of converter, either: a mustache template, "http", or "markdown"
     <a
     href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}"
