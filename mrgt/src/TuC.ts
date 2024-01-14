@@ -130,6 +130,10 @@ export class TuCBuilder {
 
         const ctextYAML = ctextFile.data as MRG.Entry
 
+        if (!ctextYAML.term) {
+          throw new Error(`The frontmatter does not include the required 'term' property`)
+        }
+
         // remove properties that match specific set of predetermined properties
         Object.keys(ctextYAML).forEach((key) => {
           if (["scopetag", "vsntag", "locator", "navurl", "headingids", "termid"].includes(key.toLowerCase())) {
@@ -420,12 +424,12 @@ function entryFilter(entry: MRG.Entry, key: string, values: string[]): boolean {
 
 function resolveFormPhrases(formPhrases: string[]): string[] {
   const regexMap: Record<string, string[]> = {
-    "{ss}": ["", "s", "'s", "(s)"],         // "act{ss}" --> "act", "acts", "act's", "act(s)"
-    "{ess}": ["", "es", "'s", "(es)"],      // "regex{es}" --> "regex", "regexes", "regex's", "regex(es"
-    "{yies}": ["y", "y's", "ies"],          // "part{yies}" --> "party", "party's", "parties"
-    "{ying}": ["y", "ying", "ies", "ied"],  // "identif{ying}" --> "identify", "identifying", "identifies", "identified"
-    "{es}": ["e", "es", "ed", "ing"],       // "mangag{es}" --> "manage", "manages", "managed", "managing"
-    "{able}": [ "able", "ability" ]         // "cap{able}" --> "capable", "capability"
+    "{ss}": ["", "s", "'s", "(s)"], // "act{ss}" --> "act", "acts", "act's", "act(s)"
+    "{ess}": ["", "es", "'s", "(es)"], // "regex{es}" --> "regex", "regexes", "regex's", "regex(es"
+    "{yies}": ["y", "y's", "ies"], // "part{yies}" --> "party", "party's", "parties"
+    "{ying}": ["y", "ying", "ies", "ied"], // "identif{ying}" --> "identify", "identifying", "identifies", "identified"
+    "{es}": ["e", "es", "ed", "ing"], // "mangag{es}" --> "manage", "manages", "managed", "managing"
+    "{able}": ["able", "ability"] // "cap{able}" --> "capable", "capability"
   }
   const alternatives = formPhrases != null ? formPhrases.map((t) => t.trim()) : []
 
