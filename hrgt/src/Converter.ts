@@ -11,6 +11,7 @@ export class Converter {
     // map of default templates for each type
     const map: Record<string, string> = {
       default: "{{term}}{{termType}}",
+      glossaryTerm: "{{glossaryTerm}}{{term}}{{termType}}",
       "markdown-table-row":
         "| [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}}) | {{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}} |\n",
       "markdown-section-2":
