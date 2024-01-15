@@ -487,13 +487,17 @@ function applyMacroReplacements(input: string, regexMap: Record<string, string[]
  */
 function extractHeadingIds(content: string): string[] {
   // Regular expression to match markdown headings
-  const headingRegex = /^#+\s+(.*)$/gm
-
-  let matches
+  const headingRegex =
+    /^#{1,6}\s+(?:[^{\n]+)(?:{.*#{1,6}\s?(?<md_id>[^}]+)})$|^#{1,6}\s+(?<md>[^{\n]+)$|(?:<(?:h[1-6])(?:.+id="(?<html_id>[^"\\]+)")?.*>(?<html>.*?)<\/h[1-6]>)/gm
+  // Named capturing groups:
+  //   md (# heading)
+  //   md_id (# heading {#heading})
+  //   html (h1>heading</h1>)
+  //   html_id (<h1 id="heading">heading</h1>)
   const headingIds: string[] = []
 
-  while ((matches = headingRegex.exec(content)) !== null) {
-    const headingId = matches[1].replace(/\s+/g, "-").toLowerCase()
+  for (const match of content.matchAll(headingRegex)) {
+    const headingId = match.filter(Boolean)[1].trim().replace(/\s+/g, "-").toLowerCase()
     headingIds.push(headingId)
   }
 
