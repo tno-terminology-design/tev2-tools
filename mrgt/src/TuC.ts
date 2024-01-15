@@ -87,6 +87,7 @@ export class TuCBuilder {
       scopes: Array.from(this.tuc.scopes),
       entries: this.tuc.entries.sort((a, b) => a.term.localeCompare(b.term))
     }
+    delete mrg.terminology.localscopedir
     for (const entry of mrg.entries) {
       entry.vsntag = entry.vsntag ?? this.tuc.terminology.vsntag
       entry.termid = `${entry.termType ?? this.saf.scope.defaulttype}:${entry.term}`
