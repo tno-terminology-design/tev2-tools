@@ -2,11 +2,11 @@
   "name": "tev2-tools",
   "private": true,
   "workspaces": [
+    "utils",
     "mrg-import",
     "mrgt",
     "trrt",
-    "hrgt",
-    "utils"
+    "hrgt"
   ],
   "type": "module",
   "scripts": {
