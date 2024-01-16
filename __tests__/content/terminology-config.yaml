@@ -24,9 +24,9 @@ trrt:
   interpreter: default
   converter: >- # Type of converter, either: a mustache template, "http", or "markdown"
     <a
-    href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}"
+    href="{{localize navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}}"
     hovertext="{{#if hoverText}}{{hoverText}}{{else}}{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}"
-    >{{showtext}}</a>
+    >{{ref.showtext}} ({{err.line}}, {{err.pos}})</a>
   converter[7]: This converter is used on and after the 7th occurrence of a term reference, in this case '{{term}}:{{termType}}'
   force: true # toggle overwriting of existing files
   input: # glob pattern strings for files to be processed by the TRRT

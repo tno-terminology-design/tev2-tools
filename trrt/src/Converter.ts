@@ -1,6 +1,14 @@
 import { MRG, Handlebars } from "@tno-terminology-design/utils"
 import { Interpreter, type TermRef } from "./Interpreter.js"
 
+export interface Profile {
+  int: Interpreter
+  ref: TermRef
+  entry: MRG.Entry
+  mrg?: MRG.Terminology
+  err?: { filename: string; line: number; pos: number; message?: string }
+}
+
 /**
  * The Converter class handles the conversion of a glossary entry to a specific format.
  * This conversion happens according to a string that is supplied in `template`.
@@ -15,13 +23,12 @@ export class Converter {
     // map of default templates for each type
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
     const map: Record<string, string> = {
-      "markdown-link": "[{{showtext}}]({{navurl}}{{#if trait}}#{{trait}}{{/if}})",
-      "html-link": '<a href="{{navurl}}{{#if trait}}#{{trait}}{{/if}}">{{showtext}}</a>',
+      "markdown-link": "[{{ref.showtext}}]({{entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}})",
+      "html-link": '<a href="{{entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}}">{{ref.showtext}}</a>',
       "html-hovertext-link":
-        '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{hoverText}}{{else}}{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
-      // 'html-hovertext-link': '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{#if hoverText}}{{noRefs hoverText}}{{else}}{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}: {{noRefs glossaryText type="markdown"}}{{/if}}">{{showtext}}</a>',
+        '<a href="{{localize entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}}" title="{{#if entry.hoverText}}{{entry.hoverText}}{{else}}{{#if entry.glossaryTerm}}{{entry.glossaryTerm}}{{else}}{{capFirst entry.term}}{{/if}}: {{noRefs entry.glossaryText type="markdown"}}{{/if}}">{{ref.showtext}}</a>',
       "html-glossarytext-link":
-        '<a href="{{localize navurl}}{{#if trait}}#{{trait}}{{/if}}" title="{{capFirst term}}: {{noRefs glossaryText type="markdown"}}">{{showtext}}</a>'
+        '<a href="{{localize entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}}" title="{{capFirst entry.term}}: {{noRefs entry.glossaryText type="markdown"}}">{{ref.showtext}}</a>'
     }
 
     const key = template.toLowerCase()
@@ -36,21 +43,18 @@ export class Converter {
     }
   }
 
-  convert(entry: MRG.Entry, termref: TermRef, terminology?: MRG.Terminology, interpreter?: Interpreter): string {
-    // Evaluate the properties inside the entry object
-    const evaluatedEntry: Record<string, unknown> = {}
-    for (const [key, value] of Object.entries(entry)) {
+  convert(profile: Profile): string {
+    // Evaluate the string properties inside the entry object
+    for (const [key, value] of Object.entries(profile.entry)) {
       if (typeof value === "string") {
         const template = Handlebars.compile(value, { noEscape: true, compat: true })
-        evaluatedEntry[key] = template({ mrg: { terminology: terminology }, interpreter, ...entry, ...termref })
-      } else {
-        evaluatedEntry[key] = value
+        profile.entry[key as keyof typeof profile.entry] = template({ ...profile, ...profile.entry })
       }
     }
 
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
+    const output = template({ ...profile, ...profile.entry })
 
-    const output = template({ mrg: { terminology: terminology }, interpreter, ...evaluatedEntry, ...termref })
     if (output === "") {
       throw new Error(`resulted in an empty string, check the converter template`)
     }

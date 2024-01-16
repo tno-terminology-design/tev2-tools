@@ -1,6 +1,6 @@
 import { glob } from "glob"
 import { Interpreter, type MRGRef } from "./Interpreter.js"
-import { Converter } from "./Converter.js"
+import { Converter, Profile } from "./Converter.js"
 import { SAF, MRG } from "@tno-terminology-design/utils"
 import { report, log, writeFile } from "@tno-terminology-design/utils"
 
@@ -114,7 +114,11 @@ export class Resolver {
     } else {
       log.info(`\tUsing default set sorter (${sorter.type})`)
     }
-    entries.sort((a, b) => sorter.convert(a, mrgref).localeCompare(sorter.convert(b, mrgref)))
+    entries.sort((a, b) =>
+      sorter
+        .convert({ int: this.interpreter, ref: mrgref, entry: a })
+        .localeCompare(sorter.convert({ int: this.interpreter, ref: mrgref, entry: b }))
+    )
 
     // Check if the MRGRef has a converter specified
     if (mrgref.converter != null) {
@@ -125,8 +129,20 @@ export class Resolver {
     }
 
     let replacement = ""
+    file.orig = file.orig.toString()
+
     for (const entry of entries) {
-      const hrgEntry = converter.convert(entry, mrgref, mrg.terminology)
+      const hrgEntry = converter.convert({
+        int: this.interpreter,
+        ref: mrgref,
+        entry: entry,
+        mrg: mrg.terminology,
+        err: {
+          filename: file.path,
+          line: file.orig.substring(0, match.index).split("\n").length,
+          pos: match.index - file.orig.lastIndexOf("\n", match.index)
+        }
+      } as Profile)
       if (hrgEntry == converter.getBlank()) {
         log.warn(
           `\t\tConversion of entry '${entry.term}${

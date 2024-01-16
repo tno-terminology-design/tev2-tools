@@ -1,5 +1,13 @@
 import { MRG, SAF, Handlebars } from "@tno-terminology-design/utils"
-import { type MRGRef } from "./Interpreter.js"
+import { Interpreter, type MRGRef } from "./Interpreter.js"
+
+export interface Profile {
+  int: Interpreter
+  ref: MRGRef
+  entry: MRG.Entry
+  mrg?: MRG.Terminology
+  err?: { filename: string; line: number; pos: number; message?: string }
+}
 
 export class Converter {
   public type: string
@@ -16,10 +24,8 @@ export class Converter {
         "| [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}}) | {{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}} |\n",
       "markdown-section-2":
         "## [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n",
-      // 'markdown-section-2': "## [{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n",
       "markdown-section-3":
         "### [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n"
-      // 'markdown-section-3': "### [{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n"
     }
 
     const key = template.toLowerCase()
@@ -34,10 +40,10 @@ export class Converter {
     }
   }
 
-  convert(entry: MRG.Entry, mrgref: MRGRef, terminology?: MRG.Terminology): string {
+  convert(profile: Profile): string {
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
-    return template({ mrg: { terminology: terminology }, ...entry, ...mrgref })
+    return template({ ...profile, ...profile.entry })
   }
 
   getBlank(): string {
