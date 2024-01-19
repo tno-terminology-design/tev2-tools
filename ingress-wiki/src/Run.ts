@@ -20,11 +20,7 @@ const program = new Command()
 program
   .name("tev2-ingress-wiki")
   .version(version)
-  .usage(
-    "[ <paramlist> ] [ <globpattern> ]\n" +
-      "- <paramlist> (optional) is a list of key-value pairs\n" +
-      "- <globpattern> (optional) specifies a set of (input) files that are to be processed"
-  )
+  .usage("[ <paramlist> ]\n" + "- <paramlist> (optional) is a list of key-value pairs")
   .description("The CLI for the Term Reference Resolution Tool")
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-w, --wikiPath <path>", "Path of the local filesystem for the wiki folder to be created")
@@ -32,9 +28,6 @@ program
   .option("-o, --output <dir>", "(Root) directory for output files to be written")
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
   .option("-t, --termselcriteria", "List of term selection criteria that are used to generate")
-  .option("-m, --method", "The method that is used to create the output (default HTML)")
-  .option("-l, --license", "File that contains the licensing conditions")
-  .option("-f, --force", "Allow overwriting of existing files")
   .parse(process.argv)
 
 program.parse()
