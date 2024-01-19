@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": [
     "utils",
+    "ingress",
     "mrg-import",
     "mrgt",
     "trrt",
