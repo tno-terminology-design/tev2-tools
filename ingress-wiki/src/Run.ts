@@ -18,7 +18,7 @@ const version = packageJson.version
 const program = new Command()
 
 program
-  .name("tev2-ingress")
+  .name("tev2-ingress-wiki")
   .version(version)
   .usage(
     "[ <paramlist> ] [ <globpattern> ]\n" +
@@ -45,7 +45,7 @@ const main = async (): Promise<void> => {
     options.input = program.args[0]
   }
 
-  console.log(chalk.red(figlet.textSync("TEv2 Ingress", { horizontalLayout: "full" })))
+  console.log(chalk.red(figlet.textSync("TEv2 Ingress Wiki", { horizontalLayout: "full" })))
   console.log(chalk.yellow(figlet.textSync(version, { horizontalLayout: "full" })))
 
   if (options.config) {

@@ -8,22 +8,23 @@
     "lib"
   ],
   "bin": {
-    "ingress": "lib/Run.js"
+    "ingress-wiki": "lib/Run.js"
   },
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "rebuild": "npm uninstall @tno-terminology-design/ingress -g && npm run build && npm i"
+    "rebuild": "npm uninstall @tno-terminology-design/ingress-wiki -g && npm run build && npm i"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tno-terminology-design/tev2-tools.git",
-    "directory": "ingress"
+    "directory": "ingress-wiki"
   },
   "keywords": [
     "ctwg",
     "tev2",
-    "ingress"
+    "ingress",
+    "wiki"
   ],
   "author": "Brian Richter",
   "license": "ISC",
