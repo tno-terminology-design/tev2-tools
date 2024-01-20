@@ -1,10 +1,11 @@
 import { Logger } from "tslog"
 
-interface Output<T> {
-  items: T[]
+export interface TermError extends Error {
+  type?: string
+  file: string
+  line?: number
+  pos?: number
 }
-
-type termError = Error & { type: string; file: string; line: number }
 
 /**
  * The Report class handles the reporting of errors and warnings.
@@ -13,67 +14,37 @@ type termError = Error & { type: string; file: string; line: number }
 class Report {
   public onNotExist: "throw" | "warn" | "log" | "ignore" = "throw"
 
-  termErrors: Output<{ file: string; line: number; message: string }> = {
-    items: []
-  }
-
-  converted: Output<{ content: string }> = {
-    items: []
-  }
-
-  files: Output<{ content: string }> = {
-    items: []
-  }
-
-  errors = new Set()
-
-  public termHelp(file: string, line: number, message: string): void {
-    this.termErrors.items.push({ file, line, message })
-  }
-
-  public mrgHelp(file: string, line: number, err: Error): void {
-    const error = err as termError
-    error.file = file
-    error.line = line
-    error.type = "MRG HELP"
-    this.errors.add(this.formatMessage(error))
-  }
-
-  public termConverted(term: string): void {
-    this.converted.items.push({ content: term })
-  }
-
-  public fileWritten(file: string): void {
-    this.files.items.push({ content: file })
-  }
+  public files: string[] = []
+  public terms: string[] = []
+  public errors: TermError[] = []
 
   public print(): void {
     console.log("\x1b[1;37m")
     console.log(" Resolution Report:")
-    console.log("\t\x1b[0mNumber of files modified: " + this.files.items.length)
-    console.log("\t\x1b[0mNumber of terms converted: " + this.converted.items.length)
+    console.log("\t\x1b[0mNumber of files modified: " + this.files.length)
+    console.log("\t\x1b[0mNumber of terms converted: " + this.terms.length)
 
-    if (this.termErrors.items.length > 0) {
+    const termErrors = this.errors.filter((err) => err.type === "TERM HELP")
+
+    if (termErrors.length > 0) {
       console.log("   \x1b[1;37mTerm Errors:\x1b[0m")
 
-      let uniqueTermHelpMessages = new Map<string, Array<{ file: string; line: number }>>()
+      const groupedTermErrors = new Map<string, Array<TermError>>()
 
-      for (const item of this.termErrors.items) {
-        const key = item.message
+      for (const error of termErrors) {
+        const key = error.message
 
-        if (uniqueTermHelpMessages.has(key)) {
-          uniqueTermHelpMessages.get(key)?.push(item)
+        if (groupedTermErrors.has(key)) {
+          groupedTermErrors.get(key)?.push(error)
         } else {
-          uniqueTermHelpMessages.set(key, [item])
+          groupedTermErrors.set(key, [error])
         }
       }
 
-      // Sort the uniqueTermHelpMessages alphabetically
-      const sortedEntries = Array.from(uniqueTermHelpMessages.entries())
-      sortedEntries.sort((a, b) => a[0].localeCompare(b[0]))
-      uniqueTermHelpMessages = new Map(sortedEntries)
+      // Sort the groupedTermErrors alphabetically
+      const sortedEntries = Array.from(groupedTermErrors.entries()).sort((a, b) => a[0].localeCompare(b[0]))
 
-      for (const [key, value] of uniqueTermHelpMessages) {
+      for (const [key, value] of sortedEntries) {
         console.log(`\x1b[1;31m${"TERM HELP"}\t\x1b[0m${key}:`)
         const filesMap = new Map<string, number[]>()
 
@@ -91,20 +62,16 @@ class Report {
       }
     }
 
-    if (this.errors.size > 0) {
+    const mainErrors = this.errors.filter((err) => err.type !== "term")
+    if (mainErrors.length > 0) {
       console.log("\n   \x1b[1;37mMain Errors:\x1b[0m")
 
-      for (const err of this.errors) {
-        console.log(err)
+      for (const err of mainErrors) {
+        const { file, line, message, type } = err
+        const locator = line > -1 ? `${file}:${line}` : file
+        console.log(`\x1b[1;31m${type}\t\x1b[1;37m${locator}\t\t\x1b[0m${message}`)
       }
     }
-  }
-
-  private formatMessage(error: termError): string {
-    const { file, line, message, type } = error
-    const locator = line > -1 ? `${file}:${line}` : file
-
-    return `\x1b[1;31m${type}\t\x1b[1;37m${locator}\t\t\x1b[0m${message}`
   }
 
   public onNotExistError(error: Error) {

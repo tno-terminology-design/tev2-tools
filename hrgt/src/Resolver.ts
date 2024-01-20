@@ -224,7 +224,7 @@ export class Resolver {
           const filepath = path.join(this.outputPath, path.dirname(filePath), path.basename(filePath))
           log.info(`Writing modified file to '${filepath}'`)
           writeFile(filepath, convertedData, this.force)
-          report.fileWritten(filepath)
+          report.files.push(filepath)
           changes = true
         } catch (err) {
           log.error(err)

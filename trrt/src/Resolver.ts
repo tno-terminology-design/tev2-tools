@@ -1,4 +1,4 @@
-import { report, log, writeFile } from "@tno-terminology-design/utils"
+import { report, log, writeFile, type TermError } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { MRG, SAF } from "@tno-terminology-design/utils"
 import { Interpreter, type TermRef } from "./Interpreter.js"
@@ -84,14 +84,17 @@ export class Resolver {
         // Get the MRG instance based on the mrgfile
         mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
       } catch (err) {
-        report.mrgHelp(mrgfile, -1, err as Error)
+        report.errors.push({ type: "MRG HELP", file: file.path, cause: err } as TermError)
       }
 
       if (mrg !== undefined && mrg.entries.length > 0) {
         this.replacementHandler(match, termref, mrg, file)
       } else {
+        // TODO: move this and make sure replacement is still called on error
+
         const message = `Term ref '${match[0]}', could not be converted due to an MRG error`
-        report.termHelp(file.path, file.orig.toString().substring(0, match.index).split("\n").length, message)
+        const line = file.orig.toString().substring(0, match.index).split("\n").length
+        report.errors.push({ type: "TERM HELP", line, file: file.path, cause: message } as TermError)
       }
     }
     if (file.converted.size > 0) {
@@ -171,7 +174,7 @@ export class Resolver {
         throw error
       } else {
         // Log the converted term
-        report.termConverted(profile.entry!.term)
+        report.terms.push(profile.entry!.term)
         file.converted.set(profile.entry!.termid, (file.converted.get(profile.entry!.termid) || 0) + 1)
       }
     } catch (err) {
@@ -191,7 +194,7 @@ export class Resolver {
         reference = `${reference}' > '${interpretation}`
       }
       const message = `Term ref '${match[0]}' > '${reference}', ${err}`
-      report.termHelp(file.path, line, message)
+      report.errors.push({ type: "TERM HELP", line, file: file.path, cause: message } as TermError)
     }
 
     return file
@@ -246,7 +249,7 @@ export class Resolver {
             convertedData,
             this.force
           )
-          report.fileWritten(filePath)
+          report.files.push(filePath)
           changes = true
         } catch (err) {
           log.error(err)
