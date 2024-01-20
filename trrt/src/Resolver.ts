@@ -125,10 +125,10 @@ export class Resolver {
       ref: termref,
       mrg: mrg.terminology,
       err: {
-        filename: file.path,
+        file: file.path,
         line,
         pos
-      }
+      } as TermError
     }
 
     try {
@@ -144,8 +144,9 @@ export class Resolver {
         // get the Converter instance where n is higher than or the same as the number of times the term has been converted
         const count = file.converted.get(`${profile.entry.termid}`) ?? 0
         const converter = Converter.instances.find((i) => i.n >= count)
-
-        replacement = converter.convert(profile)
+        if (converter) {
+          replacement = converter.convert(profile)
+        }
       } catch (err) {
         error = err
         profile.err.cause = err.message

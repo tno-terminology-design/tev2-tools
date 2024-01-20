@@ -1,4 +1,4 @@
-import { MRG, Handlebars } from "@tno-terminology-design/utils"
+import { MRG, Handlebars, type TermError } from "@tno-terminology-design/utils"
 import { Interpreter, type TermRef } from "./Interpreter.js"
 
 export interface Profile {
@@ -6,7 +6,7 @@ export interface Profile {
   ref: TermRef
   entry?: MRG.Entry
   mrg: MRG.Terminology
-  err?: { filename: string; line: number; pos: number; cause?: string }
+  err?: TermError
 }
 
 /**

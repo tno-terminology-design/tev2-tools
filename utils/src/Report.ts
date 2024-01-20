@@ -19,25 +19,28 @@ class Report {
   public errors: TermError[] = []
 
   public print(): void {
-    console.log("\x1b[1;37m")
-    console.log(" Resolution Report:")
-    console.log("\t\x1b[0mNumber of files modified: " + this.files.length)
-    console.log("\t\x1b[0mNumber of terms converted: " + this.terms.length)
-
     const termErrors = this.errors.filter((err) => err.type === "TERM HELP")
+    const mainErrors = this.errors.filter((err) => err.type !== "TERM HELP")
+
+    console.log(`\x1b[1;37m`)
+    console.log(` Resolution Report:`)
+    console.log(`\t\x1b[0mFiles modified:  ${this.files.length}`)
+    console.log(`\t\x1b[0mTerms converted: ${this.terms.length}`)
+    console.log(`\t\x1b[0mTerm errors:     ${termErrors.length}`)
+    console.log(`\t\x1b[0mMain errors:     ${mainErrors.length}`)
 
     if (termErrors.length > 0) {
-      console.log("   \x1b[1;37mTerm Errors:\x1b[0m")
+      console.log(`\n   \x1b[1;37mTerm Errors:\x1b[0m`)
 
       const groupedTermErrors = new Map<string, Array<TermError>>()
 
-      for (const error of termErrors) {
-        const key = error.message
+      for (const err of termErrors) {
+        const key = err.cause.toString()
 
         if (groupedTermErrors.has(key)) {
-          groupedTermErrors.get(key)?.push(error)
+          groupedTermErrors.get(key)?.push(err)
         } else {
-          groupedTermErrors.set(key, [error])
+          groupedTermErrors.set(key, [err])
         }
       }
 
@@ -62,14 +65,17 @@ class Report {
       }
     }
 
-    const mainErrors = this.errors.filter((err) => err.type !== "term")
     if (mainErrors.length > 0) {
-      console.log("\n   \x1b[1;37mMain Errors:\x1b[0m")
-
+      console.log(`\n   \x1b[1;37mMain Errors:\x1b[0m`)
+      const messageSet = new Set<string>()
       for (const err of mainErrors) {
-        const { file, line, message, type } = err
-        const locator = line > -1 ? `${file}:${line}` : file
-        console.log(`\x1b[1;31m${type}\t\x1b[1;37m${locator}\t\t\x1b[0m${message}`)
+        if (!messageSet.has(err.cause.toString())) {
+          const { file, line, message, type } = err
+          const locator = line > -1 ? `${file}:${line}` : file
+
+          console.log(`\x1b[1;31m${type}\t\x1b[1;37m${locator}\t\t\x1b[0m${message}`)
+          messageSet.add(err.cause.toString())
+        }
       }
     }
   }
