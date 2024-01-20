@@ -18,6 +18,9 @@ export interface Profile {
 export class Converter {
   public type: string
   public template: string
+  public n: number
+
+  static instances: Converter[] = []
 
   public constructor({ template }: { template: string }) {
     // map of default templates for each type
@@ -41,23 +44,32 @@ export class Converter {
       this.type = "custom"
       this.template = template.replace(/\\n/g, "\n")
     }
+    Converter.instances.push(this)
   }
 
   convert(profile: Profile): string {
-    // Evaluate the string properties inside the entry object
-    for (const [key, value] of Object.entries(profile.entry)) {
-      if (typeof value === "string") {
-        const template = Handlebars.compile(value, { noEscape: true, compat: true })
-        profile.entry[key as keyof typeof profile.entry] = template({ ...profile.entry, ...profile })
+    try {
+      // Evaluate the string properties inside the entry object
+      for (const [key, value] of Object.entries(profile.entry)) {
+        if (typeof value === "string") {
+          const template = Handlebars.compile(value, { noEscape: true, compat: true })
+          profile.entry[key as keyof typeof profile.entry] = template({ ...profile.entry, ...profile })
+        }
       }
-    }
 
-    const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
-    const output = template({ ...profile.entry, ...profile })
+      const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
+      const output = template({ ...profile.entry, ...profile })
 
-    if (output === "") {
-      throw new Error(`resulted in an empty string, check the converter template`)
+      if (output === "") {
+        throw new Error(`resulted in an empty string, check the converter${this.n > 0 ? `[${this.n}]` : ""} template`)
+      }
+      return output
+    } catch (err) {
+      throw new Error(
+        `unexpected results from using '${this.type}' converter${
+          this.n > 0 ? `[${this.n}]` : ""
+        } template, check that the template syntax is correct: ${err.message}`
+      )
     }
-    return output
   }
 }

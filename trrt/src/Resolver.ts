@@ -29,21 +29,18 @@ export class Resolver {
   private readonly globPattern: string
   private readonly force: boolean
   interpreter: Interpreter
-  converterMap: Map<number, Converter>
   saf: SAF.Type
 
   public constructor({
     outputPath,
     globPattern,
     force,
-    converterMap,
     interpreter,
     saf
   }: {
     outputPath: string
     globPattern: string
     force: boolean
-    converterMap: Map<number, Converter>
     interpreter: Interpreter
     saf: SAF.Type
   }) {
@@ -51,7 +48,6 @@ export class Resolver {
     this.globPattern = globPattern
     this.force = force
     this.interpreter = interpreter
-    this.converterMap = converterMap
     this.saf = saf
   }
 
@@ -114,15 +110,6 @@ export class Resolver {
    * @returns The file object.
    */
   replacementHandler(match: RegExpMatchArray, termref: TermRef, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
-    const display = { ...termref }
-
-    display.type = display.type ? display.type + ":" : ""
-    display.term = display.term ?? "<showtext>"
-    display.scopetag = display.scopetag ?? "<default>"
-    display.vsntag = termref.scopetag ? (display.vsntag ? ":" + display.vsntag : "") : ""
-
-    let reference = `${display.type}${display.term}@${display.scopetag}${display.vsntag}`
-
     file.orig = file.orig.toString()
     const line = file.orig.substring(0, match.index).split("\n").length
     const pos = file.output.split("\n")[line - 1].indexOf(match[0])
@@ -136,11 +123,11 @@ export class Resolver {
         this.saf.scope.defaulttype
       )
 
-      // get the this.converterMap that is higher than or the same as the number of times the term has been converted
-      let converter = this.converterMap.get(0)
-      for (const [key, value] of this.converterMap) {
-        if (file.converted.get(`${entry.termid}`) + 1 >= key) {
-          converter = value
+      // get the Converter instance where n is higher than or the same as the number of times the term has been converted
+      let converter = Converter.instances[0]
+      for (const i of Converter.instances) {
+        if (file.converted.get(`${entry.termid}`) + 1 >= i.n) {
+          converter = i
         }
       }
 
@@ -174,7 +161,18 @@ export class Resolver {
         file.converted.set(entry!.termid, (file.converted.get(entry!.termid) || 0) + 1)
       }
     } catch (err) {
-      const interpretation = `${err.cause}@${mrg.terminology.scopetag}${display.vsntag}`
+      const display = { ...termref }
+
+      display.type = display.type ? display.type + ":" : ""
+      display.term = display.term ?? "<showtext>"
+      display.scopetag = display.scopetag ?? "<default>"
+      display.vsntag = termref.scopetag ? (display.vsntag ? ":" + display.vsntag : "") : ""
+
+      let reference = `${display.type}${display.term}@${display.scopetag}${display.vsntag}`
+
+      const interpretation = `${display.type}${termref.term ?? termref.showtext.trim().toLowerCase()}@${
+        mrg.terminology.scopetag
+      }${display.vsntag}`
       if (interpretation !== reference) {
         reference = `${reference}' > '${interpretation}`
       }
@@ -192,11 +190,9 @@ export class Resolver {
   public async resolve(): Promise<boolean> {
     // Log information about the interpreter, converter and the files being read
     log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
-    for (const [key, value] of this.converterMap) {
+    for (const i of Converter.instances) {
       log.info(
-        `Using ${value.type} template as converter${
-          this.converterMap.size > 1 ? `[${key}]` : ""
-        }: '${value.template.replace(/\n/g, "\\n")}'`
+        `Using '${i.type}' template as converter${i.n > 1 ? `[${i.n}]` : ""}: '${i.template.replace(/\n/g, "\\n")}'`
       )
     }
     log.info(`Reading files using pattern string '${this.globPattern}'`)

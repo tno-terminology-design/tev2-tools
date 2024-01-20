@@ -85,14 +85,13 @@ async function main(): Promise<void> {
     }
   }
 
-  // Process converter options and populate the map
-  const converterMap = new Map<number, Converter>()
+  // Process converter options
   for (const [key, value] of Object.entries(options)) {
     const match = key.match(/^converter(?:\[(?<n>\d+)\])?$/)
     if (match) {
       const template = value as string
       const converter = new Converter({ template })
-      converterMap.set(parseInt(match.groups?.n) || 0, converter)
+      converter.n = parseInt(match.groups?.n) || 0
     }
   }
 
@@ -116,7 +115,6 @@ async function main(): Promise<void> {
     outputPath: resolve(options.output),
     globPattern: options.input,
     force: options.force,
-    converterMap,
     interpreter,
     saf
   })
