@@ -53,15 +53,11 @@ async function main(): Promise<void> {
 
   // Process command line converter options
   for (const [key, value] of Object.entries(process.argv.slice(2))) {
-    const match = value.match(/^--con(?:verter)?(?:\[(?<n>\d+)?\])?$/)
+    const match = value.match(/^--con(?:verter)?(?:\[(?<n>-?\d+|error)?\])?$/)
     if (match) {
       const template = process.argv[parseInt(key) + 3]
+      options[`converter[${match.groups.n}]`] = template
       const i = program.args.indexOf(value)
-      if (match.groups.n == null || parseInt(match.groups.n) < 1) {
-        options.converter = template
-      } else {
-        options[`converter[${match.groups.n}]`] = template
-      }
       if (i !== -1) {
         program.args.splice(i, 2)
       }
@@ -87,13 +83,19 @@ async function main(): Promise<void> {
 
   // Process converter options
   for (const [key, value] of Object.entries(options)) {
-    const match = key.match(/^converter(?:\[(?<n>\d+)\])?$/)
-    if (match) {
+    const match = key.match(/^con(?:verter)?(?:\[(?<n>-?\d+|error)?\])?$/)
+    if (match && value != null) {
       const template = value as string
       const converter = new Converter({ template })
-      converter.n = parseInt(match.groups?.n) || 0
+      if (match.groups.n === "error") {
+        converter.n = -1
+      } else {
+        const n = parseInt(match.groups.n)
+        converter.n = n >= 0 ? n : 0
+      }
     }
   }
+  Converter.instances.sort((a, b) => a.n - b.n)
 
   // Check if required options are provided
   if (options.output == null || options.scopedir == null || options.input == null) {

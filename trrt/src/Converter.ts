@@ -4,7 +4,7 @@ import { Interpreter, type TermRef } from "./Interpreter.js"
 export interface Profile {
   int: Interpreter
   ref: TermRef
-  entry: MRG.Entry
+  entry?: MRG.Entry
   mrg: MRG.Terminology
   err?: { filename: string; line: number; pos: number; cause?: string }
 }
@@ -48,12 +48,16 @@ export class Converter {
   }
 
   convert(profile: Profile): string {
+    const n = this.n === -1 ? "[error]" : this.n > 0 ? `[${this.n}]` : ""
+
     try {
-      // Evaluate the string properties inside the entry object
-      for (const [key, value] of Object.entries(profile.entry)) {
-        if (typeof value === "string") {
-          const template = Handlebars.compile(value, { noEscape: true, compat: true })
-          profile.entry[key as keyof typeof profile.entry] = template({ ...profile.entry, ...profile })
+      if (profile.entry) {
+        // Evaluate the string properties inside the entry object
+        for (const [key, value] of Object.entries(profile.entry)) {
+          if (typeof value === "string") {
+            const template = Handlebars.compile(value, { noEscape: true, compat: true })
+            profile.entry[key as keyof typeof profile.entry] = template({ ...profile.entry, ...profile })
+          }
         }
       }
 
@@ -61,14 +65,12 @@ export class Converter {
       const output = template({ ...profile.entry, ...profile })
 
       if (output === "") {
-        throw new Error(`resulted in an empty string, check the converter${this.n > 0 ? `[${this.n}]` : ""} template`)
+        throw new Error(`resulted in an empty string, check the converter${n} template`)
       }
       return output
     } catch (err) {
       throw new Error(
-        `unexpected results from using '${this.type}' converter${
-          this.n > 0 ? `[${this.n}]` : ""
-        } template, check that the template syntax is correct: ${err.message}`
+        `unexpected results from using '${this.type}' converter${n} template, check that the template syntax is correct: ${err.message}`
       )
     }
   }

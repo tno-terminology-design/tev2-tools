@@ -8,7 +8,7 @@ import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
 
-type GrayMatterFile = matter.GrayMatterFile<string> & {
+interface GrayMatterFile extends matter.GrayMatterFile<string> {
   path: string
   lastIndex: number
   output: string
@@ -114,34 +114,43 @@ export class Resolver {
     const line = file.orig.substring(0, match.index).split("\n").length
     const pos = file.output.split("\n")[line - 1].indexOf(match[0])
 
-    try {
-      const entry = MRG.getEntry(
-        mrg.entries,
-        mrg.filename,
-        termref.term || termref.showtext,
-        termref.type,
-        this.saf.scope.defaulttype
-      )
+    let error: Error | undefined
+    let replacement = ""
 
-      // get the Converter instance where n is higher than or the same as the number of times the term has been converted
-      let converter = Converter.instances[0]
-      for (const i of Converter.instances) {
-        if (file.converted.get(`${entry.termid}`) + 1 >= i.n) {
-          converter = i
+    const profile: Profile = {
+      int: this.interpreter,
+      ref: termref,
+      mrg: mrg.terminology,
+      err: {
+        filename: file.path,
+        line,
+        pos
+      }
+    }
+
+    try {
+      try {
+        profile.entry = MRG.getEntry(
+          mrg.entries,
+          mrg.filename,
+          termref.term ?? termref.showtext,
+          termref.type,
+          this.saf.scope.defaulttype
+        )
+
+        // get the Converter instance where n is higher than or the same as the number of times the term has been converted
+        const count = file.converted.get(`${profile.entry.termid}`) ?? 0
+        const converter = Converter.instances.find((i) => i.n >= count)
+
+        replacement = converter.convert(profile)
+      } catch (err) {
+        error = err
+        profile.err.cause = err.message
+        const converter = Converter.instances.find((i) => i.n === -1)
+        if (converter) {
+          replacement = converter.convert(profile)
         }
       }
-
-      const replacement = converter.convert({
-        int: this.interpreter,
-        ref: termref,
-        entry: entry,
-        mrg: mrg.terminology,
-        err: {
-          filename: file.path,
-          line,
-          pos
-        }
-      } as Profile)
 
       // Only execute the replacement steps if the 'replacement' string is not empty
       if (replacement.length > 0 && match.index != null) {
@@ -155,10 +164,15 @@ export class Resolver {
 
         // Update the lastIndex to account for the length difference between the match and replacement
         file.lastIndex += replacement.length - matchLength
+      }
 
+      if (error) {
+        file.converted.set(undefined, (file.converted.get(undefined) || 0) + 1)
+        throw error
+      } else {
         // Log the converted term
-        report.termConverted(entry!.term)
-        file.converted.set(entry!.termid, (file.converted.get(entry!.termid) || 0) + 1)
+        report.termConverted(profile.entry!.term)
+        file.converted.set(profile.entry!.termid, (file.converted.get(profile.entry!.termid) || 0) + 1)
       }
     } catch (err) {
       const display = { ...termref }
@@ -191,9 +205,8 @@ export class Resolver {
     // Log information about the interpreter, converter and the files being read
     log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
     for (const i of Converter.instances) {
-      log.info(
-        `Using '${i.type}' template as converter${i.n > 1 ? `[${i.n}]` : ""}: '${i.template.replace(/\n/g, "\\n")}'`
-      )
+      const n = i.n === -1 ? "[error]" : i.n > 0 ? `[${i.n}]` : ""
+      log.info(`Using '${i.type}' template as converter${n}: '${i.template.replace(/\n/g, "\\n")}'`)
     }
     log.info(`Reading files using pattern string '${this.globPattern}'`)
 
