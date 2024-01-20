@@ -129,19 +129,32 @@ export function getInstance(scopedir: string, glossarydir: string, filename: str
   return mrg
 }
 
-export function getEntry(entries: Entry[], origin: string, term: string, type: string): Entry {
-  // Find the matching entry in mrg.entries based on the term
-  let matches = entries.filter((entry) => entry.term === term || entry.formPhrases?.includes(term))
-  if (matches.length > 1 && type != null) {
+export function getEntry(entries: Entry[], origin: string, term: string, type: string, defaulttype?: string): Entry {
+  let matches = entries
+
+  term = term.trim().toLowerCase()
+  let reference = `${term}`
+
+  if (type != null) {
     matches = matches.filter((entry) => entry.termType === type)
+    reference = `${type}:${term}`
+  }
+
+  matches = entries.filter((entry) => entry.term === term || entry.formPhrases?.includes(term))
+
+  if (matches.length > 1 && defaulttype != null) {
+    matches = matches.filter((entry) => entry.termType === defaulttype)
+    reference = `${defaulttype}:${term}`
   }
 
   if (matches.length === 1) {
     return matches[0]
   } else if (matches.length === 0) {
-    throw new Error(`could not be matched with an MRG entry in '${origin}`)
+    throw new Error(`could not be matched with an MRG entry in '${origin}`, { cause: reference })
   } else if (matches.length > 1) {
     const matchingTermIds = matches.map((entry) => entry.termid).join("', '")
-    throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`)
+    throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`, {
+      cause: reference
+    })
   }
 }

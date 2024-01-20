@@ -79,7 +79,7 @@ export class Resolver {
 
       // Interpret the match using the interpreter
       const termref: TermRef = this.interpreter.interpret(match)
-      const scopetag = termref.scopetag || this.saf.scope.scopetag
+      const scopetag = termref.scopetag ?? this.saf.scope.scopetag
       const vsnvag = termref.vsntag ? `.${termref.vsntag}` : ""
 
       const mrgfile = `mrg.${scopetag}${vsnvag}.yaml`
@@ -114,27 +114,28 @@ export class Resolver {
    * @returns The file object.
    */
   replacementHandler(match: RegExpMatchArray, termref: TermRef, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
-    termref.term = termref.term || termref.showtext.trim().toLocaleLowerCase()
+    const display = { ...termref }
 
-    const defaults = `${termref.type ? termref.type + ":" : "default:"}${termref.term}@${
-      termref.scopetag || "default"
-    }${termref.vsntag ? `:${termref.vsntag}` : ":default"}`
+    display.type = display.type ? display.type + ":" : ""
+    display.term = display.term ?? "<showtext>"
+    display.scopetag = display.scopetag ?? "<default>"
+    display.vsntag = termref.scopetag ? (display.vsntag ? ":" + display.vsntag : "") : ""
 
-    termref.type = termref.type || this.saf.scope.defaulttype
-    termref.scopetag = termref.scopetag || this.saf.scope.scopetag
-    termref.vsntag = termref.vsntag || mrg.terminology.vsntag
-
-    let reference = `${termref.type}:${termref.term}@${termref.scopetag}:${termref.vsntag}`
-    if (defaults !== reference) {
-      reference = `${defaults}' > '${reference}`
-    }
+    let reference = `${display.type}${display.term}@${display.scopetag}${display.vsntag}`
 
     file.orig = file.orig.toString()
     const line = file.orig.substring(0, match.index).split("\n").length
     const pos = file.output.split("\n")[line - 1].indexOf(match[0])
 
     try {
-      const entry = MRG.getEntry(mrg.entries, mrg.filename, termref.term, termref.type)
+      const entry = MRG.getEntry(
+        mrg.entries,
+        mrg.filename,
+        termref.term || termref.showtext,
+        termref.type,
+        this.saf.scope.defaulttype
+      )
+
       // get the this.converterMap that is higher than or the same as the number of times the term has been converted
       let converter = this.converterMap.get(0)
       for (const [key, value] of this.converterMap) {
@@ -142,6 +143,7 @@ export class Resolver {
           converter = value
         }
       }
+
       const replacement = converter.convert({
         int: this.interpreter,
         ref: termref,
@@ -172,6 +174,10 @@ export class Resolver {
         file.converted.set(entry!.termid, (file.converted.get(entry!.termid) || 0) + 1)
       }
     } catch (err) {
+      const interpretation = `${err.cause}@${mrg.terminology.scopetag}${display.vsntag}`
+      if (interpretation !== reference) {
+        reference = `${reference}' > '${interpretation}`
+      }
       const message = `Term ref '${match[0]}' > '${reference}', ${err}`
       report.termHelp(file.path, line, message)
     }

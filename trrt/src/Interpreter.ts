@@ -44,6 +44,12 @@ export class Interpreter {
       throw new Error("Error in evaluating regex pattern: No groups provided")
     }
 
+    for (const key in match.groups) {
+      if (match.groups[key] === "") {
+        match.groups[key] = null
+      }
+    }
+
     return {
       ...match.groups,
       showtext: match.groups.showtext

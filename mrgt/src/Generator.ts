@@ -68,14 +68,26 @@ export class Generator {
         try {
           // if no identifier (@) is specified, refer to the ctextmap
           if (!properties.groups.identifier) {
-            entry = MRG.getEntry(TuCBuilder.cTextMap, "cTextMap", properties.groups.term, properties.groups.type)
+            entry = MRG.getEntry(
+              TuCBuilder.cTextMap,
+              "cTextMap",
+              properties.groups.term,
+              properties.groups.type,
+              this.saf.scope.defaulttype
+            )
             // if the identifier is @, refer to the MRG
           } else {
             const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
               properties.groups.vsntag ?? this.saf.scope.defaultvsn
             }.yaml`
             const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
-            entry = MRG.getEntry(mrg.entries, mrg.filename, properties.groups.term, properties.groups.type)
+            entry = MRG.getEntry(
+              mrg.entries,
+              mrg.filename,
+              properties.groups.term,
+              properties.groups.type,
+              this.saf.scope.defaulttype
+            )
           }
         } catch (err) {
           // log a warning and remove the synonymOf entry

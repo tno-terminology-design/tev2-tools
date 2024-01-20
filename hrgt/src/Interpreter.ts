@@ -37,6 +37,12 @@ export class Interpreter {
 
     const hrg: RegExpMatchArray = match.groups.hrg.match(/(?:@)?(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?/)
 
+    for (const key in match.groups) {
+      if (match.groups[key] === "") {
+        match.groups[key] = null
+      }
+    }
+
     return {
       ...match.groups,
       hrg: match.groups.hrg,
