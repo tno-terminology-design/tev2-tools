@@ -149,8 +149,8 @@ export class Resolver {
         mrg: mrg.terminology,
         err: {
           filename: file.path,
-          line: line,
-          pos: pos
+          line,
+          pos
         }
       } as Profile)
 

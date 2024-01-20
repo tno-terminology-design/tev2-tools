@@ -9,14 +9,18 @@ export { Handlebars }
 
 interface env {
   mrg: {
-    terminology: {
-      website: string
-    }
+    website: string
   }
-  interpreter: {
+  int: {
     regex: RegExp
   }
 }
+
+// int: Interpreter
+// ref: MRGRef
+// entry: MRG.Entry
+// mrg: MRG.Terminology
+// err?: { filename: string; line: number; pos: number; cause?: string }
 
 /**
  * Helper function to capitalize the first letter of every word in a string
@@ -56,7 +60,7 @@ export function ifValue(this: unknown, conditional: unknown, options: HelperOpti
 export function localize(this: env, url: string): string {
   try {
     const parsedURL = new URL(url)
-    const parsedWebsite = new URL(this.mrg.terminology.website)
+    const parsedWebsite = new URL(this.mrg.website)
     if (parsedURL.host === parsedWebsite.host) {
       url = parsedURL.pathname
     }
@@ -93,7 +97,7 @@ export function noRefs(this: env, text: string, options: HelperOptions): string 
     // switch on element of type to determine which regex to use
     switch (element.toLowerCase()) {
       case "interpreter":
-        regex = this.interpreter.regex
+        regex = this.int.regex
         break
       case "html":
         regex = /<a\b[^>]*?>(?<showtext>.*?)<\/a>/g

@@ -5,8 +5,8 @@ export interface Profile {
   int: Interpreter
   ref: TermRef
   entry: MRG.Entry
-  mrg?: MRG.Terminology
-  err?: { filename: string; line: number; pos: number; message?: string }
+  mrg: MRG.Terminology
+  err?: { filename: string; line: number; pos: number; cause?: string }
 }
 
 /**
@@ -48,12 +48,12 @@ export class Converter {
     for (const [key, value] of Object.entries(profile.entry)) {
       if (typeof value === "string") {
         const template = Handlebars.compile(value, { noEscape: true, compat: true })
-        profile.entry[key as keyof typeof profile.entry] = template({ ...profile, ...profile.entry })
+        profile.entry[key as keyof typeof profile.entry] = template({ ...profile.entry, ...profile })
       }
     }
 
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
-    const output = template({ ...profile, ...profile.entry })
+    const output = template({ ...profile.entry, ...profile })
 
     if (output === "") {
       throw new Error(`resulted in an empty string, check the converter template`)

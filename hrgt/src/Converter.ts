@@ -5,8 +5,8 @@ export interface Profile {
   int: Interpreter
   ref: MRGRef
   entry: MRG.Entry
-  mrg?: MRG.Terminology
-  err?: { filename: string; line: number; pos: number; message?: string }
+  mrg: MRG.Terminology
+  err?: { filename: string; line: number; pos: number; cause?: string }
 }
 
 export class Converter {
@@ -43,7 +43,7 @@ export class Converter {
   convert(profile: Profile): string {
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
-    return template({ ...profile, ...profile.entry })
+    return template({ ...profile.entry, ...profile })
   }
 
   getBlank(): string {

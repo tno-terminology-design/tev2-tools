@@ -116,8 +116,8 @@ export class Resolver {
     }
     entries.sort((a, b) =>
       sorter
-        .convert({ int: this.interpreter, ref: mrgref, entry: a })
-        .localeCompare(sorter.convert({ int: this.interpreter, ref: mrgref, entry: b }))
+        .convert({ int: this.interpreter, ref: mrgref, entry: a, mrg: mrg.terminology })
+        .localeCompare(sorter.convert({ int: this.interpreter, ref: mrgref, entry: b, mrg: mrg.terminology }))
     )
 
     // Check if the MRGRef has a converter specified
@@ -132,6 +132,9 @@ export class Resolver {
     file.orig = file.orig.toString()
 
     for (const entry of entries) {
+      const line = file.orig.substring(0, match.index).split("\n").length
+      const pos = file.output.split("\n")[line - 1].indexOf(match[0])
+
       const hrgEntry = converter.convert({
         int: this.interpreter,
         ref: mrgref,
@@ -139,8 +142,8 @@ export class Resolver {
         mrg: mrg.terminology,
         err: {
           filename: file.path,
-          line: file.orig.substring(0, match.index).split("\n").length,
-          pos: match.index - file.orig.lastIndexOf("\n", match.index)
+          line,
+          pos
         }
       } as Profile)
       if (hrgEntry == converter.getBlank()) {
