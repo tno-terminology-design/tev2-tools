@@ -143,7 +143,7 @@ export class Resolver {
 
         // get the Converter instance where n is higher than or the same as the number of times the term has been converted
         const count = file.converted.get(`${profile.entry.termid}`) ?? 0
-        const converter = Converter.instances.find((i) => i.n >= count)
+        const converter = Converter.instances.find((i) => i.n <= count)
         if (converter) {
           replacement = converter.convert(profile)
         }
@@ -212,6 +212,7 @@ export class Resolver {
       const n = i.n === -1 ? "[error]" : i.n > 0 ? `[${i.n}]` : ""
       log.info(`Using '${i.type}' template as converter${n}: '${i.template.replace(/\n/g, "\\n")}'`)
     }
+    Converter.instances.reverse()
     log.info(`Reading files using pattern string '${this.globPattern}'`)
 
     // Get the list of files based on the glob pattern
