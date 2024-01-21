@@ -68,21 +68,17 @@ export class Builder {
 
       // Set default values for optional properties in SAF
       if (this.saf.scope.website == undefined) {
-        // log.warn(`No 'website' property found in SAF. Using '/' as default value.`)
         this.saf.scope.website = "/"
       }
       if (this.saf.scope.navpath == undefined) {
-        // log.warn(`No 'navpath' property found in SAF. Using '/' as default value.`)
         this.saf.scope.navpath = "/"
       }
       if (this.saf.scope.defaulttype == undefined) {
-        // log.warn(`No 'defaulttype' property found in SAF. Using 'term' as default value.`)
         this.saf.scope.defaulttype = "concept"
       }
 
       // Check if there are existing versions
       if (!this.saf.versions || this.saf.versions.length === 0) {
-        // log.error(`E003 No versions found in SAF at '${safURL}'`)
         throw new Error(`No versions found`)
       }
     } catch (err) {
