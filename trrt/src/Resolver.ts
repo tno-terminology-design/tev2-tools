@@ -87,15 +87,7 @@ export class Resolver {
         report.errors.push({ type: "MRG HELP", file: file.path, cause: err } as TermError)
       }
 
-      if (mrg !== undefined && mrg.entries.length > 0) {
-        this.replacementHandler(match, termref, mrg, file)
-      } else {
-        // TODO: move this and make sure replacement is still called on error
-
-        const message = `Term ref '${match[0]}', could not be converted due to an MRG error`
-        const line = file.orig.toString().substring(0, match.index).split("\n").length
-        report.errors.push({ type: "TERM HELP", line, file: file.path, cause: message } as TermError)
-      }
+      this.replacementHandler(match, termref, mrg, file)
     }
     if (file.converted.size > 0) {
       return file.output
@@ -120,19 +112,23 @@ export class Resolver {
     let error: Error | undefined
     let replacement = ""
 
-    const profile: Profile = {
-      int: this.interpreter,
-      ref: termref,
-      mrg: mrg.terminology,
-      err: {
-        file: file.path,
-        line,
-        pos
-      } as TermError
-    }
-
     try {
+      const profile: Profile = {
+        int: this.interpreter,
+        ref: termref,
+        err: {
+          file: file.path,
+          line,
+          pos
+        } as TermError
+      }
+
       try {
+        if (mrg == undefined || mrg.entries.length === 0) {
+          throw new Error(`could not be converted due to an MRG error`)
+        }
+        profile.mrg = mrg.terminology
+
         profile.entry = MRG.getEntry(
           mrg.entries,
           mrg.filename,

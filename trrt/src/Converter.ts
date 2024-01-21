@@ -5,7 +5,7 @@ export interface Profile {
   int: Interpreter
   ref: TermRef
   entry?: MRG.Entry
-  mrg: MRG.Terminology
+  mrg?: MRG.Terminology
   err?: TermError
 }
 
