@@ -41,7 +41,7 @@ async function main(): Promise<void> {
     try {
       const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
 
-      // Overwrite command line options with config options and mrgt specific config options
+      // Overwrite config options and mrgt specific config options with command line options
       const { mrgt, ...rest } = config
       options = { ...rest, ...mrgt, ...options }
     } catch (err) {
@@ -61,10 +61,11 @@ async function main(): Promise<void> {
 
   report.setOnNotExist(options.onNotExist)
 
+  // Create a SAF and generator
   const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
   const generator = new Generator({ vsntag: options.vsntag, saf: saf })
 
-  // Generate MRGs
+  // Start generation
   generator.initialize()
   log.info("Generation complete")
 

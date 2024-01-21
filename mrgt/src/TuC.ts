@@ -13,6 +13,12 @@ interface TuC {
   cText: boolean
 }
 
+/**
+ * The TuCBuilder class handles the construction of the terminology under construction.
+ * The `resolveInstructions` method is called by the constructor to start the construction process.
+ * The `saf` parameter is used to specify the SAF.
+ * The `vsn` parameter is used to specify the version.
+ */
 export class TuCBuilder {
   static instances: TuCBuilder[] = []
   static cTextMap: MRG.Entry[] = []
@@ -97,11 +103,9 @@ export class TuCBuilder {
   }
 
   private getCtextEntries(): MRG.Entry[] {
-    // signal use of curated texts
-    this.tuc.cText = true
-    // return cTextMap if it already exists
+    this.tuc.cText = true // signal use of curated texts
     if (TuCBuilder.cTextMap.length > 0) {
-      return TuCBuilder.cTextMap
+      return TuCBuilder.cTextMap // return cTextMap if it already exists
     }
     const curatedir = path.join(this.saf.scope.localscopedir, this.saf.scope.curatedir)
 
@@ -119,8 +123,6 @@ export class TuCBuilder {
 
     // Interpret all the curated texts and store them in the terminology under construction
     const ctexts = curatedirContent.filter((ctext) => ctext.endsWith(".md"))
-
-    // load properties of curated texts as MRG Entry
     for (let ctext of ctexts) {
       try {
         const ctextPath = ctext
@@ -395,6 +397,13 @@ export class TuCBuilder {
   }
 }
 
+/**
+ * Checks if the given entry matches the given key and values.
+ * @param entry - The entry to check.
+ * @param key - The key to check.
+ * @param values - The values to check.
+ * @returns True if the entry matches the key and values, false otherwise.
+ */
 function entryFilter(entry: MRG.Entry, key: string, values: string[]): boolean {
   // if the entry has a field with the same name as the key
   if (entry[key] !== undefined) {
@@ -423,6 +432,11 @@ function entryFilter(entry: MRG.Entry, key: string, values: string[]): boolean {
   return false
 }
 
+/**
+ * Resolves the given form phrases by applying macro replacements.
+ * @param formPhrases - The form phrases to resolve.
+ * @returns An array of strings with all possible alternatives after macro replacements.
+ */
 function resolveFormPhrases(formPhrases: string[]): string[] {
   const regexMap: Record<string, string[]> = {
     "{ss}": ["", "s", "'s", "(s)"], // "act{ss}" --> "act", "acts", "act's", "act(s)"
@@ -448,9 +462,9 @@ function resolveFormPhrases(formPhrases: string[]): string[] {
 }
 
 /**
- * Apply macro replacements to the given input using the provided regexMap.
- * @param input - The input string containing macros.
- * @param regexMap - A map of macros and their possible replacements.
+ * Applies the macro replacements to the given input.
+ * @param input - The input to apply the macro replacements to.
+ * @param regexMap - The map of macro replacements.
  * @returns An array of strings with all possible alternatives after macro replacements.
  */
 function applyMacroReplacements(input: string, regexMap: Record<string, string[]>): string[] {

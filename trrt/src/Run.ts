@@ -30,11 +30,11 @@ program
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-o, --output <dir>", "(Root) directory for output files to be written")
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
-  // If interpreters or converters are added/removed, please adjust the documentation in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
+  // If interpreters or converters are added/removed, please adjust the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
   .option(
     "--int, --interpreter <regex> or <predeftype>",
     "Type of interpreter, i.e., a regex, or a predefined type (`default`, `alt`)"
-  ) // `basic` is deprecated
+  )
   .option(
     "--con[n], --converter[n] <template> or <predeftype>*",
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-link`, `html-link`, `html-hovertext-link`, `html-glossarytext-link`)"
@@ -63,7 +63,7 @@ async function main(): Promise<void> {
     }
   }
 
-  // Use the remaining arguments as input
+  // Use the remaining arguments as the input option
   if (program.args[0]) {
     options.input = program.args
   }
@@ -72,7 +72,7 @@ async function main(): Promise<void> {
     try {
       const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
 
-      // Overwrite command line options with config options and trrt specific config options
+      // Overwrite config options and trrt specific config options with command line options
       const { trrt, ...rest } = config
       options = { ...rest, ...trrt, ...options }
     } catch (err) {
@@ -107,7 +107,7 @@ async function main(): Promise<void> {
     process.exit(1)
   }
 
-  // Create an interpreter, converter, and saf with the provided options
+  // Create an interpreter and saf with the provided options
   const interpreter = new Interpreter({ regex: options.interpreter ?? "default" })
   const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
 
@@ -133,7 +133,7 @@ try {
   if ((err as Error).cause != null) {
     log.error(err)
   } else {
-    log.error("E012 Something unexpected went wrong while resoluting terms:", err)
+    log.error("E012 Something unexpected went wrong during execution:", err)
   }
   process.exit(1)
 }

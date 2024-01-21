@@ -16,12 +16,6 @@ interface env {
   }
 }
 
-// int: Interpreter
-// ref: MRGRef
-// entry: MRG.Entry
-// mrg: MRG.Terminology
-// err?: { filename: string; line: number; pos: number; cause?: string }
-
 /**
  * Helper function to capitalize the first letter of every word in a string
  * @param text - The string to be capitalized

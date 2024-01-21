@@ -15,6 +15,17 @@ type GrayMatterFile = matter.GrayMatterFile<string> & {
   converted: number
 }
 
+/**
+ * The Resolver class handles the resolution of references in files.
+ * This resolution happens to files specified by the `globPattern`.
+ * The `resolve` method is called to start the resolution process.
+ * If the resolution was successful, a resolved file is written to `outputPath`.
+ * The `force` parameter is used to overwrite existing files.
+ * The `sorter` parameter is used to specify the sorter.
+ * The `interpreter` parameter is used to specify the interpreter.
+ * The `converter` parameter is used to specify the converter.
+ * The `saf` parameter is used to specify the SAF.
+ */
 export class Resolver {
   private readonly outputPath: string
   private readonly globPattern: string
@@ -58,17 +69,16 @@ export class Resolver {
    * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
    */
   private async matchIterator(file: GrayMatterFile): Promise<string | undefined> {
-    // Get the matches of the regex in the file.orig string
+    // Find all the matches according to the interpreter regex
     const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.regex))
     if (file.matter != null) {
-      // If the file has frontmatter, get the matches of the regex in the frontmatter string
-      // remove count of frontmatter matches from the front of the matches array
+      // Remove matches that are part of the frontmatter
       const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.regex))
       matches.splice(0, frontmatter.length)
     }
 
-    file.lastIndex = 0
-    file.converted = 0
+    file.lastIndex = 0 // lastIndex is used to account for the length difference between the matches and replacements
+    file.converted = 0 // converted is used to count the number of terms that were converted
     file.output = file.orig.toString()
 
     // Iterate over each match found in the file.orig string
@@ -78,15 +88,16 @@ export class Resolver {
       // Interpret the match using the interpreter
       const mrgref: MRGRef = this.interpreter.interpret(match)
 
-      // Get the MRG instance based on the MRGRef
       const mrgfile = `mrg.${mrgref.scopetag || this.saf.scope.scopetag}${
         mrgref.vsntag ? "." + mrgref.vsntag : ""
       }.yaml`
       try {
+        // Get the MRG instance based on `mrgfile`
         const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
         log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`)
 
         if (mrg.entries.length > 0) {
+          // Start the replacement process
           this.replacementHandler(match, mrgref, mrg, file)
         } else {
           continue
@@ -102,6 +113,14 @@ export class Resolver {
     }
   }
 
+  /**
+   * Replaces the matched MRG reference in the file with the generated replacement.
+   * @param match - The match of the MRG reference.
+   * @param termref - The interpreted MRG reference.
+   * @param mrg - The MRG instance.
+   * @param file - The file object of the file being processed.
+   * @returns The processed file object.
+   */
   replacementHandler(match: RegExpMatchArray, mrgref: MRGRef, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
     let converter = this.converter
     let sorter = this.sorter
@@ -169,7 +188,7 @@ export class Resolver {
       // Update the lastIndex to account for the length difference between the reference and replacement
       file.lastIndex += replacement.length - matchLength
 
-      // // Log the converted term
+      // Log the converted term
       file.converted++
     }
 
@@ -178,7 +197,6 @@ export class Resolver {
 
   /**
    * Calles matchIterator() on files based on `this.globPattern`.
-   * @returns A Promise that resolves to true if the resolution was successful.
    */
   public async resolve(): Promise<void> {
     // Log information about the interpreter, converter and the files being read

@@ -39,7 +39,7 @@ async function main(): Promise<void> {
     try {
       const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
 
-      // Overwrite command line options with config options and mrg-import specific config options
+      // Overwrite config options and mrg-import specific config options with command line options
       const { "mrg-import": mrgimport, ...rest } = config
       options = { ...rest, ...mrgimport, ...options }
     } catch (err) {

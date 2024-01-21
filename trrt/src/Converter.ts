@@ -10,10 +10,10 @@ export interface Profile {
 }
 
 /**
- * The Converter class handles the conversion of a glossary entry to a specific format.
+ * The Converter class handles the conversion of a Profile object to a specific format.
  * This conversion happens according to a string that is supplied in `template`.
- * An entry is converted by calling the `convert` method with the corresponding entry and a matching term.
- * Helper functions are registered with Handlebars to allow for more complex conversions.
+ * A Profile is converted by calling the `convert` method.
+ * Handlebars is called from the @tno-terminology-design/utils package.
  */
 export class Converter {
   public type: string
@@ -24,7 +24,7 @@ export class Converter {
 
   public constructor({ template }: { template: string }) {
     // map of default templates for each type
-    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
+    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     const map: Record<string, string> = {
       "markdown-link": "[{{ref.showtext}}]({{entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}})",
       "html-link": '<a href="{{entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}}">{{ref.showtext}}</a>',
@@ -48,7 +48,7 @@ export class Converter {
   }
 
   convert(profile: Profile): string {
-    const n = this.n === -1 ? "[error]" : this.n > 0 ? `[${this.n}]` : ""
+    const n = this.n === -1 ? "[error]" : this.n > 0 ? `[${this.n}]` : "" // string to append to error messages
 
     try {
       if (profile.entry) {

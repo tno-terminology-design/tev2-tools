@@ -9,17 +9,23 @@ export interface Profile {
   err?: { filename: string; line: number; pos: number; cause?: string }
 }
 
+/**
+ * The Converter class handles the conversion of a Profile object to a specific format.
+ * This conversion happens according to a string that is supplied in `template`.
+ * A Profile is converted by calling the `convert` method.
+ * Handlebars is called from the @tno-terminology-design/utils package.
+ */
 export class Converter {
   public type: string
   public template: string
   static saf: SAF.Type
 
   public constructor({ template }: { template: string }) {
-    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`
+    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     // map of default templates for each type
     const map: Record<string, string> = {
-      default: "{{term}}{{termType}}",
-      glossaryTerm: "{{glossaryTerm}}{{term}}{{termType}}",
+      default: "{{term}}{{termType}}", // used by the sorter
+      glossaryTerm: "{{glossaryTerm}}{{term}}{{termType}}", // used by the sorter
       "markdown-table-row":
         "| [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}}) | {{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}} |\n",
       "markdown-section-2":
@@ -46,6 +52,9 @@ export class Converter {
     return template({ ...profile.entry, ...profile })
   }
 
+  /**
+   * The blank template can be compared to a regular output to check if any expressions were filled.
+   */
   getBlank(): string {
     const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 

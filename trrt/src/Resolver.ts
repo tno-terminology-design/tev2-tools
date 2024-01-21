@@ -16,13 +16,13 @@ interface GrayMatterFile extends matter.GrayMatterFile<string> {
 }
 
 /**
- * The Resolver class handles the resolution of term references in files.
- * This resolution happens according to a string that is supplied in `globPattern`.
- * A file is resolved by calling the `resolve` method with the corresponding file path.
- * If the resolution was successful, the resolved file is written to the output path.
+ * The Resolver class handles the resolution of references in files.
+ * This resolution happens to files specified by the `globPattern`.
+ * The `resolve` method is called to start the resolution process.
+ * If the resolution was successful, a resolved file is written to `outputPath`.
  * The `force` parameter is used to overwrite existing files.
- * The `outputPath` parameter is used to specify the output path.
- * The `globPattern` parameter is be used to specify the glob pattern.
+ * The `interpreter` parameter is used to specify the interpreter.
+ * The `saf` parameter is used to specify the SAF.
  */
 export class Resolver {
   private readonly outputPath: string
@@ -57,16 +57,15 @@ export class Resolver {
    * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
    */
   private async matchIterator(file: GrayMatterFile): Promise<string | undefined> {
-    // Get the matches of the regex in the file.orig string
+    // Find all the matches according to the interpreter regex
     const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.regex))
     if (file.matter != null) {
-      // If the file has frontmatter, get the matches of the regex in the frontmatter string
-      // remove count of frontmatter matches from the front of the matches array
+      // Remove matches that are part of the frontmatter
       const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.regex))
       matches.splice(0, frontmatter.length)
     }
 
-    file.lastIndex = 0
+    file.lastIndex = 0 // lastIndex is used to account for the length difference between the matches and replacements
     file.output = file.orig.toString()
 
     // Iterate over each match found in the file.orig string
@@ -81,12 +80,13 @@ export class Resolver {
       const mrgfile = `mrg.${scopetag}${vsnvag}.yaml`
 
       try {
-        // Get the MRG instance based on the mrgfile
+        // Get the MRG instance based on `mrgfile`
         mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
       } catch (err) {
         report.errors.push({ type: "MRG HELP", file: file.path, cause: err } as TermError)
       }
 
+      // Start the replacement process
       this.replacementHandler(match, termref, mrg, file)
     }
     if (file.converted.size > 0) {
@@ -97,12 +97,12 @@ export class Resolver {
   }
 
   /**
-   * Replaces the matched term with the generated replacement in the data string.
+   * Replaces the matched term in the file with the generated replacement.
    * @param match - The match of the term reference.
-   * @param term - The interpreted term.
+   * @param termref - The interpreted term referebce.
    * @param mrg - The MRG instance.
    * @param file - The file object of the file being processed.
-   * @returns The file object.
+   * @returns The processed file object.
    */
   replacementHandler(match: RegExpMatchArray, termref: TermRef, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
     file.orig = file.orig.toString()
@@ -144,9 +144,9 @@ export class Resolver {
           replacement = converter.convert(profile)
         }
       } catch (err) {
-        error = err
+        error = err // store the error so it can be thrown after the replacement steps with converter[error]
         profile.err.cause = err.message
-        const converter = Converter.instances.find((i) => i.n === -1)
+        const converter = Converter.instances.find((i) => i.n === -1) // get the Converter instance where n = -1 (converter[error] option)
         if (converter) {
           replacement = converter.convert(profile)
         }
@@ -167,6 +167,7 @@ export class Resolver {
       }
 
       if (error) {
+        // Also log if a reference was converted with converter[error]
         file.converted.set(undefined, (file.converted.get(undefined) || 0) + 1)
         throw error
       } else {
@@ -175,6 +176,7 @@ export class Resolver {
         file.converted.set(profile.entry!.termid, (file.converted.get(profile.entry!.termid) || 0) + 1)
       }
     } catch (err) {
+      // Log `TERM HELP` message with useful information about the term reference interpretation
       const display = { ...termref }
 
       display.type = display.type ? display.type + ":" : ""
@@ -208,7 +210,7 @@ export class Resolver {
       const n = i.n === -1 ? "[error]" : i.n > 0 ? `[${i.n}]` : ""
       log.info(`Using '${i.type}' template as converter${n}: '${i.template.replace(/\n/g, "\\n")}'`)
     }
-    Converter.instances.reverse()
+    Converter.instances.reverse() // reverse the order of the converters to correctly handle converter[n] options
     log.info(`Reading files using pattern string '${this.globPattern}'`)
 
     // Get the list of files based on the glob pattern

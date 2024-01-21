@@ -1,5 +1,3 @@
-// Read the SAF of the scope from which the MRG Importer is called.
-
 import { SAF, MRG } from "@tno-terminology-design/utils"
 import { log, report, writeFile } from "@tno-terminology-design/utils"
 import { download } from "./Handler.js"
@@ -12,8 +10,9 @@ import yaml = require("js-yaml")
 import { AxiosError } from "axios"
 
 /**
- * Initializes the MRG Importer.
- * @param scopedir The scopedir of the scope from which the MRG Importer is called.
+ * The initialize function is called to start the import process.
+ * The `scopedir` parameter is used to specify the scopedir.
+ * The `prune` parameter is used to specify whether to prune MRGs of scopes that are not in administered the SAF.
  */
 export async function initialize({ scopedir, prune }: { scopedir: string; prune: boolean }) {
   // read the SAF of the 'own' scope

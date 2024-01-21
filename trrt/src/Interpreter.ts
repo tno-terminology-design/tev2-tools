@@ -12,14 +12,14 @@ export interface TermRef {
  * The Interpreter class handles the interpretation of a term reference.
  * This interpretation happens according to a string that is supplied in `regex`.
  * A term is interpreted by calling the `interpret` method with the corresponding match.
- * The `interpret` method returns a map of the term properties.
+ * The `interpret` method returns a TermRef object.
  */
 export class Interpreter {
   public type: string
   public regex: RegExp
 
   public constructor({ regex }: { regex: string }) {
-    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
+    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     const map: Record<string, RegExp> = {
       default:
         /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#:a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
@@ -44,6 +44,7 @@ export class Interpreter {
       throw new Error("Error in evaluating regex pattern: No groups provided")
     }
 
+    // Replace empty strings with null
     for (const key in match.groups) {
       if (match.groups[key] === "") {
         match.groups[key] = null

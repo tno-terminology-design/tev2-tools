@@ -25,7 +25,7 @@ program
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-o, --output <dir>", "(Root) directory for output files to be written")
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
-  // If interpreters or converters are added/removed, please adjust the documentation in the repo-file `tno-terminology-design/tev2-specifications/docs/spec-files/90-configuration-file.md`.
+  // If interpreters or converters are added/removed, please adjust the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
   .option(
     "--int, --interpreter <regex> or <predeftype>",
     "Type of interpreter, i.e., a regex, or a predefined type (`default`)"
@@ -57,7 +57,7 @@ async function main(): Promise<void> {
     try {
       const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
 
-      // Overwrite command line options with config options and hrgt specific config options
+      // Overwrite config options and hrgt specific config options with command line options
       const { hrgt, ...rest } = config
       options = { ...rest, ...hrgt, ...options }
     } catch (err) {

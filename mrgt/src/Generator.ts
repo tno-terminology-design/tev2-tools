@@ -7,6 +7,12 @@ import path = require("path")
 import yaml = require("js-yaml")
 import fs = require("fs")
 
+/**
+ * The Generator class generates the MRG files for the local scope.
+ * The `initialize` method is called to start the generation process.
+ * The `vsntag` parameter is used to specify the vsntag.
+ * The `saf` parameter is used to specify the SAF.
+ */
 export class Generator {
   public vsntag: string
   saf: SAF.Type
@@ -56,6 +62,11 @@ export class Generator {
     }
   }
 
+  /**
+   * The `synonymOf` method handles the synonymOf entries in the TuC.
+   * It attempts to find the corresponding entry in the MRG and merges the synonymOf entry with the MRG entry.
+   * If no corresponding entry is found, the synonymOf entry is removed.
+   */
   private synonymOf(): void {
     log.info(`\x1b[1;37mProcessing synonymOf entries...`)
     TuCBuilder.synonymOf?.forEach((synonymOf, index) => {
@@ -138,6 +149,10 @@ export class Generator {
       })
   }
 
+  /**
+   * The `generate` method generates the MRG file for the specified version.
+   * @param vsn - The version object.
+   */
   public generate(vsn: SAF.Version): void {
     const build = new TuCBuilder({ vsn: vsn, saf: this.saf })
     const output = yaml.dump(build.output(), { forceQuotes: true, quotingType: '"', noRefs: true })
