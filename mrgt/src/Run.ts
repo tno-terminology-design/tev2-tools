@@ -8,7 +8,6 @@ import { log, report } from "@tno-terminology-design/utils"
 import { Generator } from "./Generator.js"
 
 import yaml from "js-yaml"
-import chalk from "chalk"
 import figlet from "figlet"
 
 const program = new Command()
@@ -35,8 +34,8 @@ async function main(): Promise<void> {
     options.input = program.args
   }
 
-  console.log(chalk.red(figlet.textSync(name + "-cli", { horizontalLayout: "full" })))
-  console.log(`Version: ${version}\n`)
+  console.log(`\x1b[31m${figlet.textSync(name + "-cli", { horizontalLayout: "full" })}`)
+  console.log(`\x1b[0mVersion: ${version}\n`)
 
   if (options.config) {
     try {

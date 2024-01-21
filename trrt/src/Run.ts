@@ -10,7 +10,6 @@ import { readFileSync } from "fs"
 import { resolve } from "path"
 
 import yaml from "js-yaml"
-import chalk from "chalk"
 import figlet from "figlet"
 
 const program = new Command()
@@ -48,8 +47,8 @@ program
 async function main(): Promise<void> {
   let options = program.opts()
 
-  console.log(chalk.red(figlet.textSync(name + "-cli", { horizontalLayout: "full" })))
-  console.log(`Version: ${version}\n`)
+  console.log(`\x1b[31m${figlet.textSync(name + "-cli", { horizontalLayout: "full" })}`)
+  console.log(`\x1b[0mVersion: ${version}\n`)
 
   // Process command line converter options
   for (const [key, value] of Object.entries(process.argv.slice(2))) {
