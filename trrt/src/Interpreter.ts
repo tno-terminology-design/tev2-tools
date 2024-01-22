@@ -22,8 +22,8 @@ export class Interpreter {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     const map: Record<string, RegExp> = {
       default:
-        /(?:(?<=[^`\\])|^)\[(?=[^@\]]+\]\([#:a-z0-9_-]*@[:a-z0-9_-]*\))(?<showtext>[^\n\]@]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[a-z0-9_-]*)?(?:#(?<trait>[a-z0-9_-]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
-      alt: /(?:(?<=[^`\\])|^)\[(?=[^@\]]+@[:a-z0-9_-]*\](?:\([#:a-z0-9_-]+\))?)(?<showtext>[^\n\]@]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*?))?\](?:\((?:(?:(?<type>[a-z0-9_-]+):)?)(?<term>[a-z0-9_-]*)(?:#(?<trait>[a-z0-9_-]*?))?\))/g
+            /(?:(?<=[^`\\])|^)\[(?=[^@\n\]]+\]\([^@\)]*@[:a-z0-9_-]*\))(?<showtext>[^@\n\]]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[^@\n:#\)]*?)?(?:#(?<trait>[^@\n:#\)]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
+      alt:  /(?:(?<=[^`\\])|^)\[(?=[^@\n\]]+?@[:a-z0-9_-]*\](?:\([#:a-z0-9_-]+\))?)(?<showtext>[^@\n\]]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*?))?\](?:\((?:(?:(?<type>[a-z0-9_-]+):)?)(?<term>[^@\n:#\)]*?)(?:#(?<trait>[^@\n:#\)]+?))?\))?/g
     }
 
     const key = regex.toString().toLowerCase()
