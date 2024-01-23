@@ -1,4 +1,4 @@
-import { log, writeFile } from "@tno-terminology-design/utils"
+import { log, writeFile, regularize } from "@tno-terminology-design/utils"
 import { SAF, MRG } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { TuCBuilder } from "./TuC.js"
@@ -75,6 +75,9 @@ export class Generator {
         /(?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[a-z0-9_-]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
       )
       if (properties?.groups) {
+        Object.keys(properties.groups).forEach((key) => {
+          properties.groups[key] = regularize(properties.groups[key])
+        })
         let entry: MRG.Entry | undefined
         try {
           // if no identifier (@) is specified, refer to the ctextmap

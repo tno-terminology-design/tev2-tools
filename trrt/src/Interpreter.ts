@@ -1,3 +1,5 @@
+import { regularize } from "@tno-terminology-design/utils"
+
 export interface TermRef {
   showtext: string
   type?: string
@@ -22,8 +24,8 @@ export class Interpreter {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     const map: Record<string, RegExp> = {
       default:
-            /(?:(?<=[^`\\])|^)\[(?=[^@\n\]]+\]\([^@\)]*@[:a-z0-9_-]*\))(?<showtext>[^@\n\]]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[^@\n:#\)]*?)?(?:#(?<trait>[^@\n:#\)]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
-      alt:  /(?:(?<=[^`\\])|^)\[(?=[^@\n\]]+?@[:a-z0-9_-]*\](?:\([#:a-z0-9_-]+\))?)(?<showtext>[^@\n\]]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*?))?\](?:\((?:(?:(?<type>[a-z0-9_-]+):)?)(?<term>[^@\n:#\)]*?)(?:#(?<trait>[^@\n:#\)]+?))?\))?/g
+        /(?:(?<=[^`\\])|^)\[(?=[^@\n\]]+\]\([^@)]*@[:a-z0-9_-]*\))(?<showtext>[^@\n\]]+)\]\((?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[^@\n:#)]*?)?(?:#(?<trait>[^@\n:#)]*))?)?@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?\)/g,
+      alt: /(?:(?<=[^`\\])|^)\[(?=[^@\n\]]+?@[:a-z0-9_-]*\](?:\([#:a-z0-9_-]+\))?)(?<showtext>[^@\n\]]+?)@(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*?))?\](?:\((?:(?:(?<type>[a-z0-9_-]+):)?)(?<term>[^@\n:#)]*?)(?:#(?<trait>[^@\n:#)]+?))?\))?/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -44,10 +46,14 @@ export class Interpreter {
       throw new Error("Error in evaluating regex pattern: No groups provided")
     }
 
-    // Replace empty strings with null
     for (const key in match.groups) {
+      // Replace empty strings with null
       if (match.groups[key] === "") {
         match.groups[key] = null
+      }
+      // Regularize the machine processable values
+      if (key in ["type", "term", "scopetag", "vsntag"]) {
+        match.groups[key] = regularize(match.groups[key])
       }
     }
 

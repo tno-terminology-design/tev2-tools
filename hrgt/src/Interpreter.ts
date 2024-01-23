@@ -1,7 +1,9 @@
+import { regularize } from "@tno-terminology-design/utils"
+
 export interface MRGRef {
-  hrg: string
-  converter: string
-  sorter: string
+  hrg?: string
+  converter?: string
+  sorter?: string
   scopetag?: string
   vsntag?: string
   [key: string]: string
@@ -42,20 +44,22 @@ export class Interpreter {
     }
 
     const hrg: RegExpMatchArray = match.groups.hrg.match(/(?:@)?(?<scopetag>[a-z0-9_-]*)(?::(?<vsntag>[a-z0-9_-]*))?/)
+    match.groups.scopetag = hrg.groups.scopetag
+    match.groups.vsntag = hrg.groups.vsntag
 
     for (const key in match.groups) {
+      // Replace empty strings with null
       if (match.groups[key] === "") {
         match.groups[key] = null
+      }
+      // Regularize the machine processable values
+      if (key in ["scopetag", "vsntag"]) {
+        match.groups[key] = regularize(match.groups[key])
       }
     }
 
     return {
-      ...match.groups,
-      hrg: match.groups.hrg,
-      converter: match.groups.converter,
-      sorter: match.groups.sorter,
-      scopetag: hrg.groups.scopetag,
-      vsntag: hrg.groups.vsntag
+      ...match.groups
     }
   }
 }

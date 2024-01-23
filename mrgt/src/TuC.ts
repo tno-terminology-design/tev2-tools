@@ -1,4 +1,4 @@
-import { log } from "@tno-terminology-design/utils"
+import { log, regularize } from "@tno-terminology-design/utils"
 import { MRG, SAF } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
@@ -454,7 +454,7 @@ function resolveFormPhrases(formPhrases: string[]): string[] {
   for (const alternative of alternatives) {
     const generatedAlternatives = applyMacroReplacements(alternative, regexMap)
     for (const generatedAlternative of generatedAlternatives) {
-      modifiedAlternatives.add(generatedAlternative)
+      modifiedAlternatives.add(regularize(generatedAlternative))
     }
   }
 

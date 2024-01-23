@@ -1,4 +1,4 @@
-import { report, log, writeFile, type TermError } from "@tno-terminology-design/utils"
+import { report, log, writeFile, regularize, type TermError } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { MRG, SAF } from "@tno-terminology-design/utils"
 import { Interpreter, type TermRef } from "./Interpreter.js"
@@ -75,9 +75,9 @@ export class Resolver {
       // Interpret the match using the interpreter
       const termref: TermRef = this.interpreter.interpret(match)
       const scopetag = termref.scopetag ?? this.saf.scope.scopetag
-      const vsnvag = termref.vsntag ? `.${termref.vsntag}` : ""
+      const vsntag = termref.vsntag ? `.${termref.vsntag}` : ""
 
-      const mrgfile = `mrg.${scopetag}${vsnvag}.yaml`
+      const mrgfile = `mrg.${scopetag}${vsntag}.yaml`
 
       try {
         // Get the MRG instance based on `mrgfile`
@@ -132,7 +132,7 @@ export class Resolver {
         profile.entry = MRG.getEntry(
           mrg.entries,
           mrg.filename,
-          termref.term ?? termref.showtext,
+          termref.term ?? regularize(termref.showtext),
           termref.type,
           this.saf.scope.defaulttype
         )
@@ -180,13 +180,13 @@ export class Resolver {
       const display = { ...termref }
 
       display.type = display.type ? display.type + ":" : ""
-      display.term = display.term ?? "<showtext>"
-      display.scopetag = display.scopetag ?? "<default>"
-      display.vsntag = termref.scopetag ? (display.vsntag ? ":" + display.vsntag : "") : ""
+      display.term = display.term ?? "\x1b[3m<showtext>\x1b[0m"
+      display.scopetag = display.scopetag ?? "\x1b[3m<default>\x1b[0m"
+      display.vsntag = display.vsntag ? ":" + display.vsntag : ""
 
       let reference = `${display.type}${display.term}@${display.scopetag}${display.vsntag}`
 
-      const interpretation = `${display.type}${termref.term ?? termref.showtext.trim().toLowerCase()}@${
+      const interpretation = `${display.type}${termref.term ?? regularize(termref.showtext)}@${
         mrg.terminology.scopetag
       }${display.vsntag}`
       if (interpretation !== reference) {
