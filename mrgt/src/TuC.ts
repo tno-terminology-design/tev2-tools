@@ -147,6 +147,7 @@ export class TuCBuilder {
         // construct navurl from website, navpath and ctext name, or bodyFile
         const navUrl = new URL(this.saf.scope.website)
         const pathname = navUrl.pathname
+
         if (ctextYAML.bodyFile) {
           // If the bodyFile property is set, then use that to construct the navurl
           const bodyFilePath = path.parse(ctextYAML.bodyFile)
@@ -168,10 +169,22 @@ export class TuCBuilder {
               }
             }
           } catch (err) {
-            throw new Error(`While loading the bodyFile '${ctextYAML.bodyFile}': ${err.message}`)
+            throw new Error(`while loading the bodyFile '${ctextYAML.bodyFile}': ${err.message}`)
           }
         } else {
+          // If the bodyFile property is not set, then use the ctext name to construct the navurl
           navUrl.pathname = path.join(pathname, this.saf.scope.navpath, path.parse(ctext).dir, path.parse(ctext).name)
+          // if the body has a `bodyFileID` property, then use that to construct the navurl
+          if (this.saf.scope.bodyFileID) {
+            if (ctextFile.data[this.saf.scope.bodyFileID]) {
+              navUrl.pathname = path.join(
+                pathname,
+                this.saf.scope.navpath,
+                path.parse(ctext).dir,
+                path.parse(ctextFile.data[this.saf.scope.bodyFileID]).name
+              )
+            }
+          }
         }
 
         const formPhrases = resolveFormPhrases(ctextYAML.formPhrases)
