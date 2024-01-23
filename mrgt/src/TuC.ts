@@ -158,13 +158,13 @@ export class TuCBuilder {
             )
             body = bodyFile.content
 
-            // if the bodyFile has a `bodyFileID` property, then use that to construct the navurl
-            if (this.saf.scope.bodyFileID) {
-              if (bodyFile.data[this.saf.scope.bodyFileID]) {
+            // if the bodyFile has a `navid` property, then use that to construct the navurl
+            if (this.saf.scope.navid) {
+              if (bodyFile.data[this.saf.scope.navid]) {
                 navUrl.pathname = path.join(
                   pathname,
                   bodyFilePath.dir,
-                  path.parse(bodyFile.data[this.saf.scope.bodyFileID]).name
+                  path.parse(bodyFile.data[this.saf.scope.navid]).name
                 )
               }
             }
@@ -174,14 +174,14 @@ export class TuCBuilder {
         } else {
           // If the bodyFile property is not set, then use the ctext name to construct the navurl
           navUrl.pathname = path.join(pathname, this.saf.scope.navpath, path.parse(ctext).dir, path.parse(ctext).name)
-          // if the body has a `bodyFileID` property, then use that to construct the navurl
-          if (this.saf.scope.bodyFileID) {
-            if (ctextFile.data[this.saf.scope.bodyFileID]) {
+          // if the body has a `navid` property, then use that to construct the navurl
+          if (this.saf.scope.navid) {
+            if (ctextFile.data[this.saf.scope.navid]) {
               navUrl.pathname = path.join(
                 pathname,
                 this.saf.scope.navpath,
                 path.parse(ctext).dir,
-                path.parse(ctextFile.data[this.saf.scope.bodyFileID]).name
+                path.parse(ctextFile.data[this.saf.scope.navid]).name
               )
             }
           }

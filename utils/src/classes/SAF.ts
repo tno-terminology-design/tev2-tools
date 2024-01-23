@@ -17,7 +17,7 @@ export interface Scope {
   defaulttype: string
   website: string
   navpath: string
-  bodyFileID?: string
+  navid?: string
   license?: string
   statuses?: string[]
   localscopedir: string
