@@ -23,7 +23,7 @@ program
       "- <paramlist> (optional) is a list of key-value pairs\n" +
       "- <globpattern> (optional) specifies a set of (input) files that are to be processed\n" +
       "\n" +
-      "*Multiple converters may be specified by appending a number to the option, e.g., `--converter[1] <template> --converter[2] <template>`, where `n` is the termid occurrence count from which to start using a specific converter during resolution of a file. Using `--converter`, without a number, is equal to using `--converter[0]`\n"
+      "*Multiple converters may be specified by appending a number to the option, e.g., `--converter[1] <template> --converter[2] <template>`, where `n` is the termid occurrence count from which to start using a specific converter during resolution of a file. Using `--converter`, without a number, is equal to using `--converter[1]`\n"
   )
   .description("The CLI for the Term Reference Resolution Tool")
   .version(version, "-V, --version", "Output the version number")
@@ -90,18 +90,18 @@ async function main(): Promise<void> {
         converter.n = -1
       } else {
         const n = parseInt(match.groups.n)
-        converter.n = n >= 0 ? n : 0
+        converter.n = n >= 1 ? n : 1
       }
     }
   }
   Converter.instances.sort((a, b) => a.n - b.n)
 
   // Check if required options are provided
-  if (options.output == null || options.scopedir == null || options.input == null) {
+  if (options.output == null || options.scopedir == null || options.input == null || Converter.instances.length === 0) {
     program.addHelpText(
       "after",
       "\nRequired options are missing\n" +
-        "Provide at least the following options: output <path>, scopedir <path>, input <globpattern>\n"
+        "Provide at least the following options: output <path>, scopedir <path>, input <globpattern>, converter[n] <template> or <predeftype>*\n"
     )
     program.help()
     process.exit(1)

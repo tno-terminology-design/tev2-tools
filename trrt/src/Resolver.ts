@@ -139,7 +139,7 @@ export class Resolver {
 
         // get the Converter instance where n is higher than or the same as the number of times the term has been converted
         const count = file.converted.get(`${profile.entry.termid}`) ?? 0
-        const converter = Converter.instances.find((i) => i.n <= count)
+        const converter = Converter.instances.find((i) => i.n <= count + 1)
         if (converter) {
           replacement = converter.convert(profile)
         }
