@@ -1,6 +1,6 @@
 {
   "name": "@tno-terminology-design/mrg-import",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Machine Readable Glossary (MRG) Import Tool",
   "main": "lib/Run.js",
   "types": "lib/Run.d.ts",
@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/tno-terminology-design/tev2-tools#readme",
   "dependencies": {
-    "@tno-terminology-design/utils": "^1.0.1",
+    "@tno-terminology-design/utils": "^1.0.2",
     "axios": "^1.4.0",
     "commander": "^11.0.0",
     "figlet": "^1.6.0",
