@@ -48,7 +48,7 @@ export class Converter {
   }
 
   convert(profile: Profile): string {
-    const n = this.n === -1 ? "[error]" : this.n > 0 ? `[${this.n}]` : "" // string to append to error messages
+    const n = this.n === -1 ? "[error]" : this.n > 1 ? `[${this.n}]` : "" // string to append to error messages
 
     try {
       if (profile.entry) {

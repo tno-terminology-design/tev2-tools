@@ -207,7 +207,7 @@ export class Resolver {
     // Log information about the interpreter, converter and the files being read
     log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
     for (const i of Converter.instances) {
-      const n = i.n === -1 ? "[error]" : i.n > 0 ? `[${i.n}]` : ""
+      const n = i.n === -1 ? "[error]" : i.n > 1 ? `[${i.n}]` : ""
       log.info(`Using '${i.type}' template as converter${n}: '${i.template.replace(/\n/g, "\\n")}'`)
     }
     Converter.instances.reverse() // reverse the order of the converters to correctly handle converter[n] options
