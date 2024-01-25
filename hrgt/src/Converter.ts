@@ -35,9 +35,9 @@ export class Converter {
       "markdown-abbr-section-2":
         "{{#if glossaryAbbr}}## [{{glossaryAbbr}}]({{localize navurl}})\n\nSee: [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{termid}}@)\n\n{{/if}}",
       "markdown-section-3":
-        "### [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n"
+        "### [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n",
       "markdown-abbr-section-3":
-        "{{#if glossaryAbbr}}### [{{glossaryAbbr}}]({{localize navurl}})\n\nSee: [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{termid}}@)\n\n{{/if}}",
+        "{{#if glossaryAbbr}}### [{{glossaryAbbr}}]({{localize navurl}})\n\nSee: [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{termid}}@)\n\n{{/if}}"
     }
 
     const key = template.toLowerCase()
