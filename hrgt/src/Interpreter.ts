@@ -22,7 +22,7 @@ export class Interpreter {
   public constructor({ regex }: { regex: string }) {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     const map: Record<string, RegExp> = {
-      default: /{%\s*hrg="(?<hrg>[^"]*)"\s*(?:converter="(?<converter>[^"]*)"\s*)?(?:sorter="(?<sorter>[^"]*)"\s*)?%}/g
+      default: /(?:(?<=[^`\\])|^){%\s*hrg="(?<hrg>[^"]*)"\s*(?:converter="(?<converter>[^"]*)"\s*)?(?:sorter="(?<sorter>[^"]*)"\s*)?%}/g
     }
 
     const key = regex.toString().toLowerCase()
