@@ -14,6 +14,8 @@ export const macroMap: Record<string, string[]> = {
   "{able}": ["able", "ability"] // "cap{able}" --> "capable", "capability"
 }
 
+const valueUsed = new Set<string>()
+
 interface TuC {
   terminology: MRG.Terminology
   scopes: Set<SAF.Scopes>
@@ -229,7 +231,7 @@ export class TuCBuilder {
     // <key> <identifier><scopetag>:<vsntag>
     // examples: '* @tev2:v1', 'term[actor,party]@tev2:v1'
     const regex =
-      /^(?<key>[^[@]+)(?:\[(?<values>.+?)?\])?(?:(?<identifier>@)(?<scopetag>[a-z0-9_-]+?)?)?(?::(?<vsntag>.+)?)?$/
+      /^(?<key>[^[@]+)?(?:\[(?<values>.+?)?\])?(?:(?<identifier>@)(?<scopetag>[a-z0-9_-]+?)?)?(?::(?<vsntag>.+)?)?$/
     const match = instruction.replace(/\s/g, "").match(regex)
 
     if (!match) {
@@ -240,9 +242,15 @@ export class TuCBuilder {
     const { key, values, identifier, scopetag, vsntag } = match.groups!
     let entries: MRG.Entry[]
     let source = ``
+    valueUsed.clear()
 
     const valuelist = values?.split(",").map((v) => v.trim())
-    instruction = `${key}${key !== "*" ? "[" + valuelist?.join(", ") + "]" : ""}${
+    if (key == null) {
+      valuelist?.forEach((value, index) => {
+        valuelist[index] = regularize(value)
+      })
+    }
+    instruction = `${key ? key : ""}${key !== "*" ? "[" + valuelist?.join(", ") + "]" : ""}${
       identifier ? "@" + scopetag + (vsntag ? ":" + vsntag : "") : ""
     }`
 
@@ -297,9 +305,14 @@ export class TuCBuilder {
 
           //  Report valueList items that did not match any entries
           if (valuelist) {
-            const unmatchedValues = valuelist.filter((value) => !entries.some((entry) => entry[key] === value))
+            // compare the valueList with the list of values that were used in the selection
+            const unmatchedValues = valuelist.filter((value) => !valueUsed.has(value))
             if (unmatchedValues.length > 0) {
-              log.warn(`\t\tCould not match: ${key}[${unmatchedValues.join(", ")}]`)
+              log.warn(
+                `\t\tCould not match value${unmatchedValues.length > 1 ? "s" : ""}: ${
+                  key ? key : ""
+                }[${unmatchedValues.join(", ")}]`
+              )
             }
           }
         } else {
@@ -324,7 +337,7 @@ export class TuCBuilder {
   private removeMrgEntry(instruction: string): void {
     // <key> <values>
     // example: '-term[actor,party]'
-    const regex = /^(?<key>[^[]+)(?:\[(?<values>.+?)?\])?$/
+    const regex = /^(?<key>[^[]+)?(?:\[(?<values>.+?)?\])?$/
     const match = instruction.replace(/\s/g, "").match(regex)
 
     if (!match) {
@@ -333,12 +346,19 @@ export class TuCBuilder {
     }
 
     const { key, values } = match.groups!
-    const removed: MRG.Entry[] = []
+    valueUsed.clear()
+
     const valuelist = values?.split(",").map((v) => v.trim())
-    instruction = `-${key}[${valuelist ? valuelist.join(", ") : ""}]`
+    if (key == null) {
+      valuelist?.forEach((value, index) => {
+        valuelist[index] = regularize(value)
+      })
+    }
+    instruction = `-${key ? key : ""}[${valuelist ? valuelist.join(", ") : ""}]`
 
     try {
-      this.tuc.entries = this.tuc.entries.filter((entry) => !entryFilter(entry, key, valuelist))
+      const removed = this.tuc.entries.filter((entry) => entryFilter(entry, key, valuelist))
+      this.tuc.entries = this.tuc.entries.filter((entry) => !removed.includes(entry))
 
       log.info(`\tTermselection (provisional): \t'${instruction}'`)
       if (removed.length === 0) {
@@ -352,9 +372,14 @@ export class TuCBuilder {
         )
         // report valueList items that did not match any entries
         if (valuelist) {
-          const unmatchedValues = valuelist.filter((value) => !removed.some((entry) => entry[key] === value))
+          // compare the valueList with the list of values that were used in the selection
+          const unmatchedValues = valuelist.filter((value) => !valueUsed.has(value))
           if (unmatchedValues.length > 0) {
-            log.warn(`\t\tCould not match: -${key}[${unmatchedValues.join(", ")}]`)
+            log.warn(
+              `\t\tCould not match value${unmatchedValues.length > 1 ? "s" : ""}: -${
+                key ? key : ""
+              }[${unmatchedValues.join(", ")}]`
+            )
           }
         }
       }
@@ -436,6 +461,7 @@ function entryFilter(entry: MRG.Entry, key: string, values: string[]): boolean {
   if (entry[key] !== undefined) {
     // and both the values list and key entry property is empty
     if (!values && (entry[key] === "" || entry[key] === null)) {
+      valueUsed.add(key)
       return true
     } else if (!values) {
       // if the values list is empty
@@ -446,13 +472,23 @@ function entryFilter(entry: MRG.Entry, key: string, values: string[]): boolean {
       if (typeof entry[key] === "string") {
         // if the entry[key] is a string
         if (entry[key] === value) {
+          valueUsed.add(value)
           return true
         }
       } else {
         if ((entry[key] as string[])?.includes(value)) {
           // if the entry[key] is an array
+          valueUsed.add(value)
           return true
         }
+      }
+    }
+  } else if (key == null) {
+    // consider the value list as a list of showtexts
+    for (const value of values) {
+      if (entry.term === value || entry.formPhrases?.includes(value)) {
+        valueUsed.add(value)
+        return true
       }
     }
   }
