@@ -166,13 +166,10 @@ export class Resolver {
         }
       } as Profile)
       if (hrgEntry == converter.getBlank()) {
-        log.warn(
-          `\t\tConversion of entry '${entry.term}${
-            entry.termType ? ":" + entry.termType : ""
-          }' did not fill in any expression`
-        )
+        log.warn(`\t\tConversion of entry '${entry.termid}' did not fill in any expression`)
+      } else {
+        replacement += hrgEntry
       }
-      replacement += hrgEntry
     }
 
     // Only execute the replacement steps if the 'replacement' string is not empty
