@@ -6,6 +6,7 @@ import { resolve } from "path"
 import { SAF } from "@tno-terminology-design/utils"
 import { log, report } from "@tno-terminology-design/utils"
 import { Generator } from "./Generator.js"
+import { macroMap } from "./TuC.js"
 
 import yaml from "js-yaml"
 import figlet from "figlet"
@@ -46,6 +47,12 @@ async function main(): Promise<void> {
       options = { ...rest, ...mrgt, ...options }
     } catch (err) {
       throw new Error(`E011 Failed to read or parse the config file '${options.config}':`, { cause: err })
+    }
+  }
+
+  if (options.macros) {
+    for (const [key, value] of Object.entries(options.macros as Record<string, string[]>)) {
+      macroMap[key] = value
     }
   }
 

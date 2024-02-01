@@ -5,6 +5,15 @@ import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
 
+export const macroMap: Record<string, string[]> = {
+  "{ss}": ["", "s", "'s", "(s)"], // "act{ss}" --> "act", "acts", "act's", "act(s)"
+  "{ess}": ["", "es", "'s", "(es)"], // "regex{es}" --> "regex", "regexes", "regex's", "regex(es"
+  "{yies}": ["y", "y's", "ies"], // "part{yies}" --> "party", "party's", "parties"
+  "{ying}": ["y", "ying", "ies", "ied"], // "identif{ying}" --> "identify", "identifying", "identifies", "identified"
+  "{es}": ["e", "es", "ed", "ing"], // "mangag{es}" --> "manage", "manages", "managed", "managing"
+  "{able}": ["able", "ability"] // "cap{able}" --> "capable", "capability"
+}
+
 interface TuC {
   terminology: MRG.Terminology
   scopes: Set<SAF.Scopes>
@@ -456,21 +465,13 @@ function entryFilter(entry: MRG.Entry, key: string, values: string[]): boolean {
  * @returns An array of strings with all possible alternatives after macro replacements.
  */
 function resolveFormPhrases(formPhrases: string[]): string[] {
-  const regexMap: Record<string, string[]> = {
-    "{ss}": ["", "s", "'s", "(s)"], // "act{ss}" --> "act", "acts", "act's", "act(s)"
-    "{ess}": ["", "es", "'s", "(es)"], // "regex{es}" --> "regex", "regexes", "regex's", "regex(es"
-    "{yies}": ["y", "y's", "ies"], // "part{yies}" --> "party", "party's", "parties"
-    "{ying}": ["y", "ying", "ies", "ied"], // "identif{ying}" --> "identify", "identifying", "identifies", "identified"
-    "{es}": ["e", "es", "ed", "ing"], // "mangag{es}" --> "manage", "manages", "managed", "managing"
-    "{able}": ["able", "ability"] // "cap{able}" --> "capable", "capability"
-  }
   const alternatives = formPhrases != null ? formPhrases.map((t) => t.trim()) : []
 
   // create a new set of alternatives that includes all possible macro replacements
   const modifiedAlternatives = new Set<string>()
 
   for (const alternative of alternatives) {
-    const generatedAlternatives = applyMacroReplacements(alternative, regexMap)
+    const generatedAlternatives = applyMacroReplacements(alternative, macroMap)
     for (const generatedAlternative of generatedAlternatives) {
       modifiedAlternatives.add(regularize(generatedAlternative))
     }
