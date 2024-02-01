@@ -133,16 +133,21 @@ export class TuCBuilder {
 
         const ctextYAML = ctextFile.data as MRG.Entry
 
-        if (!ctextYAML.term) {
-          throw new Error(`The frontmatter does not include the required 'term' property`)
-        }
-
-        // remove properties that match specific set of predetermined properties
         Object.keys(ctextYAML).forEach((key) => {
+          // regularize all term and termType  properties
+          if (["term", "termType"].includes(key.toLowerCase())) {
+            ctextYAML[key] = regularize(ctextYAML[key].toString())
+          }
+
+          // remove properties that match specific set of predetermined properties
           if (["scopetag", "vsntag", "locator", "navurl", "headingids", "termid"].includes(key.toLowerCase())) {
             delete ctextYAML[key]
           }
         })
+
+        if (!ctextYAML.term) {
+          throw new Error(`The frontmatter does not include a valid 'term' property`)
+        }
 
         // construct navurl from website, navpath and ctext name, or bodyFile
         const navUrl = new URL(this.saf.scope.website)
