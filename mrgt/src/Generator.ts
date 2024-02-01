@@ -149,10 +149,21 @@ export class Generator {
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)
 
     // Check for duplicate termids in the MRG
-    const termids = build.tuc.entries?.map((entry) => entry.termid)
+    const termids: string[] = []
+    // add termids constructed from termtype and all form phrases
+    build.tuc.entries?.forEach((entry) => {
+      const formPhrases = new Set<string>([entry.termid, ...(entry.formPhrases || [])])
+      formPhrases.forEach((formphrase) => {
+        termids.push(`${entry.termType}:${formphrase}`)
+      })
+    })
     const duplicates = termids?.filter((termid, index) => termids.indexOf(termid) !== index)
     if (duplicates?.length > 0) {
-      throw new Error(`Duplicate termids found in MRG: ${duplicates}`)
+      throw new Error(
+        `Duplicate termids, or combination of termType and formPhrase, found in provisional MRG of version '${
+          build.tuc.terminology.vsntag
+        }': ${duplicates.join(", ")}`
+      )
     }
 
     // Output the MRG to a file
