@@ -1,6 +1,6 @@
 export * as SAF from "./classes/SAF.js"
 export * as MRG from "./classes/MRG.js"
 export * from "./classes/Report.js"
-export * from "./helpers/filesystem.js"
+export * from "./helpers/writeFile.js"
 export * from "./helpers/regularize.js"
 export { Handlebars } from "./classes/Handlebars.js"
