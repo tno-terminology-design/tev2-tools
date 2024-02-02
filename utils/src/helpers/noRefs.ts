@@ -1,5 +1,5 @@
-import Handlebars, { type HelperOptions } from "handlebars"
-import { env } from "../classes/Handlebars.js"
+import { type HelperOptions } from "handlebars"
+import { env, Handlebars } from "../classes/Handlebars.js"
 import { capFirst } from "./capFirst.js"
 
 /**

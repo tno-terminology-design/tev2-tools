@@ -1,3 +1,5 @@
+import { Handlebars } from "../classes/Handlebars.js"
+
 /**
  * Helper function to capitalize the first letter of every word in a string
  * @param text - The string to be capitalized
