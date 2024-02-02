@@ -96,6 +96,8 @@ async function main(): Promise<void> {
         const n = parseInt(match.groups.n)
         converter.n = n >= 1 ? n : 1
       }
+      const n = converter.n === -1 ? "[error]" : converter.n > 1 ? `[${converter.n}]` : ""
+      converter.name = `converter${n}`
     }
   }
   Converter.instances.sort((a, b) => a.n - b.n)

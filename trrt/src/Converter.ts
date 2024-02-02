@@ -19,6 +19,7 @@ export class Converter {
   public type: string
   public template: string
   public n: number
+  public name: string
 
   static instances: Converter[] = []
 
@@ -48,8 +49,6 @@ export class Converter {
   }
 
   convert(profile: Profile): string {
-    const n = this.n === -1 ? "[error]" : this.n > 1 ? `[${this.n}]` : "" // string to append to error messages
-
     try {
       if (profile.entry) {
         // Evaluate the string properties inside the entry object
@@ -65,12 +64,12 @@ export class Converter {
       const output = template({ ...profile.entry, ...profile })
 
       if (output === "") {
-        throw new Error(`resulted in an empty string, check the converter${n} template`)
+        throw new Error(`resulted in an empty string, check the ${this.name} template`)
       }
       return output
     } catch (err) {
       throw new Error(
-        `unexpected results from using '${this.type}' converter${n} template, check that the template syntax is correct: ${err.message}`
+        `unexpected results from using '${this.type}' ${this.name} template, check that the template syntax is correct: ${err.message}`
       )
     }
   }
