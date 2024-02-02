@@ -39,6 +39,10 @@ program
     "--con[n], --converter[n] <template> or <predeftype>*",
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-link`, `html-link`, `html-hovertext-link`, `html-glossarytext-link`)"
   )
+  .option(
+    "--con[error], --converter[error] <template> or <predeftype>",
+    "Type of converter, i.e., a mustache/handlebars template, or a predefined type to use in case a term reference could not be resolved"
+  )
   .option("-f, --force", "Allow overwriting of existing files")
   .option("-h, --help", "Display help for command")
   .allowUnknownOption(true)
