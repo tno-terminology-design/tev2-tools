@@ -1,12 +1,12 @@
-import { MRG, SAF, Handlebars } from "@tno-terminology-design/utils"
+import { MRG, Handlebars, type TermError } from "@tno-terminology-design/utils"
 import { Interpreter, type MRGRef } from "./Interpreter.js"
 
 export interface Profile {
   int: Interpreter
   ref: MRGRef
-  entry: MRG.Entry
-  mrg: MRG.Terminology
-  err?: { filename: string; line: number; pos: number; cause?: string }
+  entry?: MRG.Entry
+  mrg?: MRG.Terminology
+  err?: TermError
 }
 
 /**
@@ -18,11 +18,14 @@ export interface Profile {
 export class Converter {
   public type: string
   public template: string
-  static saf: SAF.Type
+  public n: number
+  public name: string
+
+  static instances: Converter[] = []
 
   public constructor({ template }: { template: string }) {
-    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     // map of default templates for each type
+    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     const map: Record<string, string> = {
       default: "{{term}}{{termType}}", // used by the sorter
       glossaryterm: "{{noRefs glossaryTerm}}{{term}}{{termType}}", // used by the sorter
@@ -50,12 +53,19 @@ export class Converter {
       this.type = "custom"
       this.template = template.replace(/\\n/g, "\n")
     }
+    Converter.instances.push(this)
   }
 
   convert(profile: Profile): string {
-    const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
+    try {
+      const template = Handlebars.compile(this.template, { noEscape: true, compat: true })
 
-    return template({ ...profile.entry, ...profile })
+      return template({ ...profile.entry, ...profile })
+    } catch (err) {
+      throw new Error(
+        `unexpected results from using '${this.type}' ${this.name} template, check that the template syntax is correct: ${err.message}`
+      )
+    }
   }
 
   /**

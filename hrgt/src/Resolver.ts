@@ -1,14 +1,14 @@
 import { glob } from "glob"
 import { Interpreter, type MRGRef } from "./Interpreter.js"
-import { Converter, Profile } from "./Converter.js"
+import { Converter, type Profile } from "./Converter.js"
 import { SAF, MRG } from "@tno-terminology-design/utils"
-import { report, log, writeFile } from "@tno-terminology-design/utils"
+import { report, log, writeFile, type TermError } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
 
-type GrayMatterFile = matter.GrayMatterFile<string> & {
+interface GrayMatterFile extends matter.GrayMatterFile<string> {
   path: string
   lastIndex: number
   output: string
@@ -32,7 +32,6 @@ export class Resolver {
   private readonly force: boolean
   sorter: Converter
   interpreter: Interpreter
-  converter: Converter
   saf: SAF.Type
 
   public constructor({
@@ -41,7 +40,6 @@ export class Resolver {
     force,
     sorter,
     interpreter,
-    converter,
     saf
   }: {
     outputPath: string
@@ -49,18 +47,15 @@ export class Resolver {
     force: boolean
     sorter: string
     interpreter: string
-    converter: string
     saf: string
   }) {
     this.outputPath = outputPath
     this.globPattern = globPattern
     this.force = force
     this.sorter = new Converter({ template: sorter })
+    this.sorter.name = "sorter"
     this.interpreter = new Interpreter({ regex: interpreter })
-    this.converter = new Converter({ template: converter })
     this.saf = new SAF.Builder({ scopedir: saf }).saf
-
-    Converter.saf = this.saf
   }
 
   /**
@@ -78,7 +73,6 @@ export class Resolver {
     }
 
     file.lastIndex = 0 // lastIndex is used to account for the length difference between the matches and replacements
-    file.converted = 0 // converted is used to count the number of terms that were converted
     file.output = file.orig.toString()
 
     // Iterate over each match found in the file.orig string
@@ -122,15 +116,21 @@ export class Resolver {
    * @returns The processed file object.
    */
   replacementHandler(match: RegExpMatchArray, mrgref: MRGRef, mrg: MRG.Type, file: GrayMatterFile): GrayMatterFile {
-    let converter = this.converter
-    let sorter = this.sorter
+    file.orig = file.orig.toString()
+    const line = file.orig.substring(0, match.index).split("\n").length
+    const pos = file.output.split("\n")[line - 1].indexOf(match[0])
+
+    let sorter: Converter
+    let converters: Converter[]
     const entries = [...mrg.entries]
 
     // Sort entries according to the sort parameter in the MRGRef or the default
     if (mrgref.sorter != null) {
       sorter = new Converter({ template: mrgref.sorter })
+      sorter.name = "sorter"
       log.info(`\tUsing ${sorter.type} sorter: '${sorter.template.replace(/\n/g, "\\n")}'`)
     } else {
+      sorter = this.sorter
       log.info(`\tUsing default set sorter (${sorter.type})`)
     }
     entries.sort((a, b) =>
@@ -141,34 +141,47 @@ export class Resolver {
 
     // Check if the MRGRef has a converter specified
     if (mrgref.converter != null) {
-      converter = new Converter({ template: mrgref.converter })
-      log.info(`\tUsing ${converter.type} converter: '${converter.template.replace(/\n/g, "\\n")}'`)
+      converters = [new Converter({ template: mrgref.converter })]
+      converters[0].name = "converter"
+      log.info(`\tUsing ${converters[0].type} converter: '${converters[0].template.replace(/\n/g, "\\n")}'`)
     } else {
-      log.info(`\tUsing default set converter (${converter.type})`)
+      converters = Converter.instances.filter((i) => i.n > 0)
+      log.info(`\tUsing default set converters`)
     }
 
     let replacement = ""
     file.orig = file.orig.toString()
 
     for (const entry of entries) {
-      const line = file.orig.substring(0, match.index).split("\n").length
-      const pos = file.output.split("\n")[line - 1].indexOf(match[0])
-
-      const hrgEntry = converter.convert({
+      const profile: Profile = {
         int: this.interpreter,
         ref: mrgref,
         entry: entry,
         mrg: mrg.terminology,
         err: {
-          filename: file.path,
+          file: file.path,
           line,
           pos
+        } as TermError
+      }
+
+      for (const converter of converters) {
+        try {
+          const hrgEntry = converter.convert(profile)
+          if (hrgEntry == converter.getBlank()) {
+            throw new Error(
+              `Conversion of entry '${entry.termid}' using ${converter.name} did not fill in any expression`
+            )
+          } else {
+            replacement += hrgEntry
+          }
+        } catch (err) {
+          const error = Converter.instances.find((i) => i.n === -1)
+          if (error) {
+            replacement += error.convert(profile)
+          }
+          log.warn(`\t\t${err.message}`)
         }
-      } as Profile)
-      if (hrgEntry == converter.getBlank()) {
-        log.warn(`\t\tConversion of entry '${entry.termid}' did not fill in any expression`)
-      } else {
-        replacement += hrgEntry
       }
     }
 
@@ -185,7 +198,7 @@ export class Resolver {
       // Update the lastIndex to account for the length difference between the reference and replacement
       file.lastIndex += replacement.length - matchLength
 
-      // Log the converted term
+      // Update the number of converted references
       file.converted++
     }
 
@@ -199,7 +212,10 @@ export class Resolver {
     // Log information about the interpreter, converter and the files being read
     log.info(`Using ${this.interpreter.type} interpreter: '${this.interpreter.regex}'`)
     log.info(`Using ${this.sorter.type} sorter as default: '${this.sorter.template.replace(/\n/g, "\\n")}'`)
-    log.info(`Using ${this.converter.type} converter as default: '${this.converter.template.replace(/\n/g, "\\n")}'`)
+    for (const i of Converter.instances.filter((i) => i.n > 0)) {
+      log.info(`Using '${i.type}' template as ${i.name}: '${i.template.replace(/\n/g, "\\n")}'`)
+    }
+    Converter.instances.reverse() // reverse the order of the converters to correctly handle converter[n] options
     log.info(`Reading files using pattern string '${this.globPattern}'`)
 
     // Get the list of files based on the glob pattern
@@ -219,6 +235,7 @@ export class Resolver {
       try {
         file = matter(fs.readFileSync(filePath, "utf8")) as GrayMatterFile
         file.path = filePath
+        file.converted = 0
       } catch (err) {
         log.error(`E009 Could not read file '${filePath}':`, err)
         continue
