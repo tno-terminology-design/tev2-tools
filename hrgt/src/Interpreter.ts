@@ -22,7 +22,8 @@ export class Interpreter {
   public constructor({ regex }: { regex: string }) {
     // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
     const map: Record<string, RegExp> = {
-      default: /(?:(?<=[^`\\])|^){%\s*hrg="(?<hrg>[^"]*)"\s*(?:converter="(?<converter>[^"]*)"\s*)?(?:sorter="(?<sorter>[^"]*)"\s*)?%}/g
+      default:
+        /(?:(?<=[^`\\])|^){%\s*hrg="(?<hrg>[^"]*)"\s*(?:converter="(?<converter>[^"]*)"\s*)?(?:sorter="(?<sorter>[^"]*)"\s*)?%}/g
     }
 
     const key = regex.toString().toLowerCase()
@@ -53,7 +54,7 @@ export class Interpreter {
         match.groups[key] = null
       }
       // Regularize the machine processable values
-      if (key in ["scopetag", "vsntag"]) {
+      if (["scopetag", "vsntag"].includes(key)) {
         match.groups[key] = regularize(match.groups[key])
       }
     }

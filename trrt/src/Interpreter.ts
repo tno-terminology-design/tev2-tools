@@ -52,7 +52,7 @@ export class Interpreter {
         match.groups[key] = null
       }
       // Regularize the machine processable values
-      if (key in ["type", "term", "scopetag", "vsntag"]) {
+      if (["type", "term", "scopetag", "vsntag"].includes(key)) {
         match.groups[key] = regularize(match.groups[key])
       }
     }
