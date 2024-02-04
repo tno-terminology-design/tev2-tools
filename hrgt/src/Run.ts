@@ -19,7 +19,9 @@ program
   .usage(
     "[ <paramlist> ] [ <globpattern> ]\n" +
       "- <paramlist> (optional) is a list of key-value pairs\n" +
-      "- <globpattern> (optional) specifies a set of (input) files that are to be processed"
+      "- <globpattern> (optional) specifies a set of (input) files that are to be processed" +
+      "\n" +
+      "*Multiple converters may be specified by appending a number to the parameter key, e.g., `converter[1]: <template>` `converter[2]: <template>`, where `n` specifies the order in which converters are applied to every [MRG entry](@). Using `converter`, without a number, is equal to using `converter[1]`\n"
   )
   .description("The CLI for the Human Readable Glossary Generation Tool")
   .version(version, "-V, --version", "Output the version number")
@@ -36,7 +38,7 @@ program
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-table-row`, `markdown-section-2`, `markdown-section-3`)"
   )
   .option(
-    "--con[error], --converter[error] <template> or <predeftype>",
+    "--con[error], --converter[error] <template> or <predeftype>*",
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type to use in case a HRG entry could not be resolved"
   )
   .option(
