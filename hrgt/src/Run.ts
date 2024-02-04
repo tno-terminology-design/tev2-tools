@@ -12,7 +12,7 @@ import figlet from "figlet"
 
 const program = new Command()
 const name = "hrgt"
-const version = "1.0.3"
+const version = "1.0.4"
 
 program
   .name(name)
@@ -34,11 +34,11 @@ program
     "Type of interpreter, i.e., a regex, or a predefined type (`default`)"
   )
   .option(
-    "--con[n], --converter[n] <template> or <predeftype>",
+    "--con[n], --converter[n] <template> or <predeftype>*",
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type (`markdown-table-row`, `markdown-section-2`, `markdown-section-3`)"
   )
   .option(
-    "--con[error], --converter[error] <template> or <predeftype>*",
+    "--con[error], --converter[error] <template> or <predeftype>",
     "Type of converter, i.e., a mustache/handlebars template, or a predefined type to use in case a HRG entry could not be resolved"
   )
   .option(
