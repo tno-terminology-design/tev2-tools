@@ -19,7 +19,7 @@ program
   .usage(
     "[ <paramlist> ] [ <globpattern> ]\n" +
       "- <paramlist> (optional) is a list of key-value pairs\n" +
-      "- <globpattern> (optional) specifies a set of (input) files that are to be processed" +
+      "- <globpattern> (optional) specifies a set of (input) files that are to be processed\n" +
       "\n" +
       "*Multiple converters may be specified by appending a number to the parameter key, e.g., `converter[1]: <template>` `converter[2]: <template>`, where `n` specifies the order in which converters are applied to every [MRG entry](@). Using `converter`, without a number, is equal to using `converter[1]`\n"
   )
