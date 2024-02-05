@@ -4,26 +4,26 @@ on:
     types: [published]
 
 jobs:
-  github:
-    name: Publish to GitHub Package Manager
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
-          registry-url: "https://npm.pkg.github.com"
-          cache: "npm"
-          scope: "@tno-terminology-design"
-      - run: |
-          npm ci
-          npm run build
-          npm publish --workspaces --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # github:
+  #   name: Publish to GitHub Package Manager
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     packages: write
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: "18.x"
+  #         registry-url: "https://npm.pkg.github.com"
+  #         cache: "npm"
+  #         scope: "@tno-terminology-design"
+  #     - run: |
+  #         npm ci
+  #         npm run build
+  #         npm publish --workspaces --access public
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   npm:
     name: Publish to Node Package Manager
