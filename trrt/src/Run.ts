@@ -103,11 +103,16 @@ async function main(): Promise<void> {
   Converter.instances.sort((a, b) => a.n - b.n)
 
   // Check if required options are provided
-  if (options.output == null || options.scopedir == null || options.input == null || Converter.instances.length === 0) {
+  if (
+    options.output == null ||
+    options.scopedir == null ||
+    options.input == null ||
+    Converter.instances.filter((c) => c.n === 1).length === 0
+  ) {
     program.addHelpText(
       "after",
       "\nRequired options are missing\n" +
-        "Provide at least the following options: output <path>, scopedir <path>, input <globpattern>, converter[n] <template> or <predeftype>*\n"
+        "Provide at least the following options: output <path>, scopedir <path>, input <globpattern>, converter <template> or <predeftype>*\n"
     )
     program.help()
     process.exit(1)
