@@ -232,7 +232,12 @@ export class TuCBuilder {
     // examples: '* @tev2:v1', 'term[actor,party]@tev2:v1'
     const regex =
       /^(?<key>[^[@]+)?(?:\[(?<values>.+?)?\])?(?:(?<identifier>@)(?<scopetag>[a-z0-9_-]+?)?)?(?::(?<vsntag>.+)?)?$/
-    const match = instruction.replace(/\s/g, "").match(regex)
+    const match = instruction.match(regex)
+    Object.keys(match.groups).forEach((key) => {
+      if (match.groups[key]) {
+        match.groups[key] = match.groups[key].trim()
+      }
+    })
 
     if (!match) {
       log.error(`\tE021 Invalid instruction: '${instruction}'`)
@@ -338,7 +343,12 @@ export class TuCBuilder {
     // <key> <values>
     // example: '-term[actor,party]'
     const regex = /^(?<key>[^[]+)?(?:\[(?<values>.+?)?\])?$/
-    const match = instruction.replace(/\s/g, "").match(regex)
+    const match = instruction.match(regex)
+    Object.keys(match.groups).forEach((key) => {
+      if (match.groups[key]) {
+        match.groups[key] = match.groups[key].trim()
+      }
+    })
 
     if (!match) {
       log.error(`\tE021 Invalid instruction: '-${instruction}'`)
