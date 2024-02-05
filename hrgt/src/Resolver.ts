@@ -97,6 +97,7 @@ export class Resolver {
           continue
         }
       } catch (err) {
+        this.replacementHandler(match, mrgref, null, file)
         report.onNotExistError(err)
       }
     }
@@ -122,66 +123,70 @@ export class Resolver {
 
     let sorter: Converter
     let converters: Converter[]
-    const entries = [...mrg.entries]
-
-    // Sort entries according to the sort parameter in the MRGRef or the default
-    if (mrgref.sorter != null) {
-      sorter = new Converter({ template: mrgref.sorter })
-      sorter.name = "sorter"
-      log.info(`\tUsing ${sorter.type} sorter: '${sorter.template.replace(/\n/g, "\\n")}'`)
-    } else {
-      sorter = this.sorter
-      log.info(`\tUsing default set sorter (${sorter.type})`)
-    }
-    entries.sort((a, b) =>
-      sorter
-        .convert({ int: this.interpreter, ref: mrgref, entry: a, mrg: mrg.terminology })
-        .localeCompare(sorter.convert({ int: this.interpreter, ref: mrgref, entry: b, mrg: mrg.terminology }))
-    )
-
-    // Check if the MRGRef has a converter specified
-    if (mrgref.converter != null) {
-      converters = [new Converter({ template: mrgref.converter })]
-      converters[0].name = "converter"
-      log.info(`\tUsing ${converters[0].type} converter: '${converters[0].template.replace(/\n/g, "\\n")}'`)
-    } else {
-      converters = Converter.instances.filter((i) => i.n > 0)
-      log.info(`\tUsing default set converters`)
-    }
-
     let replacement = ""
-    file.orig = file.orig.toString()
 
-    for (const entry of entries) {
-      const profile: Profile = {
-        int: this.interpreter,
-        ref: mrgref,
-        entry: entry,
-        mrg: mrg.terminology,
-        err: {
-          file: file.path,
-          line,
-          pos
-        } as TermError
+    const profile: Profile = {
+      int: this.interpreter,
+      ref: mrgref,
+      mrg: mrg.terminology,
+      err: {
+        file: file.path,
+        line,
+        pos
+      } as TermError
+    }
+
+    if (mrg != null) {
+      const entries = [...mrg.entries]
+
+      // Sort entries according to the sort parameter in the MRGRef or the default
+      if (mrgref.sorter != null) {
+        sorter = new Converter({ template: mrgref.sorter })
+        sorter.name = "sorter"
+        log.info(`\tUsing ${sorter.type} sorter: '${sorter.template.replace(/\n/g, "\\n")}'`)
+      } else {
+        sorter = this.sorter
+        log.info(`\tUsing default set sorter (${sorter.type})`)
+      }
+      entries.sort((a, b) =>
+        sorter
+          .convert({ int: this.interpreter, ref: mrgref, entry: a, mrg: mrg.terminology })
+          .localeCompare(sorter.convert({ int: this.interpreter, ref: mrgref, entry: b, mrg: mrg.terminology }))
+      )
+
+      // Check if the MRGRef has a converter specified
+      if (mrgref.converter != null) {
+        converters = [new Converter({ template: mrgref.converter })]
+        converters[0].name = "converter"
+        log.info(`\tUsing ${converters[0].type} converter: '${converters[0].template.replace(/\n/g, "\\n")}'`)
+      } else {
+        converters = Converter.instances.filter((i) => i.n > 0)
+        log.info(`\tUsing default set converters`)
       }
 
-      for (const converter of converters) {
-        try {
-          const hrgEntry = converter.convert(profile)
-          if (hrgEntry == converter.getBlank()) {
-            throw new Error(
-              `Conversion of entry '${entry.termid}' using ${converter.name} did not fill in any expression`
-            )
-          } else {
-            replacement += hrgEntry
+      for (const entry of entries) {
+        profile.entry = entry
+        for (const converter of converters) {
+          try {
+            const hrgEntry = converter.convert(profile)
+            if (hrgEntry == converter.getBlank()) {
+              throw new Error(
+                `Conversion of entry '${entry.termid}' using ${converter.name} did not fill in any expression`
+              )
+            } else {
+              replacement += hrgEntry
+            }
+          } catch (err) {
+            log.warn(`\t\t${err.message}`)
           }
-        } catch (err) {
-          const error = Converter.instances.find((i) => i.n === -1)
-          if (error) {
-            replacement += error.convert(profile)
-          }
-          log.warn(`\t\t${err.message}`)
         }
+      }
+    } else {
+      // If the MRG instance is not found, create the replacement using the error converter
+      const error = Converter.instances.find((i) => i.n === -1)
+      profile.err.message = `Something went wrong while retrieving the MRG file '${mrgref.hrg}'`
+      if (error) {
+        replacement = error.convert(profile)
       }
     }
 
