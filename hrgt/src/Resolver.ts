@@ -9,7 +9,7 @@ import fs = require("fs")
 import path = require("path")
 
 interface GrayMatterFile extends matter.GrayMatterFile<string> {
-  path: string
+  path: path.ParsedPath
   lastIndex: number
   output: string
   converted: number
@@ -130,7 +130,8 @@ export class Resolver {
       ref: mrgref,
       mrg: mrg.terminology,
       err: {
-        file: file.path,
+        file: file.path.base,
+        dir: file.path.dir,
         line,
         pos
       } as TermError
@@ -239,7 +240,7 @@ export class Resolver {
       let file
       try {
         file = matter(fs.readFileSync(filePath, "utf8")) as GrayMatterFile
-        file.path = filePath
+        file.path = path.parse(filePath)
         file.converted = 0
       } catch (err) {
         log.error(`E009 Could not read file '${filePath}':`, err)

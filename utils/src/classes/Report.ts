@@ -1,8 +1,10 @@
 import { Logger } from "tslog"
+import path = require("path")
 
 export interface TermError extends Error {
   type?: string
   file: string
+  dir: string
   line?: number
   pos?: number
 }
@@ -52,10 +54,11 @@ class Report {
         const filesMap = new Map<string, number[]>()
 
         for (const item of value) {
-          if (!filesMap.has(item.file)) {
-            filesMap.set(item.file, [])
+          const filePath = path.join(item.dir, item.file)
+          if (!filesMap.has(filePath)) {
+            filesMap.set(filePath, [])
           }
-          filesMap.get(item.file)?.push(item.line)
+          filesMap.get(filePath)?.push(item.line)
         }
 
         for (const [file, lines] of filesMap) {

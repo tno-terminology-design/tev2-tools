@@ -9,7 +9,7 @@ import fs = require("fs")
 import path = require("path")
 
 interface GrayMatterFile extends matter.GrayMatterFile<string> {
-  path: string
+  path: path.ParsedPath
   lastIndex: number
   output: string
   converted: Map<string, number>
@@ -83,7 +83,7 @@ export class Resolver {
         // Get the MRG instance based on `mrgfile`
         mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
       } catch (err) {
-        report.errors.push({ type: "MRG HELP", file: file.path, cause: err } as TermError)
+        report.errors.push({ type: "MRG HELP", file: file.path.base, dir: file.path.dir, cause: err } as TermError)
       }
 
       // Start the replacement process
@@ -117,7 +117,8 @@ export class Resolver {
         int: this.interpreter,
         ref: termref,
         err: {
-          file: file.path,
+          file: file.path.base,
+          dir: file.path.dir,
           line,
           pos
         } as TermError
@@ -193,7 +194,13 @@ export class Resolver {
         reference = `${reference}' > '${interpretation}`
       }
       const message = `Term ref '${match[0]}' > '${reference}', ${err}`
-      report.errors.push({ type: "TERM HELP", line, file: file.path, cause: message } as TermError)
+      report.errors.push({
+        type: "TERM HELP",
+        line,
+        file: file.path.base,
+        dir: file.path.dir,
+        cause: message
+      } as TermError)
     }
 
     return file
@@ -224,7 +231,7 @@ export class Resolver {
       let file
       try {
         file = matter(fs.readFileSync(filePath, "utf8")) as GrayMatterFile
-        file.path = filePath
+        file.path = path.parse(filePath)
         file.converted = new Map()
       } catch (err) {
         log.error(`E009 Could not read file '${filePath}':`, err)
