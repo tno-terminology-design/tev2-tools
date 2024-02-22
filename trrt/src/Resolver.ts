@@ -243,7 +243,7 @@ export class Resolver {
       try {
         convertedData = await this.matchIterator(file)
       } catch (err) {
-        log.error(`E010 Could not interpret or convert file '${file.path}':`, err)
+        log.error(`E010 Could not interpret or convert file '${path.join(file.path.dir, file.path.base)}':`, err)
         continue
       }
 

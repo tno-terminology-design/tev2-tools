@@ -1,4 +1,4 @@
-import { MRG, Handlebars, type TermError } from "@tno-terminology-design/utils"
+import { MRG, Handlebars, type TermError, mappings } from "@tno-terminology-design/utils"
 import { Interpreter, type TermRef } from "./Interpreter.js"
 
 export interface Profile {
@@ -23,18 +23,11 @@ export class Converter {
 
   static instances: Converter[] = []
 
-  public constructor({ template }: { template: string }) {
-    // map of default templates for each type
-    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
-    const map: Record<string, string> = {
-      "markdown-link": "[{{ref.showtext}}]({{entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}})",
-      "html-link": '<a href="{{entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}}">{{ref.showtext}}</a>',
-      "html-hovertext-link":
-        '<a href="{{localize entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}}" title="{{#if entry.hoverText}}{{entry.hoverText}}{{else}}{{#if entry.glossaryTerm}}{{entry.glossaryTerm}}{{else}}{{capFirst entry.term}}{{/if}}: {{noRefs entry.glossaryText type="markdown"}}{{/if}}">{{ref.showtext}}</a>',
-      "html-glossarytext-link":
-        '<a href="{{localize entry.navurl}}{{#if ref.trait}}#{{ref.trait}}{{/if}}" title="{{capFirst entry.term}}: {{noRefs entry.glossaryText type="markdown"}}">{{ref.showtext}}</a>'
-    }
+  public constructor({ template, n }: { template: string; n?: number }) {
+    this.n = n ?? 0
+    this.name = `converter${this.n === -1 ? "[error]" : this.n > 1 ? `[${this.n}]` : ""}`
 
+    const map = mappings.trrt_converter_map
     const key = template.toLowerCase()
     const exist = Object.prototype.hasOwnProperty.call(map, key)
     // check if the template parameter is a key in the defaults map

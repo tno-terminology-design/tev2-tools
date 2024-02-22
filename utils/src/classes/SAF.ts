@@ -20,6 +20,7 @@ export interface Scope {
   navid?: string
   license?: string
   statuses?: string[]
+  macros?: Record<string, string[]>
   localscopedir: string
 }
 

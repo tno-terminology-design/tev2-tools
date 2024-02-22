@@ -52,8 +52,7 @@ export class Resolver {
     this.outputPath = outputPath
     this.globPattern = globPattern
     this.force = force
-    this.sorter = new Converter({ template: sorter })
-    this.sorter.name = "sorter"
+    this.sorter = new Converter({ template: sorter, sorter: true })
     this.interpreter = new Interpreter({ regex: interpreter })
     this.saf = new SAF.Builder({ scopedir: saf }).saf
   }
@@ -77,7 +76,7 @@ export class Resolver {
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
-      log.info(`\x1b[1;37mFound MRG Reference '${match[0]}' in file '${file.path}'`)
+      log.info(`\x1b[1;37mFound MRG Reference '${match[0]}' in file '${file.path.base}'`)
 
       // Interpret the match using the interpreter
       const mrgref: MRGRef = this.interpreter.interpret(match)
@@ -142,8 +141,7 @@ export class Resolver {
 
       // Sort entries according to the sort parameter in the MRGRef or the default
       if (mrgref.sorter != null) {
-        sorter = new Converter({ template: mrgref.sorter })
-        sorter.name = "sorter"
+        sorter = new Converter({ template: mrgref.sorter, sorter: true })
         log.info(`\tUsing ${sorter.type} sorter: '${sorter.template.replace(/\n/g, "\\n")}'`)
       } else {
         sorter = this.sorter
@@ -158,7 +156,6 @@ export class Resolver {
       // Check if the MRGRef has a converter specified
       if (mrgref.converter != null) {
         converters = [new Converter({ template: mrgref.converter })]
-        converters[0].name = "converter"
         log.info(`\tUsing ${converters[0].type} converter: '${converters[0].template.replace(/\n/g, "\\n")}'`)
       } else {
         converters = Converter.instances.filter((i) => i.n > 0)
@@ -252,7 +249,7 @@ export class Resolver {
       try {
         convertedData = await this.matchIterator(file)
       } catch (err) {
-        log.error(`E010 Could not interpret or convert file '${file.path}':`, err)
+        log.error(`E010 Could not interpret or convert file '${path.join(file.path.dir, file.path.base)}':`, err)
         continue
       }
 

@@ -1,5 +1,6 @@
 export * as SAF from "./classes/SAF.js"
 export * as MRG from "./classes/MRG.js"
+export * as mappings from "./mappings.js"
 export * from "./classes/Report.js"
 export * from "./helpers/writeFile.js"
 export * from "./helpers/regularize.js"

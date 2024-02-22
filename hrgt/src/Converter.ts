@@ -1,4 +1,4 @@
-import { MRG, Handlebars, type TermError } from "@tno-terminology-design/utils"
+import { MRG, Handlebars, mappings, type TermError } from "@tno-terminology-design/utils"
 import { Interpreter, type MRGRef } from "./Interpreter.js"
 
 export interface Profile {
@@ -23,26 +23,15 @@ export class Converter {
 
   static instances: Converter[] = []
 
-  public constructor({ template }: { template: string }) {
-    // map of default templates for each type
-    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
-    const map: Record<string, string> = {
-      default: "{{term}}{{termType}}", // used by the sorter
-      glossaryterm: "{{noRefs glossaryTerm}}{{term}}{{termType}}", // used by the sorter
-      "markdown-table-row":
-        "| [{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}}) | {{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}} |\n",
-      "markdown-abbr-table-row":
-        "{{#if glossaryAbbr}}| [{{glossaryAbbr}}]({{localize navurl}}) | See: [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{termid}}@) |\n{{/if}}",
-      "markdown-section-2":
-        "## [{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n",
-      "markdown-abbr-section-2":
-        "{{#if glossaryAbbr}}## [{{glossaryAbbr}}]({{localize navurl}})\n\nSee: [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{termid}}@)\n\n{{/if}}",
-      "markdown-section-3":
-        "### [{{#if glossaryTerm}}{{noRefs glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{localize navurl}})\n\n{{#if glossaryText}}{{glossaryText}}{{else}}no `glossaryText` was specified for this entry.{{/if}}\n\n",
-      "markdown-abbr-section-3":
-        "{{#if glossaryAbbr}}### [{{glossaryAbbr}}]({{localize navurl}})\n\nSee: [{{#if glossaryTerm}}{{glossaryTerm}}{{else}}{{capFirst term}}{{/if}}]({{termid}}@)\n\n{{/if}}"
+  public constructor({ template, n, sorter = false }: { template: string; n?: number; sorter?: boolean }) {
+    if (!sorter) {
+      this.name = "sorter"
+    } else {
+      this.n = n ?? 0
+      this.name = `converter${this.n === -1 ? "[error]" : this.n > 1 ? `[${this.n}]` : ""}`
     }
 
+    const map = sorter ? mappings.hrgt_sorter_map : mappings.hrgt_converter_map
     const key = template.toLowerCase()
     const exist = Object.prototype.hasOwnProperty.call(map, key)
     // check if the template parameter is a key in the defaults map

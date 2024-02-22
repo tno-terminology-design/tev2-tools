@@ -1,4 +1,4 @@
-import { regularize } from "@tno-terminology-design/utils"
+import { regularize, mappings } from "@tno-terminology-design/utils"
 
 export interface MRGRef {
   hrg?: string
@@ -20,12 +20,7 @@ export class Interpreter {
   public regex: RegExp
 
   public constructor({ regex }: { regex: string }) {
-    // If you add/remove mappings, please also edit the corresponding `.option` statement in `Run.ts`, and the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
-    const map: Record<string, RegExp> = {
-      default:
-        /(?:(?<=[^`\\])|^){%\s*hrg="(?<hrg>[^"]*)"\s*(?:converter="(?<converter>[^"]*)"\s*)?(?:sorter="(?<sorter>[^"]*)"\s*)?%}/g
-    }
-
+    const map = mappings.hrgt_interpreter_map
     const key = regex.toString().toLowerCase()
     const exist = Object.prototype.hasOwnProperty.call(map, key)
     // Check if the regex parameter is a key in the defaults map

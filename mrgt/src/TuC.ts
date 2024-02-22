@@ -1,18 +1,9 @@
-import { log, regularize } from "@tno-terminology-design/utils"
+import { log, regularize, mappings } from "@tno-terminology-design/utils"
 import { MRG, SAF } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
 import fs = require("fs")
 import path = require("path")
-
-export const macroMap: Record<string, string[]> = {
-  "{ss}": ["", "s", "'s", "(s)"], // "act{ss}" --> "act", "acts", "act's", "act(s)"
-  "{ess}": ["", "es", "'s", "(es)"], // "regex{es}" --> "regex", "regexes", "regex's", "regex(es"
-  "{yies}": ["y", "y's", "ies"], // "part{yies}" --> "party", "party's", "parties"
-  "{ying}": ["y", "ying", "ies", "ied"], // "identif{ying}" --> "identify", "identifying", "identifies", "identified"
-  "{es}": ["e", "es", "ed", "ing"], // "mangag{es}" --> "manage", "manages", "managed", "managing"
-  "{able}": ["able", "ability"] // "cap{able}" --> "capable", "capability"
-}
 
 const valueUsed = new Set<string>()
 
@@ -517,7 +508,7 @@ function resolveFormPhrases(formPhrases: string[]): string[] {
   const modifiedAlternatives = new Set<string>()
 
   for (const alternative of alternatives) {
-    const generatedAlternatives = applyMacroReplacements(alternative, macroMap)
+    const generatedAlternatives = applyMacroReplacements(alternative, mappings.formphrase_macro_map)
     for (const generatedAlternative of generatedAlternatives) {
       modifiedAlternatives.add(regularize(generatedAlternative))
     }
