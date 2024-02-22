@@ -24,7 +24,7 @@ export class Converter {
   static instances: Converter[] = []
 
   public constructor({ template, n, sorter = false }: { template: string; n?: number; sorter?: boolean }) {
-    if (!sorter) {
+    if (sorter) {
       this.name = "sorter"
     } else {
       this.n = n ?? 0
