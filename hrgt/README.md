@@ -1,1 +1,5 @@
-# Human Readable Glossary (Generation) Tool (HRGT)
+# Human Readable Glossary Generator Tool (HRGT)
+
+The **Human Readable Glossary Generator Tool ([HRGT](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/tools/hrgt))** is a [TEv2 text conversion tool](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/tev2-text-conversion-tool) that takes files that contain so-called [MRGRefs](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/syntax/mrg-refs) as inputs, and that outputs (a copy of) these files in which these [MRGRefs](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/syntax/mrg-refs) are converted into [hrg-lists](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/hrg-list), i.e. lists of alphabetically sorted [HRG entries](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/hrg-entry) that can be further processed by tools such as the [TRRT](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/tools/trrt), as well as rendering tools such as GitHub pages, Docusaurus, etc.
+
+Please refer to the [HRGT specifications](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/tools/mrg-import) for more information.

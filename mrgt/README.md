@@ -1,3 +1,6 @@
-# mrgt
+# Machine Readable Glossary Generation Tool
 
-Machine-readable glossary (generator) tool (MRGT)
+The **Machine Readable Glossary generation Tool ([MRGT](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/tools/mrgt))** generates Machine Readable Glossaries ([MRGs](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/files/mrg)) for one specific, or all [terminology](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/terminology) versions that are [curated](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/curate) within a specific [scope](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/scope). [MRGs](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/files/mrg) come in a specific, well-defined [format](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/files/mrg). They contain some meta-data, followed by a list of so-called [MRG entries](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/mrg-entry), one for every [term](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/term) in its [scope](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/scope), which represent [concepts](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/concept) and other [semantic units](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/semantic-unit) that are known within that [scope](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/scope).
+
+
+Please refer to the [MRGT specifications](https://tno-terminology-design.github.io/tev2-specifications/docs/specs/tools/mrgt) for more information.
