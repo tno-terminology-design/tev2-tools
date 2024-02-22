@@ -2,6 +2,8 @@ import fs = require("fs")
 import path = require("path")
 import yaml = require("js-yaml")
 
+import { formphrase_macro_map } from "../mappings.js"
+
 export interface Type {
   scope: Scope
   scopes: Scopes[]
@@ -81,6 +83,14 @@ export class Builder {
       // Check if there are existing versions
       if (!this.saf.versions || this.saf.versions.length === 0) {
         throw new Error(`No versions found`)
+      }
+
+      // Add the formphrase macros to the formphrase_macro_map
+      if (this.saf.scope.macros) {
+        const macros = Object.entries(this.saf.scope.macros)
+        for (const [key, value] of macros) {
+          formphrase_macro_map[key] = value
+        }
       }
     } catch (err) {
       throw new Error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, { cause: err })

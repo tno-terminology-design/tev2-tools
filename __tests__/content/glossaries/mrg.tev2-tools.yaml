@@ -17,6 +17,35 @@ terminology:
       email:
         id: "rieks.joosten"
         at: "tno.nl"
+  macros:
+    "{ss}":
+      - ""
+      - "s"
+      - "'s"
+      - "(s)"
+      - "aaaaa"
+    "{ess}":
+      - ""
+      - "es"
+      - "'s"
+      - "(es)"
+    "{yies}":
+      - "y"
+      - "y's"
+      - "ies"
+    "{ying}":
+      - "y"
+      - "ying"
+      - "ies"
+      - "ied"
+    "{es}":
+      - "e"
+      - "es"
+      - "ed"
+      - "ing"
+    "{able}":
+      - "able"
+      - "ability"
   defaulttype: "concept"
   vsntag: "terms"
   altvsntags:
@@ -401,11 +430,10 @@ entries:
       - "object"
       - "`err`-fields"
       - "helpers"
-      - "capfirst"
-      - "ifvalue"
-      - "localize"
-      - "norefs"
+      - "`capfirst`"
+      - "`norefs`"
       - "regularize"
+      - "localize"
     termid: "concept:converter-profile"
     vsntag: "documentation"
   - id: "corpus"

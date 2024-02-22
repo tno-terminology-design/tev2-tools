@@ -3,7 +3,7 @@
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
-import { SAF, mappings } from "@tno-terminology-design/utils"
+import { SAF } from "@tno-terminology-design/utils"
 import { log, report } from "@tno-terminology-design/utils"
 import { Generator } from "./Generator.js"
 
@@ -61,17 +61,8 @@ async function main(): Promise<void> {
 
   report.setOnNotExist(options.onNotExist)
 
-  // Create a SAF
+  // Create a SAF and generator instance
   const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
-
-  if (options.macros || saf.scope.macros) {
-    const macros = Object.entries({ ...saf.scope.macros, ...options.macros } as Record<string, string[]>)
-    for (const [key, value] of macros) {
-      mappings.formphrase_macro_map[key] = value
-    }
-  }
-
-  // Create a generator
   const generator = new Generator({ vsntag: options.vsntag, saf: saf })
 
   // Start generation
