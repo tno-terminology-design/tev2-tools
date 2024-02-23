@@ -8,13 +8,14 @@ import { report, log } from "@tno-terminology-design/utils"
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
 import { resolve } from "path"
+import * as packageJson from "../package.json"
 
 import yaml from "js-yaml"
 import figlet from "figlet"
 
 const program = new Command()
 const name = "trrt"
-const version = "1.1.1"
+const version = packageJson.default.version
 
 program
   .name(name)

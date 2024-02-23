@@ -6,13 +6,14 @@ import { resolve } from "path"
 import { SAF } from "@tno-terminology-design/utils"
 import { log, report } from "@tno-terminology-design/utils"
 import { Generator } from "./Generator.js"
+import * as packageJson from "../package.json"
 
 import yaml from "js-yaml"
 import figlet from "figlet"
 
 const program = new Command()
 const name = "mrgt"
-const version = "1.1.1"
+const version = packageJson.default.version
 
 program
   .name(name)

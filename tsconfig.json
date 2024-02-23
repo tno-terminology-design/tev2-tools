@@ -9,7 +9,8 @@
     "noImplicitAny": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   },
   "paths": {
     "*": ["node_modules/*"]
