@@ -2,18 +2,21 @@
 
 import { Command, type OptionValues } from "commander"
 import { readFileSync } from "fs"
-import { resolve } from "path"
+import { resolve, join, dirname } from "path"
 import { SAF } from "@tno-terminology-design/utils"
 import { log, report } from "@tno-terminology-design/utils"
 import { Generator } from "./Generator.js"
-import * as packageJson from "../package.json"
+import { fileURLToPath } from "url"
 
 import yaml from "js-yaml"
 import figlet from "figlet"
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 const program = new Command()
 const name = "mrgt"
-const version = packageJson.default.version
+const version = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf8")).version
 
 program
   .name(name)

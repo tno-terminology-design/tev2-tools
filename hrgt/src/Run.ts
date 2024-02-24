@@ -3,17 +3,20 @@
 import { Command, type OptionValues } from "commander"
 import { Converter } from "./Converter.js"
 import { readFileSync } from "fs"
-import { resolve } from "path"
+import { resolve, dirname, join } from "path"
 import { log, report } from "@tno-terminology-design/utils"
 import { Resolver } from "./Resolver.js"
-import * as packageJson from "../package.json"
+import { fileURLToPath } from "url"
 
 import yaml from "js-yaml"
 import figlet from "figlet"
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 const program = new Command()
 const name = "hrgt"
-const version = packageJson.default.version
+const version = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf8")).version
 
 program
   .name(name)
