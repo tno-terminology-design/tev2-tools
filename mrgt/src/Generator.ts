@@ -149,20 +149,31 @@ export class Generator {
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir)
 
     // Check for duplicate termids in the MRG
-    const termids: string[] = []
+    const termids: { [termid: string]: [MRG.Entry] } = {} // Map of termids to their corresponding entries
     // add termids constructed from termtype and all form phrases
     build.tuc.entries?.forEach((entry) => {
       const formPhrases = new Set<string>([entry.termid, ...(entry.formPhrases || [])])
       formPhrases.forEach((formphrase) => {
-        termids.push(`${entry.termType}:${formphrase}`)
+        const termid = `${entry.termType}:${formphrase}`
+        if (termids[termid]) {
+          termids[termid].push(entry)
+        } else {
+          termids[termid] = [entry]
+        }
       })
     })
-    const duplicates = termids?.filter((termid, index) => termids.indexOf(termid) !== index)
-    if (duplicates?.length > 0) {
+    const duplicates = Object.entries(termids).filter(([, entries]) => entries.length > 1)
+    if (duplicates.length > 0) {
+      // create a string of the locators for each duplicate
+      const locators = duplicates
+        .map(([termid, entries]) => {
+          return `\n\t'\x1b[1;37m${termid}\x1b[0;37m': (${entries
+            .map((entry) => `${entry.locator}@${entry.scopetag}`)
+            .join(", ")})`
+        })
+        .join(", ")
       throw new Error(
-        `Duplicate termids, or combination of termType and formPhrase, found in provisional MRG of version '${
-          build.tuc.terminology.vsntag
-        }': ${duplicates.join(", ")}`
+        `Duplicate termids, or combination of termType and formPhrase, found in provisional MRG of version '${build.tuc.terminology.vsntag}': ${locators}`
       )
     }
 
