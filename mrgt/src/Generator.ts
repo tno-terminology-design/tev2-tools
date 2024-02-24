@@ -29,7 +29,9 @@ export class Generator {
     if (this.vsntag) {
       const vsn = this.saf.versions?.find((vsn) => vsn.vsntag === this.vsntag)
       if (vsn) {
-        log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...`)
+        log.info(
+          `\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...\x1b[0m`
+        )
         this.generate(new TuCBuilder({ vsn: vsn, saf: this.saf }))
       } else {
         // check altvsntags
@@ -37,7 +39,7 @@ export class Generator {
 
         if (vsn) {
           log.info(
-            `\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}') (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...`
+            `\x1b[1;37mProcessing version '${vsn.vsntag}' (altvsn '${this.vsntag}') (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...\x1b[0m`
           )
           this.generate(new TuCBuilder({ vsn: vsn, saf: this.saf }))
         } else {
@@ -51,7 +53,9 @@ export class Generator {
         throw new Error(`No versions were found in the SAF`)
       }
       this.saf.versions?.forEach((vsn) => {
-        log.info(`\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...`)
+        log.info(
+          `\x1b[1;37mProcessing version '${vsn.vsntag}' (mrg.${this.saf.scope.scopetag}.${vsn.vsntag}.yaml)...\x1b[0m`
+        )
         this.generate(new TuCBuilder({ vsn: vsn, saf: this.saf }))
       })
     }
@@ -60,7 +64,7 @@ export class Generator {
     if (TuCBuilder.synonymOf.length > 0) {
       for (const instance of TuCBuilder.instances) {
         if (instance.tuc.cText) {
-          log.info(`\x1b[1;37mProcessing synonymOf entries...`)
+          log.info(`\x1b[1;37mProcessing synonymOf entries...\x1b[0m`)
           // temporarily set the log level to 4 to suppress the output of the MRG files
           log.settings.minLevel = 4
           this.handleSynonymOf(instance)
@@ -167,7 +171,7 @@ export class Generator {
       // create a string of the locators for each duplicate
       const locators = duplicates
         .map(([termid, entries]) => {
-          return `\n\t'\x1b[1;37m${termid}\x1b[0;37m': (${entries
+          return `\n\t'\x1b[1;37m${termid}\x1b[0m': (${entries
             .map((entry) => `${entry.locator}@${entry.scopetag}`)
             .join(", ")})`
         })
@@ -207,7 +211,7 @@ export class Generator {
   }
 
   public async prune(): Promise<void> {
-    log.info(`\x1b[1;37mPruning MRGs of the local scope that are not in the SAF...`)
+    log.info(`\x1b[1;37mPruning MRGs of the local scope that are not in the SAF...\x1b[0m`)
     const glossaryfiles = path.join(
       this.saf.scope.localscopedir,
       this.saf.scope.glossarydir,

@@ -24,7 +24,7 @@ class Report {
     const termErrors = this.errors.filter((err) => err.type === "TERM HELP")
     const mainErrors = this.errors.filter((err) => err.type !== "TERM HELP")
 
-    console.log(`\x1b[1;37m`)
+    console.log(`\x1B[0m`)
     console.log(` Resolution Report:`)
     console.log(`\t\x1b[0mFiles modified:  ${this.files.length}`)
     console.log(`\t\x1b[0mTerms converted: ${this.terms.length}`)
@@ -63,7 +63,7 @@ class Report {
 
         for (const [file, lines] of filesMap) {
           const lineNumbers = lines.join(":")
-          console.log(`   \x1b[1;37m${file}:${lineNumbers}`)
+          console.log(`   \x1b[1;37m${file}:${lineNumbers}\x1b[0m`)
         }
       }
     }

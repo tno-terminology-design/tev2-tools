@@ -76,7 +76,7 @@ export class Resolver {
 
     // Iterate over each match found in the file.orig string
     for (const match of matches) {
-      log.info(`\x1b[1;37mFound MRG Reference '${match[0]}' in file '${file.path.base}'`)
+      log.info(`\x1b[1;37mFound MRG Reference '${match[0]}' in file '${file.path.base}'\x1b[0m`)
 
       // Interpret the match using the interpreter
       const mrgref: MRGRef = this.interpreter.interpret(match)

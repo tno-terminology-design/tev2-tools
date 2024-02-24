@@ -31,7 +31,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
   log.info(
     `\x1b[1;37mFound ${saf.scopes.length} import scope${saf.scopes.length > 1 ? "s" : ""} in scopedir '${
       saf.scope.scopedir
-    }'`
+    }'\x1b[0m`
   )
   for (const scope of saf.scopes) {
     log.info(`\tHandling import scope '${scope.scopetag}'`)
@@ -48,7 +48,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
     log.info(
       `\x1b[1;37mFound ${importSaf.versions.length} maintained MRG file${
         importSaf.versions.length > 1 ? "s" : ""
-      } in import scope '${scope.scopetag}'`
+      } in import scope '${scope.scopetag}'\x1b[0m`
     )
     for (const version of importSaf.versions) {
       try {
@@ -70,7 +70,7 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
         // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
         mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`)
         const mrgdump = yaml.dump(mrg, { forceQuotes: true, quotingType: '"', noRefs: true })
-        log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'`)
+        log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'\x1b[0m`)
         writeFile(mrgURL, mrgdump, true)
 
         if (version.altvsntags || version.vsntag === importSaf.scope.defaultvsn) {
@@ -156,7 +156,7 @@ export class Interpreter {
   }
 
   public async prune(): Promise<void> {
-    log.info(`\x1b[1;37mPruning MRGs of scopes that are not in administered the SAF...`)
+    log.info(`\x1b[1;37mPruning MRGs of scopes that are not in administered the SAF...\x1b[0m`)
     const saf = await this.saf
     const glossaryfiles = path.join(saf.scope.localscopedir, saf.scope.glossarydir, `mrg.*.yaml`)
     // get all mrg files that match the glossaryfiles pattern
