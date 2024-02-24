@@ -14,7 +14,7 @@
     "rebuild": "npm run rebuild --workspaces",
     "format": "prettier . --write && npm run lint",
     "lint": "eslint . --cache --fix --ext js,ts",
-    "test": "mocha '__tests__/**/*.test.js'"
+    "test": "mocha '__tests__/**/*.test.js' --timeout 500"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",
