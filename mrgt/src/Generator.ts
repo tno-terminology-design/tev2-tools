@@ -65,8 +65,8 @@ export class Generator {
       for (const instance of TuCBuilder.instances) {
         if (instance.tuc.cText) {
           log.info(`\x1b[1;37mProcessing synonymOf entries...\x1b[0m`)
-          // temporarily set the log level to 4 to suppress the output of the MRG files
-          log.settings.minLevel = 4
+          // temporarily set the log level to 5 to suppress the output of the MRG files
+          log.settings.minLevel = 5
           this.handleSynonymOf(instance)
         }
       }
@@ -176,7 +176,10 @@ export class Generator {
             .join(", ")})`
         })
         .join(", ")
-      throw new Error(
+      // Log with lower level to avoid repeated output on synonymOf use
+      log.log(
+        4,
+        "ERROR",
         `Duplicate termids, or combination of termType and formPhrase, found in provisional MRG of version '${build.tuc.terminology.vsntag}': ${locators}`
       )
     }
