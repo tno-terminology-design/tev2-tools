@@ -97,7 +97,6 @@ export class Builder {
             formphrase_macro_map[key] = value
           }
         }
-        console.log(formphrase_macro_map)
       }
     } catch (err) {
       throw new Error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, { cause: err })
