@@ -98,7 +98,6 @@ export class TuCBuilder {
     delete mrg.terminology.localscopedir
     for (const entry of mrg.entries) {
       entry.vsntag = entry.vsntag ?? this.tuc.terminology.vsntag
-      entry.termid = `${entry.termType ?? this.saf.scope.defaulttype}:${entry.term}`
     }
 
     return mrg as MRG.Type
@@ -205,6 +204,7 @@ export class TuCBuilder {
         ctextYAML.navurl = navUrl.href
         ctextYAML.formPhrases = formPhrases
         ctextYAML.headingids = headingIds
+        ctextYAML.termid = `${ctextYAML.termType ?? this.saf.scope.defaulttype}:${ctextYAML.term}`
 
         if (ctextYAML.synonymOf) {
           TuCBuilder.synonymOf.push(ctextYAML)
@@ -433,6 +433,10 @@ export class TuCBuilder {
           renamed.push(entry.term)
           for (const [key, value] of Object.entries(fieldModifiers)) {
             entry[key] = value
+
+            if (key === "termType" || key === "term") {
+              entry.termid = `${entry.termType ?? this.saf.scope.defaulttype}:${entry.term}`
+            }
           }
         }
       }
