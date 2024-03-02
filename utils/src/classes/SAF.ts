@@ -87,10 +87,17 @@ export class Builder {
 
       // Add the formphrase macros to the formphrase_macro_map
       if (this.saf.scope.macros) {
-        const macros = Object.entries(this.saf.scope.macros)
-        for (const [key, value] of macros) {
-          formphrase_macro_map[key] = value
+        for (const [key, value] of Object.entries(this.saf.scope.macros)) {
+          // handle the case where the values are passed as a list
+          if (!Array.isArray(value)) {
+            for (const [key, list] of Object.entries(value)) {
+              formphrase_macro_map[key] = list as string[]
+            }
+          } else {
+            formphrase_macro_map[key] = value
+          }
         }
+        console.log(formphrase_macro_map)
       }
     } catch (err) {
       throw new Error(`E004 An error occurred while attempting to load the SAF at '${safURL}':`, { cause: err })
