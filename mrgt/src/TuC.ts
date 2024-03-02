@@ -420,7 +420,7 @@ export class TuCBuilder {
           fieldModifiers[key] = value
           modifierString.push(`${key}: ${value}`)
         }
-        instruction = `rename ${term} [${modifierString?.join(", ")}]`
+        instruction = `rename ${term} [ ${modifierString?.join(", ")} ]`
       }
 
       // Find the entries with the term
