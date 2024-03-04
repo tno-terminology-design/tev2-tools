@@ -83,7 +83,7 @@ export class Resolver {
         // Get the MRG instance based on `mrgfile`
         mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
       } catch (err) {
-        report.errors.push({ type: "MRG HELP", file: file.path.base, dir: file.path.dir, cause: err } as TermError)
+        report.errors.push({ type: "MRG HELP", file: mrgfile, message: `${err.message} ${err.cause}` } as TermError)
       }
 
       // Start the replacement process
@@ -188,7 +188,7 @@ export class Resolver {
       let reference = `${display.type}${display.term}@${display.scopetag}${display.vsntag}`
 
       const interpretation = `${display.type}${termref.term ?? regularize(termref.showtext)}@${
-        mrg.terminology.scopetag
+        termref.scopetag ?? this.saf.scope.scopetag
       }${display.vsntag}`
       if (interpretation !== reference) {
         reference = `${reference}' > '${interpretation}`

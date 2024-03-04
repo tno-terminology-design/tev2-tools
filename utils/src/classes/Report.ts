@@ -72,12 +72,12 @@ class Report {
       console.log(`\n   \x1b[1;37mMain Errors:\x1b[0m`)
       const messageSet = new Set<string>()
       for (const err of mainErrors) {
-        if (!messageSet.has(err.cause.toString())) {
+        if (!messageSet.has(err.message)) {
           const { file, line, message, type } = err
           const locator = line > -1 ? `${file}:${line}` : file
 
           console.log(`\x1b[1;31m${type}\t\x1b[1;37m${locator}\t\t\x1b[0m${message}`)
-          messageSet.add(err.cause.toString())
+          messageSet.add(message)
         }
       }
     }
