@@ -4,6 +4,7 @@
  * @returns The regularized text
  */
 export function regularize(input: string): string {
+  if (!input) return input
   try {
     // Convert the text to lowercase
     let process = input.toLowerCase()
