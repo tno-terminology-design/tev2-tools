@@ -167,25 +167,25 @@ export class Resolver {
         for (const converter of converters) {
           try {
             const hrgEntry = converter.convert(profile)
-            if (hrgEntry == converter.getBlank()) {
-              throw new Error(
-                `Conversion of entry '${entry.termid}' using ${converter.name} did not fill in any expression`
-              )
-            } else {
-              replacement += hrgEntry
-            }
+            replacement += hrgEntry
           } catch (err) {
             log.warn(`\t\t${err.message}`)
+            log.settings.minLevel = undefined // reset the log level set by {{log level="silent"}}
+            try {
+              const error = Converter.instances.find((i) => i.n === -1)
+              profile.err.message = err.message
+              if (error) {
+                replacement = error.convert(profile)
+              }
+            } catch (err) {
+              log.warn(`\t\t${err.message}`)
+            }
           }
+          log.settings.minLevel = undefined // reset the log level set by {{log level="silent"}}
         }
       }
     } else {
-      // If the MRG instance is not found, create the replacement using the error converter
-      const error = Converter.instances.find((i) => i.n === -1)
-      profile.err.message = `Something went wrong while retrieving the MRG file '${mrgref.hrg}'`
-      if (error) {
-        replacement = error.convert(profile)
-      }
+      report.onNotExistError(new Error(`Something went wrong while retrieving the MRG file '${mrgref.hrg}'`))
     }
 
     // Only execute the replacement steps if the 'replacement' string is not empty

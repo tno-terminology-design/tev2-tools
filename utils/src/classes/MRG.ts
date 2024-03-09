@@ -146,7 +146,7 @@ export function getEntry(entries: Entry[], origin: string, term: string, type: s
   if (matches.length === 1) {
     return matches[0]
   } else if (matches.length === 0) {
-    throw new Error(`could not be matched with an MRG entry in '${origin}`)
+    throw new Error(`could not be matched with an MRG entry in '${origin}'`)
   } else if (matches.length > 1) {
     const matchingTermIds = matches.map((entry) => entry.termid).join("', '")
     throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`)

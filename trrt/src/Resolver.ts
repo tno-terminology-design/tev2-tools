@@ -147,9 +147,13 @@ export class Resolver {
       } catch (err) {
         error = err // store the error so it can be thrown after the replacement steps with converter[error]
         profile.err.cause = err.message
-        const converter = Converter.instances.find((i) => i.n === -1) // get the Converter instance where n = -1 (converter[error] option)
-        if (converter) {
-          replacement = converter.convert(profile)
+        try {
+          const converter = Converter.instances.find((i) => i.n === -1) // get the Converter instance where n = -1 (converter[error] option)
+          if (converter) {
+            replacement = converter.convert(profile)
+          }
+        } catch (err) {
+          error.message = `${error.message}, and: ${err.message}`
         }
       }
 
@@ -193,7 +197,13 @@ export class Resolver {
       if (interpretation !== reference) {
         reference = `${reference}' > '${interpretation}`
       }
-      const message = `Term ref '${match[0]}' > '${reference}', ${err}`
+
+      let message = `Term ref '${match[0]}' > '${reference}', ${err}`
+      // If the log level is set to 5 by {{log level="silent"}}, do not log the message
+      if (log.settings.minLevel === 5) {
+        message = undefined
+        log.settings.minLevel = undefined // reset the log level
+      }
       report.errors.push({
         type: "TERM HELP",
         line,

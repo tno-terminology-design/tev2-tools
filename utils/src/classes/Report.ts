@@ -26,10 +26,10 @@ class Report {
 
     console.log(`\x1B[0m`)
     console.log(` Resolution Report:`)
-    console.log(`\t\x1b[0mFiles modified:  ${this.files.length}`)
-    console.log(`\t\x1b[0mTerms converted: ${this.terms.length}`)
-    console.log(`\t\x1b[0mTerm errors:     ${termErrors.length}`)
-    console.log(`\t\x1b[0mMain errors:     ${mainErrors.length}`)
+    console.log(`\t\x1b[0mFiles modified:          ${this.files.length}`)
+    console.log(`\t\x1b[0mTerms converted:         ${this.terms.length}`)
+    console.log(`\t\x1b[0mTerm errors \x1b[3m(silenced)\x1b[0m:  ${termErrors.length}`)
+    console.log(`\t\x1b[0mMain error occurences:   ${mainErrors.length}`)
 
     if (termErrors.length > 0) {
       console.log(`\n   \x1b[1;37mTerm Errors:\x1b[0m`)
@@ -37,6 +37,9 @@ class Report {
       const groupedTermErrors = new Map<string, Array<TermError>>()
 
       for (const err of termErrors) {
+        if (!err.cause) {
+          continue
+        }
         const key = err.cause.toString()
 
         if (groupedTermErrors.has(key)) {

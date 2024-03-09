@@ -65,12 +65,11 @@ export class Generator {
       for (const instance of TuCBuilder.instances) {
         if (instance.tuc.cText) {
           log.info(`\x1b[1;37mProcessing synonymOf entries...\x1b[0m`)
-          // temporarily set the log level to 5 to suppress the output of the MRG files
-          log.settings.minLevel = 5
+          log.settings.minLevel = 5 // temporarily set the log level to 5 to suppress the output of the MRG files
           this.handleSynonymOf(instance)
         }
       }
-      log.settings.minLevel = 1
+      log.settings.minLevel = undefined // reset the log level
     }
   }
 
