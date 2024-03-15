@@ -193,7 +193,12 @@ export class TuCBuilder {
           }
         }
 
-        const formPhrases = resolveFormPhrases(ctextYAML.formPhrases)
+        let formPhrases: string[] = []
+        if (ctextYAML.formPhrases) {
+          formPhrases = resolveFormPhrases([ctextYAML.term, ...ctextYAML.formPhrases])
+        } else {
+          formPhrases.push(ctextYAML.term)
+        }
 
         // Extract heading IDs from markdown content
         const headingIds = extractHeadingIds(body)
@@ -491,7 +496,7 @@ function entryFilter(entry: MRG.Entry, key: string, values: string[]): boolean {
   } else if (key == null) {
     // consider the value list as a list of showtexts
     for (const value of values) {
-      if (entry.term === value || entry.formPhrases?.includes(value)) {
+      if (entry.formPhrases?.includes(value)) {
         valueUsed.add(value)
         return true
       }

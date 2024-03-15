@@ -37,7 +37,7 @@ export interface Entry {
   glossaryText?: string
   synonymOf?: string
   grouptags?: string[]
-  formPhrases?: string[]
+  formPhrases: string[]
   [key: string]: unknown
 }
 
@@ -137,7 +137,7 @@ export function getEntry(entries: Entry[], origin: string, term: string, type: s
     matches = matches.filter((entry) => entry.termType === type)
   }
 
-  matches = matches.filter((entry) => entry.term === term || entry.formPhrases?.includes(term))
+  matches = matches.filter((entry) => entry.formPhrases.includes(term))
 
   if (matches.length > 1 && defaulttype != null) {
     matches = matches.filter((entry) => entry.termType === defaulttype)
