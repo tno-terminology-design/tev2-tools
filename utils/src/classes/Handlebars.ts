@@ -14,11 +14,6 @@ Handlebars.registerHelper("noRefs", noRefs)
 Handlebars.registerHelper("regularize", regularize)
 Handlebars.registerHelper("log", log)
 
-// Handlebars.log = function (level: number, ...message: string[]) {
-//   console.log(`Level: ${level}.`)
-//   console.log(`Message: ${message}`)
-// }
-
 export { Handlebars }
 
 export interface env {
