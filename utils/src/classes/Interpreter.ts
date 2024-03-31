@@ -7,7 +7,7 @@ export interface Reference {
 /**
  * The Interpreter class handles the interpretation of a reference.
  * This interpretation happens according to a string that is supplied in `regex`.
- * An reference is interpreted by calling the `interpret` method with the corresponding match.
+ * A reference is interpreted by calling the `interpret` method with the corresponding match.
  * The `interpret` method returns a Reference object.
  */
 export abstract class Interpreter {

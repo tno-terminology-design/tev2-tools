@@ -64,7 +64,13 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
         mrg.terminology.scopedir = scope.scopedir
         mrg.terminology.scopetag = scope.scopetag
         for (const entry of mrg.entries) {
-          entry.scopetag = scope.scopetag
+          // // for every property in the entry
+          // for (const [property, value] of Object.entries(entry)) {
+          //   // if the property is a string
+          //   if (typeof value === "string") {
+          //     const matches: RegExpMatchArray[] = Array.from(value.matchAll(mrg.terminology.interpreter))
+          //   }
+          // }
         }
 
         // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml

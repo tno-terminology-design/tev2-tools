@@ -20,6 +20,7 @@ export interface Terminology {
   curatedir: string
   vsntag: string
   altvsntags: string[]
+  interpreter: RegExp
   [key: string]: unknown
 }
 
