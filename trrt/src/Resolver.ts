@@ -1,8 +1,8 @@
-import { report, log, writeFile, regularize, type TermError } from "@tno-terminology-design/utils"
+import { report, log, writeFile, regularize, type TermError, type Profile } from "@tno-terminology-design/utils"
 import { glob } from "glob"
 import { MRG, SAF } from "@tno-terminology-design/utils"
 import { Interpreter, type TermRef } from "./Interpreter.js"
-import { Converter, type Profile } from "./Converter.js"
+import { Converter } from "./Converter.js"
 
 import matter from "gray-matter"
 import fs = require("fs")

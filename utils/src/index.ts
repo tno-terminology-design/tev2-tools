@@ -1,5 +1,7 @@
 export * as SAF from "./classes/SAF.js"
 export * as MRG from "./classes/MRG.js"
+export * from "./classes/Converter.js"
+export * from "./classes/Interpreter.js"
 export * as mappings from "./mappings.js"
 export * from "./classes/Report.js"
 export * from "./helpers/writeFile.js"

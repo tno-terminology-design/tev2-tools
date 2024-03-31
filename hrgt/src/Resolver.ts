@@ -1,8 +1,9 @@
 import { glob } from "glob"
 import { Interpreter, type MRGRef } from "./Interpreter.js"
-import { Converter, type Profile } from "./Converter.js"
+import { Converter } from "./Converter.js"
+import { Sorter } from "./Sorter.js"
 import { SAF, MRG } from "@tno-terminology-design/utils"
-import { report, log, writeFile, type TermError } from "@tno-terminology-design/utils"
+import { report, log, writeFile, type TermError, type Profile } from "@tno-terminology-design/utils"
 
 import matter from "gray-matter"
 import fs = require("fs")
@@ -52,7 +53,7 @@ export class Resolver {
     this.outputPath = outputPath
     this.globPattern = globPattern
     this.force = force
-    this.sorter = new Converter({ template: sorter, sorter: true })
+    this.sorter = new Sorter({ template: sorter })
     this.interpreter = new Interpreter({ regex: interpreter })
     this.saf = new SAF.Builder({ scopedir: saf }).saf
   }
@@ -141,7 +142,7 @@ export class Resolver {
 
       // Sort entries according to the sort parameter in the MRGRef or the default
       if (mrgref.sorter != null) {
-        sorter = new Converter({ template: mrgref.sorter, sorter: true })
+        sorter = new Sorter({ template: mrgref.sorter })
         log.info(`\tUsing ${sorter.type} sorter: '${sorter.template.replace(/\n/g, "\\n")}'`)
       } else {
         sorter = this.sorter
