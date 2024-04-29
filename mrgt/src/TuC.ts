@@ -209,7 +209,8 @@ export class TuCBuilder {
         ctextYAML.navurl = navUrl.href
         ctextYAML.formPhrases = formPhrases
         ctextYAML.headingids = headingIds
-        ctextYAML.termid = `${ctextYAML.termType ?? this.saf.scope.defaulttype}:${ctextYAML.term}`
+        ctextYAML.termType = ctextYAML.termType || this.saf.scope.defaulttype || "concept";
+        ctextYAML.termid = `${ctextYAML.termType}:${ctextYAML.term}`
 
         if (ctextYAML.synonymOf) {
           TuCBuilder.synonymOf.push(ctextYAML)
