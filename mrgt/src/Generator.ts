@@ -74,72 +74,85 @@ export class Generator {
   }
 
   /**
-   * The `synonymOf` method handles the synonymOf entries in the TuC.
+   * The `handleSynonymOf` method handles the synonymOf entries in the TuC.
    * It attempts to find the corresponding entry in the MRG and merges the synonymOf entry with the MRG entry.
    * If no corresponding entry is found, the synonymOf entry is removed.
    */
   private handleSynonymOf(instance: TuCBuilder): void {
     for (let entry of TuCBuilder.synonymOf!) {
-      entry = instance.tuc.entries.find((e) => e.termid === entry.termid)!
-      if (!entry) {
-        continue
-      }
-      const index = instance.tuc.entries.indexOf(entry)
-      // wrangle the synonymOf field using a regex
-      const properties = entry.synonymOf!.match(
-        /(?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[^@\n:#)]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
-      )
-      if (properties?.groups) {
-        Object.keys(properties.groups).forEach((key) => {
-          properties.groups[key] = regularize(properties.groups[key])
-        })
-        let match: MRG.Entry
-        try {
-          // if no identifier (@) is specified, refer to the entries in the TuC
-          if (!properties.groups.identifier) {
-            match = MRG.getEntry(
-              instance.tuc.entries,
-              instance.tuc.filename,
-              properties.groups.term,
-              properties.groups.type,
-              this.saf.scope.defaulttype
-            )
-            // if the identifier is @, refer to the MRG
-          } else {
-            const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
-              properties.groups.vsntag ? properties.groups.vsntag + "." : ""
-            }yaml`
-            const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
-            match = MRG.getEntry(
-              mrg.entries,
-              mrg.filename,
-              properties.groups.term,
-              properties.groups.type,
-              this.saf.scope.defaulttype
-            )
-          }
-        } catch (err) {
-          // log a warning and remove the synonymOf entry
-          delete instance.tuc.entries[index]
-          log.warn(`\tEntry '${entry.termid}' with SynonymOf field (${entry.synonymOf}) was removed:`, err)
-        }
-        // if a match was found, merge the synonymOf entry with the matched MRG entry
-        if (match) {
-          Object.keys(entry).forEach((key) => {
-            if (["scopetag", "vsntag", "locator", "navurl", "headingids"].includes(key.toLowerCase())) {
-              delete entry[key]
+      // Ensure the synonymOf field is defined before proceeding
+      if (entry.synonymOf) {
+        const properties = entry.synonymOf.match(
+          /(?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[^@\n:#)]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
+        );
+
+        if (properties?.groups) {
+          Object.keys(properties.groups).forEach((key) => {
+            properties.groups[key] = regularize(properties.groups[key]);
+          });
+
+          let match: MRG.Entry;
+          let index: number;
+
+          try {
+            // Determine if we are working within the TuC entries or need to reference MRG
+            if (!properties.groups.identifier) {
+              match = MRG.getEntry(
+                instance.tuc.entries,
+                instance.tuc.filename,
+                properties.groups.term,
+                properties.groups.type,
+                this.saf.scope.defaulttype
+              );
+            } else {
+              const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
+                properties.groups.vsntag ? properties.groups.vsntag + "." : ""
+              }yaml`;
+              const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile);
+              match = MRG.getEntry(
+                mrg.entries,
+                mrg.filename,
+                properties.groups.term,
+                properties.groups.type,
+                this.saf.scope.defaulttype
+              );
             }
-          })
-          instance.tuc.entries[index] = { ...match, ...entry }
+          } catch (err) {
+            // Calculate the index to delete the problematic entry
+            index = instance.tuc.entries.indexOf(entry);
+            if (index !== -1) {
+              // Log the warning before deletion
+              log.warn(`\tEntry '${entry.termid}' with SynonymOf field (${entry.synonymOf}) was removed:`, err);
+              delete instance.tuc.entries[index];
+            }
+            continue; // Skip further processing for this entry
+          }
+
+          // If a match was found, merge the synonymOf entry with the matched MRG entry
+          if (match) {
+            // Calculate the index again before updating the entry
+            index = instance.tuc.entries.indexOf(entry);
+            if (index !== -1) {
+              // Remove certain properties before merging
+              Object.keys(entry).forEach((key) => {
+                if (["scopetag", "vsntag", "locator", "navurl", "headingids"].includes(key.toLowerCase())) {
+                  delete entry[key];
+                }
+              });
+              instance.tuc.entries[index] = { ...match, ...entry };
+            }
+          }
         }
+      } else {
+        log.warn(`synonymOf field is missing for entry with termid '${entry.termid}'`);
       }
     }
 
-    // regenerate the MRG files
+    // Regenerate the MRG files
     try {
-      this.generate(instance)
+      this.generate(instance);
     } catch (err) {
-      log.error(err)
+      log.error(err);
     }
   }
 
