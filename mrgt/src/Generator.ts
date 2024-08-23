@@ -79,10 +79,10 @@ export class Generator {
    * If no corresponding entry is found, the synonymOf entry is removed.
    */
   private handleSynonymOf(instance: TuCBuilder): void {
-    const replacementEntries: MRG.Entry[] = [];
+    // First and only pass: Directly modify the entries in tuc.entries
+    for (let i = 0; i < instance.tuc.entries.length; i++) {
+        let entry = instance.tuc.entries[i];
 
-    // First pass: Create replacement entries
-    for (let entry of TuCBuilder.synonymOf!) {
         if (entry.synonymOf) {
             const properties = entry.synonymOf.match(
                 /(?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[^@\n:#)]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
@@ -126,9 +126,7 @@ export class Generator {
                         delete entry[key];
                     });
 
-                    const newEntry = { ...match, ...entry };
-                    replacementEntries.push(newEntry);
-                    console.log("Replacement entry created:", newEntry);
+                    instance.tuc.entries[i] = { ...match, ...entry };  // Directly replace the original entry
                 } else {
                     log.warn("No match found for entry with synonymOf:", entry);
                 }
@@ -136,48 +134,12 @@ export class Generator {
         }
     }
 
-    // Debug: Show the entries in replacementEntries
-    console.log("Replacement entries array:", replacementEntries);
-
-    // Second pass: Construct the final entries array
-    const finalEntries: MRG.Entry[] = [];
-
-    for (let entry of TuCBuilder.synonymOf!) {
-        console.log("Processing entry in second pass:", entry);
-
-        if (!entry.synonymOf) {
-            console.log("Adding non-synonym entry to final array:", entry);
-            finalEntries.push(entry);
-        } else {
-            // Find the corresponding replacement entry
-            const replacement = replacementEntries.find(
-                repl => repl.termid === entry.termid && repl.vsntag === entry.vsntag
-            );
-            if (replacement) {
-                console.log("Adding replacement entry to final array:", replacement);
-                finalEntries.push(replacement);
-            } else {
-                console.warn(`No replacement found for entry with termid '${entry.termid}', adding original entry.`);
-                finalEntries.push(entry); // Ensures the original entry is not lost
-            }
-        }
-    }
-
-    // Debug: Show the finalEntries array before assignment
-    console.log("Final entries array:", finalEntries);
-
-    // Replace the original entries with the final processed entries
-    instance.tuc.entries = finalEntries;
-
-    // Log all entries after processing synonyms
-    console.log("All entries after processing synonyms:", instance.tuc.entries);
-
     try {
-        this.generate(instance);
+        this.generate(instance);  // Proceed directly to generating the MRG files
     } catch (err) {
         log.error(err);
     }
-}
+  }
 
   /**
    * The `generate` method generates the MRG files for the specified TuCBuilder.
