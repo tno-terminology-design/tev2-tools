@@ -79,82 +79,105 @@ export class Generator {
    * If no corresponding entry is found, the synonymOf entry is removed.
    */
   private handleSynonymOf(instance: TuCBuilder): void {
+    const replacementEntries: MRG.Entry[] = [];
+
+    // First pass: Create replacement entries
     for (let entry of TuCBuilder.synonymOf!) {
-      // Ensure the synonymOf field is defined before proceeding
-      if (entry.synonymOf) {
-        const properties = entry.synonymOf.match(
-          /(?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[^@\n:#)]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
-        );
+        if (entry.synonymOf) {
+            const properties = entry.synonymOf.match(
+                /(?:(?:(?<type>[a-z0-9_-]*):)?)(?:(?<term>[^@\n:#)]+))(?:(?:(?<identifier>@)(?:(?<scopetag>[a-z0-9_-]+)?))?(?::(?<vsntag>.+))?)/
+            );
 
-        if (properties?.groups) {
-          Object.keys(properties.groups).forEach((key) => {
-            properties.groups[key] = regularize(properties.groups[key]);
-          });
+            if (properties?.groups) {
+                Object.keys(properties.groups).forEach((key) => {
+                    properties.groups[key] = regularize(properties.groups[key]);
+                });
 
-          let match: MRG.Entry;
-          let index: number;
-
-          try {
-            // Determine if we are working within the TuC entries or need to reference MRG
-            if (!properties.groups.identifier) {
-              match = MRG.getEntry(
-                instance.tuc.entries,
-                instance.tuc.filename,
-                properties.groups.term,
-                properties.groups.type,
-                this.saf.scope.defaulttype
-              );
-            } else {
-              const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
-                properties.groups.vsntag ? properties.groups.vsntag + "." : ""
-              }yaml`;
-              const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile);
-              match = MRG.getEntry(
-                mrg.entries,
-                mrg.filename,
-                properties.groups.term,
-                properties.groups.type,
-                this.saf.scope.defaulttype
-              );
-            }
-          } catch (err) {
-            // Calculate the index to delete the problematic entry
-            index = instance.tuc.entries.indexOf(entry);
-            if (index !== -1) {
-              // Log the warning before deletion
-              log.warn(`\tEntry '${entry.termid}' with SynonymOf field (${entry.synonymOf}) was removed:`, err);
-              delete instance.tuc.entries[index];
-            }
-            continue; // Skip further processing for this entry
-          }
-
-          // If a match was found, merge the synonymOf entry with the matched MRG entry
-          if (match) {
-            // Calculate the index again before updating the entry
-            index = instance.tuc.entries.indexOf(entry);
-            if (index !== -1) {
-              // Remove certain properties before merging
-              Object.keys(entry).forEach((key) => {
-                if (["scopetag", "vsntag", "locator", "navurl", "headingids"].includes(key.toLowerCase())) {
-                  delete entry[key];
+                let match: MRG.Entry | undefined;
+                try {
+                    if (!properties.groups.identifier) {
+                        match = MRG.getEntry(
+                            instance.tuc.entries,
+                            instance.tuc.filename,
+                            properties.groups.term,
+                            properties.groups.type,
+                            this.saf.scope.defaulttype
+                        );
+                    } else {
+                        const mrgfile = `mrg.${properties.groups.scopetag ?? this.saf.scope.scopetag}.${
+                            properties.groups.vsntag ? properties.groups.vsntag + "." : ""
+                        }yaml`;
+                        const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile);
+                        match = MRG.getEntry(
+                            mrg.entries,
+                            mrg.filename,
+                            properties.groups.term,
+                            properties.groups.type,
+                            this.saf.scope.defaulttype
+                        );
+                    }
+                } catch (err) {
+                    log.warn(`Error retrieving entry for synonymOf field '${entry.synonymOf}' in entry '${entry.termid}':`, err);
+                    continue;
                 }
-              });
-              instance.tuc.entries[index] = { ...match, ...entry };
+
+                if (match) {
+                    ["scopetag", "vsntag", "locator", "navurl", "headingids"].forEach((key) => {
+                        delete entry[key];
+                    });
+
+                    const newEntry = { ...match, ...entry };
+                    replacementEntries.push(newEntry);
+                    console.log("Replacement entry created:", newEntry);
+                } else {
+                    log.warn("No match found for entry with synonymOf:", entry);
+                }
             }
-          }
         }
-      } else {
-        log.warn(`synonymOf field is missing for entry with termid '${entry.termid}'`);
-      }
     }
 
-    // Regenerate the MRG files
-    try {
-      this.generate(instance);
-    } catch (err) {
-      log.error(err);
+    // Debug: Show the entries in replacementEntries
+    console.log("Replacement entries array:", replacementEntries);
+
+    // Second pass: Construct the final entries array
+    const finalEntries: MRG.Entry[] = [];
+
+    for (let entry of TuCBuilder.synonymOf!) {
+        console.log("Processing entry in second pass:", entry);
+
+        if (!entry.synonymOf) {
+            console.log("Adding non-synonym entry to final array:", entry);
+            finalEntries.push(entry);
+        } else {
+            // Find the corresponding replacement entry
+            const replacement = replacementEntries.find(
+                repl => repl.termid === entry.termid && repl.vsntag === entry.vsntag
+            );
+            if (replacement) {
+                console.log("Adding replacement entry to final array:", replacement);
+                finalEntries.push(replacement);
+            } else {
+                console.warn(`No replacement found for entry with termid '${entry.termid}', adding original entry.`);
+                finalEntries.push(entry); // Ensures the original entry is not lost
+            }
+        }
     }
-  }
+
+    // Debug: Show the finalEntries array before assignment
+    console.log("Final entries array:", finalEntries);
+
+    // Replace the original entries with the final processed entries
+    instance.tuc.entries = finalEntries;
+
+    // Log all entries after processing synonyms
+    console.log("All entries after processing synonyms:", instance.tuc.entries);
+
+    try {
+        this.generate(instance);
+    } catch (err) {
+        log.error(err);
+    }
+}
 
   /**
    * The `generate` method generates the MRG files for the specified TuCBuilder.
