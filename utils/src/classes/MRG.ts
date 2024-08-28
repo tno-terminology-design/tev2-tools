@@ -1,3 +1,5 @@
+import { regularize } from "../index.js"
+
 import fs = require("fs")
 import path = require("path")
 import yaml = require("js-yaml")
@@ -129,26 +131,41 @@ export function getInstance(scopedir: string, glossarydir: string, filename: str
   return mrg
 }
 
-export function getEntry(entries: Entry[], origin: string, term: string, type: string, defaulttype?: string): Entry {
-  let matches = entries
-  term = term.trim().toLowerCase()
+export function getEntry(
+  entries: Entry[],
+  origin: string,
+  term: string,
+  type: string,
+  defaulttype?: string
+): Entry {
+  // Regularize the term, type, and default type before any processing
+  term = regularize(term);
+  type = regularize(type);
+  if (defaulttype) {
+    defaulttype = regularize(defaulttype);
+  }
 
+  // Filter the entries by matching termType if type is provided
+  let matches = entries;
   if (type != null) {
-    matches = matches.filter((entry) => entry.termType === type)
+    matches = matches.filter((entry) => entry.termType === type);
   }
 
-  matches = matches.filter((entry) => entry.formPhrases.includes(term))
+  // Filter the entries by matching formPhrases
+  matches = matches.filter((entry) => entry.formPhrases.includes(term));
 
+  // If more than one match is found, try filtering by the default type
   if (matches.length > 1 && defaulttype != null) {
-    matches = matches.filter((entry) => entry.termType === defaulttype)
+    matches = matches.filter((entry) => entry.termType === defaulttype);
   }
 
+  // Return the matching entry or throw appropriate errors
   if (matches.length === 1) {
-    return matches[0]
+    return matches[0];
   } else if (matches.length === 0) {
-    throw new Error(`could not be matched with an MRG entry in '${origin}'`)
+    throw new Error(`could not be matched with an MRG entry in '${origin}'`);
   } else if (matches.length > 1) {
-    const matchingTermIds = matches.map((entry) => entry.termid).join("', '")
-    throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`)
+    const matchingTermIds = matches.map((entry) => entry.termid).join("', '");
+    throw new Error(`has multiple matching MRG entries in '${origin}'. Matching termids: '${matchingTermIds}'`);
   }
 }
