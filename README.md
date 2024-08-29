@@ -6,5 +6,15 @@ Please refer to the [project documentation](https://tno-terminology-design.githu
 
 ## Release Notes
 
+### v1.2.1
+
+- Rename `-o` into `-e` as equivalent for `--onNotExist`, to avoid ambiguities with `-o` that is used for output stuff.
+- MRGT:
+  - enhanced logging.
+  - bugfixing in the treatment of `synonymOf` fields.
+
+### v1.2.0
+
 - Starting from release 1.2.0, we are maintaining more detailed release notes
 - MRGT has a bug fixed in handling `synonymOf` fields.
+
