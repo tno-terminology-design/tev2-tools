@@ -32,7 +32,6 @@ program
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-o, --output <dir>", "(Root) directory for output files to be written")
   .option("-s, --scopedir <path>", "Path of the scope directory where the SAF is located")
-  // If interpreters or converters are added/removed, please adjust the documentation at `tno-terminology-design/tev2-specifications/docs/specs`.
   .option(
     "--int, --interpreter <regex> or <predeftype>",
     "Type of interpreter, i.e., a regex, or a predefined type (`default`)"
@@ -66,7 +65,7 @@ async function main(): Promise<void> {
     const match = value.match(/^--con(?:verter)?(?:\[(?<n>-?\d+|error)?\])?$/)
     if (match) {
       const template = process.argv[parseInt(key) + 3]
-      options[`converter[${match.groups.n}]`] = template
+      options[`converter[${match.groups?.n}]`] = template
       const i = program.args.indexOf(value)
       if (i !== -1) {
         program.args.splice(i, 2)
@@ -96,11 +95,11 @@ async function main(): Promise<void> {
     const match = key.match(/^con(?:verter)?(?:\[(?<n>-?\d+|error)?\])?$/)
     if (match && value != null) {
       const template = value as string
-      if (match.groups.n === "error") {
+      if (match.groups?.n === "error") {
         const n = -1
         new Converter({ template, n })
       } else {
-        const n = parseInt(match.groups.n)
+        const n = parseInt(match.groups?.n ?? '1')
         new Converter({ template, n: n >= 1 ? n : 1 })
       }
     }
@@ -108,14 +107,17 @@ async function main(): Promise<void> {
   Converter.instances.sort((a, b) => a.n - b.n)
 
   // Check if required options are provided
-  if (options.output == null || options.scopedir == null || options.input == null || Converter.instances.length === 0) {
-    program.addHelpText(
-      "after",
-      "\nRequired options are missing\n" +
-        "Provide at least the following options: output <path>, scopedir <path> and input <globpattern>, converter[n] <template> or <predeftype>*\n"
-    )
-    program.help()
-    process.exit(1)
+  const missingOptions = []
+  if (!options.output) missingOptions.push('output <path>')
+  if (!options.scopedir) missingOptions.push('scopedir <path>')
+  if (!options.input) missingOptions.push('input <globpattern>')
+  // No longer checking if (Converter.instances.length === 0) missingOptions.push('converter[n] <template> or <predeftype>')
+
+  if (missingOptions.length > 0) {
+    console.log("\nRequired options are missing:")
+    console.log(missingOptions.join('\n'))
+    console.log(program.helpInformation()) // Manually logs the help message
+    process.exit(1)  // Exits with code 1 to indicate an error
   }
 
   // Create a resolver with the provided options

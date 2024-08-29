@@ -64,47 +64,71 @@ export class Resolver {
    * @returns A Promise that resolves to the processed data string or undefined in case of no matches.
    */
   private async matchIterator(file: GrayMatterFile): Promise<string | undefined> {
-    // Find all the matches according to the interpreter regex
-    const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.regex))
-    if (file.matter != null) {
-      // Remove matches that are part of the frontmatter
-      const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.regex))
-      matches.splice(0, frontmatter.length)
-    }
-
-    file.lastIndex = 0 // lastIndex is used to account for the length difference between the matches and replacements
-    file.output = file.orig.toString()
-
-    // Iterate over each match found in the file.orig string
-    for (const match of matches) {
-      log.info(`\x1b[1;37mFound MRG Reference '${match[0]}' in file '${file.path.base}'\x1b[0m`)
-
-      // Interpret the match using the interpreter
-      const mrgref: MRGRef = this.interpreter.interpret(match)
-
-      const mrgfile = `mrg.${mrgref.scopetag || this.saf.scope.scopetag}${
-        mrgref.vsntag ? "." + mrgref.vsntag : ""
-      }.yaml`
-      try {
-        // Get the MRG instance based on `mrgfile`
-        const mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile)
-        log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`)
-
-        if (mrg.entries.length > 0) {
-          // Start the replacement process
-          this.replacementHandler(match, mrgref, mrg, file)
-        } else {
-          continue
+    try {
+        // Find all matches according to the interpreter regex
+        const matches: RegExpMatchArray[] = Array.from(file.orig.toString().matchAll(this.interpreter.regex));
+        if (file.matter != null) {
+            // Remove matches that are part of the frontmatter
+            const frontmatter: RegExpMatchArray[] = Array.from(file.matter.matchAll(this.interpreter.regex));
+            matches.splice(0, frontmatter.length);
         }
-      } catch (err) {
-        this.replacementHandler(match, mrgref, null, file)
-        report.onNotExistError(err)
-      }
-    }
-    if (file.converted > 0) {
-      return file.output
-    } else {
-      return undefined
+
+        file.lastIndex = 0; // Reset lastIndex to account for the length difference between the matches and replacements
+        file.output = file.orig.toString(); // Initialize file output
+
+        // Iterate over each match found in the file
+        for (const match of matches) {
+            log.info(`\x1b[1;37mFound MRG Reference '${match[0]}' in file '${file.path.base}'\x1b[0m`);
+
+            // Interpret the match using the interpreter
+            const mrgref: MRGRef = this.interpreter.interpret(match);
+            if (!mrgref) {
+                log.error(`Failed to interpret MRG reference in file '${file.path.base}' at index ${match.index}`);
+                continue; // Skip this match and proceed to the next
+            }
+
+            // Construct the MRG file path
+            const mrgfile = `mrg.${mrgref.scopetag || this.saf.scope.scopetag}${mrgref.vsntag ? "." + mrgref.vsntag : ""}.yaml`;
+
+            let mrg: MRG.Type | null = null;
+            try {
+                // Get the MRG instance based on the constructed file path
+                mrg = MRG.getInstance(this.saf.scope.localscopedir, this.saf.scope.glossarydir, mrgfile);
+                if (!mrg || !mrg.entries) {
+                    throw new Error(`MRG file '${mrgfile}' could not be found or contains no entries.`);
+                }
+                log.info(`\tFound ${mrg.entries.length} entr${mrg.entries.length === 1 ? "y" : "ies"} in '${mrg.filename}'`);
+            } catch (err) {
+                log.error(`Error loading MRG file '${mrgfile}': ${err.message}`);
+                this.replacementHandler(match, mrgref, null, file); // Attempt error handling replacement
+                report.onNotExistError(err);
+                continue; // Skip to the next match
+            }
+
+            // Ensure MRG entries exist before processing
+            if (mrg.entries.length > 0) {
+                try {
+                    // Start the replacement process
+                    this.replacementHandler(match, mrgref, mrg, file);
+                } catch (err) {
+                    log.error(`Error during replacement for MRG reference '${match[0]}' in file '${file.path.base}': ${err.message}`);
+                }
+            } else {
+                log.warn(`MRG file '${mrg.filename}' contains no entries to process for reference '${match[0]}' in file '${file.path.base}'`);
+                continue; // Skip to the next match
+            }
+        }
+
+        // Return processed output if there were any conversions
+        if (file.converted > 0) {
+            return file.output;
+        } else {
+            log.info(`No conversions were made for file '${file.path.base}'.`);
+            return undefined;
+        }
+    } catch (err) {
+        log.error(`Unexpected error during match iteration: ${err.message}`);
+        return undefined;
     }
   }
 
@@ -156,11 +180,17 @@ export class Resolver {
 
       // Check if the MRGRef has a converter specified
       if (mrgref.converter != null) {
+        // Converter specified inline in MRGRef
         converters = [new Converter({ template: mrgref.converter })]
-        log.info(`\tUsing ${converters[0].type} converter: '${converters[0].template.replace(/\n/g, "\\n")}'`)
+        log.info(`\tUsing inline MRGRef converter: '${converters[0].template.replace(/\n/g, "\\n")}'`)
+      } else if (Converter.instances.filter((i) => i.n > 0).length > 0) {
+          // Converters specified via command line or configuration file
+          converters = Converter.instances.filter((i) => i.n > 0)
+          log.info(`\tUsing converters specified in configuration or command line`)
       } else {
-        converters = Converter.instances.filter((i) => i.n > 0)
-        log.info(`\tUsing default set converters`)
+          // Fallback to a default converter if no other is specified
+          converters = [new Converter({ template: 'markdown-table-row' })] // Example default
+          log.info(`\tNo converter is specified - using default converter: 'markdown-table-row'`)
       }
 
       for (const entry of entries) {
