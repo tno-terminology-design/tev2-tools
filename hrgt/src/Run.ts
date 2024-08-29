@@ -49,7 +49,7 @@ program
     "--sort, --sorter <template> or <predeftype>",
     "Type of sorter, i.e., a mustache/handlebars template, or a predifined type (`default`) by which to sort the glossary items"
   )
-  .option("-o, --onNotExist <action>", "The action in case an MRG file unexpectedly does not exist")
+  .option("-e, --onNotExist <action>", "The action in case an MRG file unexpectedly does not exist")
   .option("-f, --force", "Allow overwriting of existing files")
   .option("-h, --help", "Display help for command")
   .allowUnknownOption(true)

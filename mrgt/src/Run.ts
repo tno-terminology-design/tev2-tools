@@ -26,7 +26,7 @@ program
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-s, --scopedir <path>", "Path of the scope directory from which the tool is called")
   .option("-v, --vsntag <vsntag>", "Versiontag for which the MRG needs to be (re)generated")
-  .option("-o, --onNotExist <action>", "The action in case a `vsntag` was specified, but wasn't found in the SAF")
+  .option("-e, --onNotExist <action>", "The action in case a `vsntag` was specified, but wasn't found in the SAF")
   .option("-p, --prune", "Prune MRGs of the local scope that are not in the SAF")
   .option("-h, --help", "Display help for command")
   .parse(process.argv)

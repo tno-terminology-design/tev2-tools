@@ -24,7 +24,7 @@ program
   .version(version, "-V, --version", "Output the version number")
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-s, --scopedir <path>", "Path of the scope directory from which the tool is called")
-  .option("-o, --onNotExist <action>", "The action in case an MRG file unexpectedly does not exist")
+  .option("-e, --onNotExist <action>", "The action in case an MRG file unexpectedly does not exist")
   .option("-p, --prune", "Prune MRGs of scopes that are not in administered the SAF")
   .option("-h, --help", "Display help for command")
   .parse(process.argv)
