@@ -73,32 +73,33 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
           // }
         }
 
-        // write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
-        mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`)
-        const mrgdump = yaml.dump(mrg, { forceQuotes: true, quotingType: '"', noRefs: true })
-        log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}'\x1b[0m`)
-        writeFile(mrgURL, mrgdump, true)
+        // Write the contents to {my-scopedir}/{my-glossarydir}/mrg.{import-scopetag}.{import-vsntag}.yaml
+        mrgURL = path.join(scopedir, saf.scope.glossarydir, `mrg.${scope.scopetag}.${version.vsntag}.yaml`);
+        const mrgdump = yaml.dump(mrg, { forceQuotes: true, quotingType: '"', noRefs: true });
+        log.info(`\x1b[1;37m\tStoring MRG file '${path.basename(mrgURL)}' in '${path.dirname(mrgURL)}' (primary version)\x1b[0m`);
+        writeFile(mrgURL, mrgdump, true);
 
         if (version.altvsntags || version.vsntag === importSaf.scope.defaultvsn) {
-          log.info(`\tCreating duplicates...`)
+          log.info(`\tCreating duplicate MRGs for 'altvsntags' and/or 'defaultvsn'.`);
         }
 
-        // if the version is the default version, create a duplicate {mrg.{import-scopetag}.yaml}
+        // If the version is the default version, create a duplicate {mrg.{import-scopetag}.yaml}
         if (version.vsntag === importSaf.scope.defaultvsn || version.altvsntags?.includes(importSaf.scope.defaultvsn)) {
-          const defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`)
-          log.trace(`\t\t'${path.basename(defaultmrgURL)}' (default)`)
-          writeFile(defaultmrgURL, mrgdump, true)
+          const defaultmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.yaml`);
+          log.info(`\tStoring MRG file '${path.basename(defaultmrgURL)}' in '${path.dirname(defaultmrgURL)}' (default version)`);
+          writeFile(defaultmrgURL, mrgdump, true);
         }
 
         // Create a duplicate for every altvsntag
         if (typeof version.altvsntags === "string") {
-          version.altvsntags = [version.altvsntags]
+          version.altvsntags = [version.altvsntags];
         }
         version.altvsntags?.forEach((altvsntag) => {
-          const altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`)
-          log.trace(`\t\t'${path.basename(altmrgURL)}' (altvsn)`)
-          writeFile(altmrgURL, mrgdump, true)
-        })
+          const altmrgURL = path.join(path.dirname(mrgURL), `mrg.${scope.scopetag}.${altvsntag}.yaml`);
+          log.info(`\tStoring MRG file '${path.basename(altmrgURL)}' in '${path.dirname(altmrgURL)}' (alternative version: ${altvsntag})`);
+          writeFile(altmrgURL, mrgdump, true);
+        });
+
       } catch (err) {
         report.onNotExistError(err as Error)
       }
