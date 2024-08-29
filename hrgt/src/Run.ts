@@ -78,15 +78,19 @@ async function main(): Promise<void> {
     options.input = program.args
   }
 
+  // Load the configuration file, if specified
   if (options.config) {
     try {
-      const config = yaml.load(readFileSync(resolve(options.config), "utf8")) as OptionValues
+      const configPath = resolve(options.config)
+      log.info(`Loading configuration file from '${configPath}'`)
+      const config = yaml.load(readFileSync(configPath, "utf8")) as OptionValues
 
-      // Overwrite config options and hrgt specific config options with command line options
+      // Merge command line options with config options
       const { hrgt, ...rest } = config
       options = { ...rest, ...hrgt, ...options }
     } catch (err) {
-      throw new Error(`E011 Failed to read or parse the config file '${options.config}'`, { cause: err })
+      log.error(`E011 Failed to read or parse the config file '${options.config}': ${err.message}`)
+      process.exit(1)
     }
   }
 
@@ -94,16 +98,23 @@ async function main(): Promise<void> {
   for (const [key, value] of Object.entries(options)) {
     const match = key.match(/^con(?:verter)?(?:\[(?<n>-?\d+|error)?\])?$/)
     if (match && value != null) {
-      const template = value as string
-      if (match.groups?.n === "error") {
-        const n = -1
-        new Converter({ template, n })
-      } else {
-        const n = parseInt(match.groups?.n ?? '1')
-        new Converter({ template, n: n >= 1 ? n : 1 })
+      try {
+        const template = value as string
+        if (match.groups?.n === "error") {
+          const n = -1
+          new Converter({ template, n })
+        } else {
+          const n = parseInt(match.groups?.n ?? '1')
+          new Converter({ template, n: n >= 1 ? n : 1 })
+        }
+      } catch (err) {
+        log.error(`E013 Failed to process converter option '${key}': ${err.message}`)
+        process.exit(1)
       }
     }
   }
+
+  // Sort the converter instances
   Converter.instances.sort((a, b) => a.n - b.n)
 
   // Check if required options are provided
@@ -111,40 +122,46 @@ async function main(): Promise<void> {
   if (!options.output) missingOptions.push('output <path>')
   if (!options.scopedir) missingOptions.push('scopedir <path>')
   if (!options.input) missingOptions.push('input <globpattern>')
-  // No longer checking if (Converter.instances.length === 0) missingOptions.push('converter[n] <template> or <predeftype>')
 
   if (missingOptions.length > 0) {
     console.log("\nRequired options are missing:")
     console.log(missingOptions.join('\n'))
     console.log(program.helpInformation()) // Manually logs the help message
-    process.exit(1)  // Exits with code 1 to indicate an error
+    process.exit(1)
   }
 
   // Create a resolver with the provided options
-  const resolver = new Resolver({
-    outputPath: resolve(options.output),
-    globPattern: options.input,
-    force: options.force,
-    sorter: options.sorter ?? "default",
-    interpreter: options.interpreter ?? "default",
-    saf: resolve(options.scopedir)
-  })
+  let resolver: Resolver
+  try {
+    resolver = new Resolver({
+      outputPath: resolve(options.output),
+      globPattern: options.input,
+      force: options.force,
+      sorter: options.sorter ?? "default",
+      interpreter: options.interpreter ?? "default",
+      saf: resolve(options.scopedir)
+    })
+  } catch (err) {
+    log.error(`E014 Failed to initialize the resolver: ${err.message}`)
+    process.exit(1)
+  }
 
   report.setOnNotExist(options.onNotExist)
 
   // Resolve terms
-  await resolver.resolve()
-  log.info("Execution complete")
+  try {
+    await resolver.resolve()
+    log.info("Execution complete")
+    process.exit(0)
+  } catch (err) {
+    log.error(`E015 Error during resolution: ${err.message}`)
+    process.exit(1)
+  }
 }
 
 try {
   await main()
-  process.exit(0)
 } catch (err) {
-  if ((err as Error).cause) {
-    log.error(err)
-  } else {
-    log.error("E012 Something unexpected went wrong during execution:", err)
-  }
+  log.error(`E012 Something unexpected went wrong during execution: ${err.message}`)
   process.exit(1)
 }

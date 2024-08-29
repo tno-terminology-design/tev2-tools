@@ -68,11 +68,11 @@ export class Builder {
    */
   public getMap(mrgpath: string): Type {
     try {
-      // try to load the MRG map from the `mrgpath`
+      // Attempt to read the MRG file
       const mrgfile = fs.readFileSync(mrgpath, "utf8")
       this.mrg = yaml.load(mrgfile) as Type
 
-      // check for missing required properties in MRG terminology
+      // Check for missing required properties in MRG terminology
       type TerminologyProperty = keyof Terminology
       const requiredProperties: TerminologyProperty[] = ["scopetag", "scopedir", "curatedir", "vsntag"]
       const terminology = this.mrg.terminology
@@ -85,11 +85,11 @@ export class Builder {
       const requiredEntryProperties = ["term", "scopetag", "locator"]
 
       for (const entry of this.mrg.entries) {
-        // check for missing required properties in MRG entries
+        // Check for missing required properties in MRG entries
         const missingProperties = requiredEntryProperties.filter((prop) => entry[prop] == null)
 
         if (missingProperties.length > 0) {
-          // create a reference to the problematic entry using the first three property-value pairs
+          // Create a reference to the problematic entry using the first three property-value pairs
           const reference = Object.keys(entry)
             .slice(0, 3)
             .map((prop) => `${prop}: '${entry[prop]}'`)
@@ -101,8 +101,17 @@ export class Builder {
           )
         }
       }
-    } catch (err) {
-      throw new Error(`E005 An error occurred while attempting to load an MRG at ${mrgpath}`, { cause: err })
+    } catch (err: any) {
+      // Differentiate error types
+      if (err.code === 'ENOENT') {
+        throw new Error(`E005 MRG file not found at ${mrgpath}. Please ensure the file exists.`, { cause: err });
+      } else if (err.name === 'YAMLException' || err.message.includes('YAML')) {
+        throw new Error(`E005 Failed to parse MRG file at ${mrgpath} due to invalid YAML format.`, { cause: err });
+      } else if (err.code === 'EACCES' || err.code === 'EPERM') {
+        throw new Error(`E005 Permission denied while reading MRG file at ${mrgpath}. Check file access permissions.`, { cause: err });
+      } else {
+        throw new Error(`E005 An unknown error occurred while attempting to load an MRG at ${mrgpath}`, { cause: err });
+      }
     }
 
     return this.mrg
