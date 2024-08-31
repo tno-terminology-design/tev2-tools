@@ -71,59 +71,92 @@ export class Builder {
     try {
       // Attempt to read the MRG file
       const mrgfile = fs.readFileSync(mrgpath, "utf8");
+      log.info(`Successfully read MRG file from path: ${mrgpath}`);
+  
+      // Load the YAML file into a Type object
       const mrgDocument = yaml.load(mrgfile, { json: true }) as Type;
+  
+      // Log the loaded document to verify its contents
+      // log.debug(`Loaded MRG document from ${mrgpath}: ${JSON.stringify(mrgDocument, null, 2)}`);
+  
+      // Ensure the loaded YAML document is valid
+      if (!mrgDocument) {
+        throw new Error(`E005 MRG file at ${mrgpath} could not be loaded as expected.`);
+      }
+  
+      // Validate 'entries' array
+      if (!mrgDocument.entries || !Array.isArray(mrgDocument.entries)) {
+        throw new Error(`E005 Invalid MRG structure in file at ${mrgpath}: 'entries' is missing or not an array.`);
+      }
+  
+      // Validate 'terminology' object
+      if (!mrgDocument.terminology || typeof mrgDocument.terminology !== 'object') {
+        throw new Error(`E005 Invalid MRG structure in file at ${mrgpath}: 'terminology' is missing or not an object.`);
+      }
+  
+      // Assign the validated document to the class property
       this.mrg = mrgDocument;
-
+  
       // Calculate line numbers for each entry
       const fileLines = mrgfile.split("\n");
       for (const entry of this.mrg.entries) {
         entry.lineNumber = findLineNumberForEntry(entry, fileLines);
       }
-
+  
       // Check for missing required properties in MRG terminology
       type TerminologyProperty = keyof Terminology;
       const requiredProperties: TerminologyProperty[] = ["scopetag", "scopedir", "curatedir", "vsntag"];
       const terminology = this.mrg.terminology;
       const missingProperties = requiredProperties.filter((prop) => terminology[prop] == null);
-
+  
       if (missingProperties.length > 0) {
         throw new Error(`Missing required property: '${missingProperties.join("', '")}'`);
       }
-
-      const requiredEntryProperties = ["term", "scopetag", "locator"];
-
+  
+      // const requiredEntryProperties = ["term", "scopetag", "locator"];
+      // See issue https://github.com/tno-terminology-design/tev2-tools/issues/49
+      const requiredEntryProperties = ["term"];
+  
       for (const entry of this.mrg.entries) {
         // Check for missing required properties in MRG entries
         const missingProperties = requiredEntryProperties.filter((prop) => entry[prop] == null);
-
+  
         if (missingProperties.length > 0) {
           // Create a reference to the problematic entry using the first three property-value pairs
           const reference = Object.keys(entry)
             .slice(0, 3)
             .map((prop) => `${prop}: '${entry[prop]}'`)
             .join(", ");
-
+  
           throw new Error(
             `Entry missing required property: '${missingProperties.join("', '")}'. 
             Entry starts with values ${reference} (line ${entry.lineNumber})`
           );
         }
       }
+  
+      return this.mrg;
     } catch (err: any) {
+      // Log the error details for easier debugging
+      log.error(`Error processing MRG file at ${mrgpath}: ${err.message}`);
+      log.error(`Error details: ${JSON.stringify(err, null, 2)}`);
+  
       // Differentiate error types
       if (err.code === "ENOENT") {
         throw new Error(`E005 MRG file not found at ${mrgpath}. Please ensure the file exists.`, { cause: err });
       } else if (err.name === "YAMLException" || err.message.includes("YAML")) {
         throw new Error(`E005 Failed to parse MRG file at ${mrgpath} due to invalid YAML format.`, { cause: err });
       } else if (err.code === "EACCES" || err.code === "EPERM") {
-        throw new Error(`E005 Permission denied while reading MRG file at ${mrgpath}. Check file access permissions.`, { cause: err });
+        throw new Error(
+          `E005 Permission denied while reading MRG file at ${mrgpath}. Check file access permissions.`,
+          { cause: err }
+        );
       } else {
         throw new Error(`E005 An unknown error occurred while attempting to load an MRG at ${mrgpath}`, { cause: err });
       }
     }
-
-    return this.mrg;
   }
+  
 }
 
 /**
