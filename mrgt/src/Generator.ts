@@ -45,20 +45,20 @@ function logSynonymExcerpt(synEntry: MRG.Entry, matchEntry: MRG.Entry | null, me
   }
 
   // Log the table header using the same logging function
-  log.debug(formatRow('Field', 'Syn Entry', 'Match Entry', 'Merged Entry'));
+  // log.debugformatRow('Field', 'Syn Entry', 'Match Entry', 'Merged Entry'));
 
   // Log each row for the fields
   fields.forEach(field => {
-    log.debug(formatRow(
-      field,
-      excerptSynEntry[field],
-      excerptMatchEntry[field] || '',
-      excerptMergedEntry[field] || ''
-    ));
+    //   log.debugformatRow(
+    //   field,
+    //   excerptSynEntry[field],
+    //   excerptMatchEntry[field] || '',
+    //   excerptMergedEntry[field] || ''
+    // ));
   });
 
   // Add a blank line after the table for better readability
-  log.debug('');
+  // log.debug'');
 }
 
 /**
@@ -98,9 +98,9 @@ export class Generator {
     }
 
     // Handle synonymOf entries
-    log.debug("Starting synonymOf processing for all TuC instances...");
+    // log.debug"Starting synonymOf processing for all TuC instances...");
     for (const instance of TuCBuilder.instances) {
-        log.debug(`Processing TuC instance with version '${instance.tuc.terminology.vsntag}'...`);
+        // log.debug`Processing TuC instance with version '${instance.tuc.terminology.vsntag}'...`);
         this.handleSynonymOf(instance);
     }
   }
@@ -109,7 +109,7 @@ export class Generator {
    * The `handleSynonymOf` method handles the synonymOf entries in the TuC.
    */
   private handleSynonymOf(instance: TuCBuilder): void {
-    log.debug(`Handling synonyms for TuC with version '${instance.tuc.terminology.vsntag}'...`);
+    // log.debug`Handling synonyms for TuC with version '${instance.tuc.terminology.vsntag}'...`);
     let synonymCount = 0;
     let successCount = 0;
     let failureCount = 0;
@@ -120,7 +120,7 @@ export class Generator {
 
       if (entry.synonymOf) {
         synonymCount++;
-        log.debug(`Processing entry with synonymOf field: ${entry.termid}`);
+        // log.debug`Processing entry with synonymOf field: ${entry.termid}`);
         this.logEntry(entry);  // Log the entry with the synonymOf field
 
         // Extract properties from synonymOf field
@@ -134,7 +134,7 @@ export class Generator {
           });
 
           // Log the named capturing groups after regularization
-          log.debug(`Named capturing groups after regularization: ${JSON.stringify(properties.groups)}`);
+          // log.debug`Named capturing groups after regularization: ${JSON.stringify(properties.groups)}`);
 
           // Determine the entries list: either from the current TuC or an MRG file
           let entriesList: MRG.Entry[] = [];
@@ -150,7 +150,7 @@ export class Generator {
             entriesList = mrg.entries;
           }
 
-          log.debug(`The synonym search is conducted in: ${sourceDescription}`);
+          // log.debug`The synonym search is conducted in: ${sourceDescription}`);
 
           // First-Level Search: Using NCG `term` and `type` (allow `type` to be undefined if not provided)
           let firstLevelMatches: MRG.Entry[] = [];
@@ -165,7 +165,7 @@ export class Generator {
               properties.groups.type // Allow `type` to be undefined if not defined
             );
 
-            log.debug(`First-level search returned ${firstLevelMatches.length} match(es).`);
+            // log.debug`First-level search returned ${firstLevelMatches.length} match(es).`);
             this.logFirstThreeEntries(firstLevelMatches);
 
             if (firstLevelMatches.length === 1) {
@@ -174,7 +174,7 @@ export class Generator {
               successCount++;
               continue;
             } else if (firstLevelMatches.length === 0) {
-              log.debug(`No matches found in the first-level search. Skipping to next entry.`);
+              // log.debug`No matches found in the first-level search. Skipping to next entry.`);
               failureCount++;
               continue;
             }
@@ -191,18 +191,18 @@ export class Generator {
 
             // Check if we have a valid type for filtering
             if (!typeForSecondSearch) {
-              log.debug(`Both 'termType' for entry '${entry.termid}' and 'defaulttype' are undefined. Cannot filter matches accurately.`);
+              // log.debug`Both 'termType' for entry '${entry.termid}' and 'defaulttype' are undefined. Cannot filter matches accurately.`);
               logSynonymExcerpt(entry, null, null); // Log the table with empty Match and Modified columns
               failureCount++;
               continue;
             }
 
             // Log entries before refining in the second-level search
-            log.debug(`Number of entries for second-level search: ${firstLevelMatches.length}`);
+            // log.debug`Number of entries for second-level search: ${firstLevelMatches.length}`);
             this.logFirstThreeEntries(firstLevelMatches); // Log the first three entries in a table format
 
             // Perform second-level search using type
-            log.debug(`Refining matches with term: '${properties.groups.term}', type: '${typeForSecondSearch}', from: '${sourceDescription}'`);
+            // log.debug`Refining matches with term: '${properties.groups.term}', type: '${typeForSecondSearch}', from: '${sourceDescription}'`);
             const secondLevelMatches = MRG.getAllMatches(
               firstLevelMatches,  // Use first-level matches as entries list
               sourceDescription,
@@ -210,7 +210,7 @@ export class Generator {
               typeForSecondSearch // Use `termType` of `syn-entry` or `defaulttype`
             );
 
-            log.debug(`Second-level search returned ${secondLevelMatches.length} match(es).`);
+            // log.debug`Second-level search returned ${secondLevelMatches.length} match(es).`);
             this.logFirstThreeEntries(secondLevelMatches);  // Log the matched entries for the second-level search
 
             if (secondLevelMatches.length === 1) {
@@ -249,19 +249,19 @@ export class Generator {
     const truncateLength = 32;
 
     // Prepare table headers
-    log.debug(`  Field        | First entry                      | Second entry                     | Third entry`);
-    log.debug(`-----------------------------------------------------------------------------------------------------`);
+    // log.debug`  Field        | First entry                      | Second entry                     | Third entry`);
+    // log.debug`-----------------------------------------------------------------------------------------------------`);
 
     // Log each row for the fields
     fields.forEach(field => {
       const firstEntryValue = entriesList[0] ? truncate(String(entriesList[0][field] || ""), truncateLength) : '';
       const secondEntryValue = entriesList[1] ? truncate(String(entriesList[1][field] || ""), truncateLength) : '';
       const thirdEntryValue = entriesList[2] ? truncate(String(entriesList[2][field] || ""), truncateLength) : '';
-      log.debug(`  ${field.padEnd(12)} | ${firstEntryValue.padEnd(30)} | ${secondEntryValue.padEnd(30)} | ${thirdEntryValue.padEnd(30)}`);
+      // log.debug`  ${field.padEnd(12)} | ${firstEntryValue.padEnd(30)} | ${secondEntryValue.padEnd(30)} | ${thirdEntryValue.padEnd(30)}`);
     });
 
     // Add a blank line after the table
-    log.debug('');
+    // log.debug'');
   }
 
   private logEntry(entry: MRG.Entry): void {
@@ -269,14 +269,14 @@ export class Generator {
     const truncateLength = 32;
 
     // Log each field with its value
-    log.debug(`Entry Details:`);
+    // log.debug`Entry Details:`);
     fields.forEach(field => {
       const value = truncate(String(entry[field] || ""), truncateLength);
-      log.debug(`  ${field}: ${value}`);
+      // log.debug`  ${field}: ${value}`);
     });
 
     // Add a blank line after the entry details
-    log.debug('');
+    // log.debug'');
   }
 
   /**
@@ -307,7 +307,7 @@ export class Generator {
    * The `generate` method generates the MRG files for the specified TuCBuilder.
    */
   public generate(build: TuCBuilder): void {
-    log.debug(`Entering generate for version '${build.tuc.terminology.vsntag}'...`);
+    // log.debug`Entering generate for version '${build.tuc.terminology.vsntag}'...`);
 
     const output = yaml.dump(build.output(), { forceQuotes: true, quotingType: '"', noRefs: true });
     const glossarydir = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir);
@@ -331,7 +331,7 @@ export class Generator {
       const locators = duplicates.map(([termid, entries]) => {
         return `\n\t'\x1b[1;37m${termid}\x1b[0m': (${entries.map((entry) => `${entry.locator}@${entry.scopetag}`).join(", ")})`;
       }).join(", ");
-      log.debug(`Duplicate termids found: ${locators}`);
+      // log.debug`Duplicate termids found: ${locators}`);
     }
 
     const mrgFile = `mrg.${build.tuc.terminology.scopetag}.${build.tuc.terminology.vsntag}.yaml`;
@@ -356,27 +356,8 @@ export class Generator {
       log.trace(`Created altvsn duplicate '${path.basename(altmrgURL)}'`);
     });
 
-    log.debug(`Exiting generate for version '${build.tuc.terminology.vsntag}'...`);
+    // log.debug`Exiting generate for version '${build.tuc.terminology.vsntag}'...`);
   }
 
-  public async prune(): Promise<void> {
-    log.info("Pruning MRGs of the local scope that are not in the SAF...");
 
-    const glossaryfiles = path.join(this.saf.scope.localscopedir, this.saf.scope.glossarydir, `mrg.${this.saf.scope.scopetag}*.yaml`);
-    const mrgfiles = await glob(glossaryfiles);
-
-    for (const mrgfile of mrgfiles) {
-      const basename = path.basename(mrgfile);
-      const vsntag = basename.match(/mrg.[a-z0-9_-]+(?:.([a-z0-9_-]+))?.yaml/)?.[1];
-      if (vsntag != null && !this.saf.versions?.find((vsn) => vsn.vsntag === vsntag || vsn.altvsntags?.includes(vsntag))) {
-        log.trace(`Deleting '${basename}'...`);
-        fs.unlink(mrgfile, (err) => {
-          if (err) {
-            log.error(`Failed to delete '${basename}': ${err}`);
-            throw new Error(`Failed to delete '${basename}': ${err}`);
-          }
-        });
-      }
-    }
-  }
 }

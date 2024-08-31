@@ -25,7 +25,6 @@ program
   .option("-c, --config <path>", "Path (including the filename) of the tool's (YAML) configuration file")
   .option("-s, --scopedir <path>", "Path of the scope directory from which the tool is called")
   .option("-e, --onNotExist <action>", "The action in case an MRG file unexpectedly does not exist")
-  .option("-p, --prune", "Prune MRGs of scopes that are not in administered the SAF")
   .option("-h, --help", "Display help for command")
   .parse(process.argv)
 
@@ -63,7 +62,7 @@ async function main(): Promise<void> {
 
   report.setOnNotExist(options.onNotExist)
 
-  await initialize({ scopedir: resolve(options.scopedir), prune: options.prune })
+  await initialize({ scopedir: resolve(options.scopedir) })
   log.info("The MRG Import Tool has finished execution")
 }
 

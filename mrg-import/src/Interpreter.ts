@@ -12,9 +12,8 @@ import { AxiosError } from "axios"
 /**
  * The initialize function is called to start the import process.
  * The `scopedir` parameter is used to specify the scopedir.
- * The `prune` parameter is used to specify whether to prune MRGs of scopes that are not in administered the SAF.
  */
-export async function initialize({ scopedir, prune }: { scopedir: string; prune: boolean }) {
+export async function initialize({ scopedir }: { scopedir: string }) {
   // read the SAF of the 'own' scope
   const env = new Interpreter({ scopedir: scopedir })
   const saf = await env.saf
@@ -24,9 +23,6 @@ export async function initialize({ scopedir, prune }: { scopedir: string; prune:
     return
   }
 
-  if (prune) {
-    env.prune()
-  }
   // for each scope in the scopes-section of the 'own' SAF
   log.info(
     `\x1b[1;37mFound ${saf.scopes.length} import scope${saf.scopes.length > 1 ? "s" : ""} in scopedir '${
@@ -162,29 +158,5 @@ export class Interpreter {
     return filePath
   }
 
-  public async prune(): Promise<void> {
-    log.info(`\x1b[1;37mPruning MRGs of scopes that are not in administered the SAF...\x1b[0m`)
-    const saf = await this.saf
-    const glossaryfiles = path.join(saf.scope.localscopedir, saf.scope.glossarydir, `mrg.*.yaml`)
-    // get all mrg files that match the glossaryfiles pattern
-    const mrgfiles = await glob(glossaryfiles)
 
-    for (const mrgfile of mrgfiles) {
-      const basename = path.basename(mrgfile)
-      // get the scopetag from the basename
-      const scopetag = basename.match(/mrg.([a-z0-9_-]+)(?:.[a-z0-9_-]+)?.yaml/)?.[1]
-      // if the scopetag is not in the SAF, delete the mrgfile
-      if (
-        scopetag != null &&
-        !(saf.scopes?.find((scope) => scope.scopetag === scopetag) || scopetag === saf.scope.scopetag)
-      ) {
-        log.trace(`\tDeleting '${basename}'...`)
-        fs.unlink(mrgfile, (err) => {
-          if (err) {
-            throw new Error(`Failed to delete '${basename}': ${err}`)
-          }
-        })
-      }
-    }
-  }
 }

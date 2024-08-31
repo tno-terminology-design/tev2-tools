@@ -27,7 +27,7 @@ program
   .option("-s, --scopedir <path>", "Path of the scope directory from which the tool is called")
   .option("-v, --vsntag <vsntag>", "Versiontag for which the MRG needs to be (re)generated")
   .option("-e, --onNotExist <action>", "The action in case a `vsntag` was specified, but wasn't found in the SAF")
-  .option("-p, --prune", "Prune MRGs of the local scope that are not in the SAF")
+  .option("-d, --debug <level>", "Set the debug level (e.g., 'info', 'debug', 'warn', 'error', 'trace')")
   .option("-h, --help", "Display help for command")
   .parse(process.argv)
 
@@ -65,6 +65,28 @@ async function main(): Promise<void> {
 
   report.setOnNotExist(options.onNotExist)
 
+  // Map string log levels to numeric values
+  const logLevelMap: { [key: string]: number } = {
+    trace: 0,
+    debug: 1,
+    info: 2,
+    warn: 3,
+    error: 4,
+    fatal: 5
+  };
+
+  const defaultLogLevel = "info";  // Default to 'info' level if not specified
+  let logLevel = options.debug?.toLowerCase() || defaultLogLevel;  // Use default if not specified
+
+  // Check if the logLevel provided is valid
+  if (!Object.keys(logLevelMap).includes(logLevel)) {
+    log.warn(`Invalid debug level '${logLevel}' provided. Falling back to default level '${defaultLogLevel}'.`);
+    logLevel = defaultLogLevel;
+  }
+
+  // Set the log level using the numeric value
+  log.settings.minLevel = logLevelMap[logLevel];  // Convert string log level to number using the map
+
   // Create a SAF and generator instance
   const saf = new SAF.Builder({ scopedir: resolve(options.scopedir) }).saf
   const generator = new Generator({ vsntag: options.vsntag, saf: saf })
@@ -72,10 +94,6 @@ async function main(): Promise<void> {
   // Start generation
   generator.initialize()
   log.info("Generation complete")
-
-  if (options.prune) {
-    await generator.prune()
-  }
 }
 
 try {

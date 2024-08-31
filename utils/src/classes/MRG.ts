@@ -1,3 +1,4 @@
+import { log } from "@tno-terminology-design/utils"; // Ensure this import is included
 import { regularize } from "../index.js";
 import fs = require("fs");
 import path = require("path");
@@ -227,31 +228,30 @@ export function getAllMatches(
 
   // Initial list of entries
   let matches = entries;
-  console.log(`Initial entries count in '${origin}': ${matches.length}`);
+  // log.debug`Initial entries count in '${origin}': ${matches.length}`);
 
   // Filter the entries by matching termType if type is provided and valid
   if (type != null) { // Skip filtering if type is undefined
     matches = matches.filter((entry) => entry.termType === type);
-    console.log(`Entries after termType filter (${type}) in '${origin}': ${matches.length}`);
+    // log.debug`Entries after termType filter (${type}) in '${origin}': ${matches.length}`);
   }
 
   // Enhanced filter: Include entries that either have `term` in `formPhrases` or the entry's `term` field matches
   matches = matches.filter((entry) =>
     (Array.isArray(entry.formPhrases) && entry.formPhrases.includes(term)) || entry.term === term
   );
-  console.log(`Entries after formPhrases or term match filter (${term}) in '${origin}': ${matches.length}`);
+  // log.debug`Entries after formPhrases or term match filter (${term}) in '${origin}': ${matches.length}`);
 
   // If more than one match is found, try filtering by the default type
   if (matches.length > 1 && defaulttype != null) {
     matches = matches.filter((entry) => entry.termType === defaulttype);
-    console.log(`Entries after defaulttype filter (${defaulttype}) in '${origin}': ${matches.length}`);
+    // log.debug`Entries after defaulttype filter (${defaulttype}) in '${origin}': ${matches.length}`);
   }
 
   // Return the list of matches, whether empty, single, or multiple
   return matches;
 }
 
-// Helper function to log multiple matching entries
 function logMultipleMatches(
   searchTerm: string,
   searchType: string,
@@ -274,9 +274,9 @@ function logMultipleMatches(
         return [field, truncate(String(value !== undefined && value !== null ? value : "undefined or empty"), truncateLength)];
       })
     );
-    console.log(`Searching for entry: ${JSON.stringify(excerptEntryToFind)}`);
+    // log.debug`Searching for entry: ${JSON.stringify(excerptEntryToFind)}`);
   } else {
-    console.log(`Entry being searched for: term '${searchTerm}', type '${searchType}' could not be specifically identified.`);
+    // log.debug`Entry being searched for: term '${searchTerm}', type '${searchType}' could not be specifically identified.`);
   }
 
   // Log the multiple matching entries found
@@ -293,7 +293,7 @@ function logMultipleMatches(
         }
       })
     );
-    console.log(`Match ${index + 1}: ${JSON.stringify(excerptMatch)}`);
+    // log.debug`Match ${index + 1}: ${JSON.stringify(excerptMatch)}`);
   });
 }
 
