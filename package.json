@@ -31,5 +31,8 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
-  "version": ""
+  "version": "",
+  "dependencies": {
+    "yaml": "^2.5.0"
+  }
 }
