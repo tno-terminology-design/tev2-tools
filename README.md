@@ -8,10 +8,10 @@ Please refer to the [project documentation](https://tno-terminology-design.githu
 
 ### v1.2.1
 
-- Added handlebars helper `eq`, which allows HRG templates to better deal with arrays that don't exist, have a single value, or multiple ones.
+- Extended the handlebars helper `ifValue`, which now allows not only the `equals` option, but also `notEqual`, `greaterThan`, `greaterThanOrEqual`, `lessThan`, `lessThanOrEqual`, `isNull`, `isTruthy`, and `isFalsy,`.
 - Rename `-o` into `-e` as equivalent for `--onNotExist`, to avoid ambiguities with `-o` that is used for output stuff (HRGT, MRG-import)
 - Make calling MRGT, HRGT more robust in terms of testing that stuff exists, and enhancing the logging
-- MRGT has some bugfixing in the treatment of `synonymOf` fields.
+- MRGT has bugfixes in the treatment of `synonymOf` fields.
 - HRGT command line no longer has `converter` as a requirement - if it isn't specified on the command-line, the config file, or in the MRG-ref, a default is taken.
 
 ### v1.2.0
