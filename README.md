@@ -8,6 +8,7 @@ Please refer to the [project documentation](https://tno-terminology-design.githu
 
 ### v1.2.1
 
+- Added handlebars helper `eq`, which allows HRG templates to better deal with arrays that don't exist, have a single value, or multiple ones.
 - Rename `-o` into `-e` as equivalent for `--onNotExist`, to avoid ambiguities with `-o` that is used for output stuff (HRGT, MRG-import)
 - Make calling MRGT, HRGT more robust in terms of testing that stuff exists, and enhancing the logging
 - MRGT has some bugfixing in the treatment of `synonymOf` fields.
