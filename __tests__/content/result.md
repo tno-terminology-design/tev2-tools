@@ -571,7 +571,7 @@ a specification, in the form of a predefined value or a <a href="https://tno-ter
 
 sSI (Self-Sovereign Identity) is a term that has many different interpretations, and that we use to refer to concepts/ideas, architectures, processes and technologies that aim to support (autonomous) This converter is used on and after the 7th occurrence of a term reference, in this case 'party:concept' as they negotiate and execute electronic <a href="https://essif-lab.github.io/framework/docs/terms/transaction" hovertext="Transaction: the exchange of goods, services, funds, or data between some Parties (called Participants of the Transaction)." >transaction (572, 346)</a> with one another.
 
-### [Synonym (of a [term](@))](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/synonym)
+### [Synonym (of a term)](https://tno-terminology-design.github.io/tev2-specifications/docs/terms/synonym)
 
 a This converter is used on and after the 7th occurrence of a term reference, in this case 'term:concept' that has the same (or sufficiently similar) meaning as another This converter is used on and after the 7th occurrence of a term reference, in this case 'term:concept' (i.e., the This converter is used on and after the 7th occurrence of a term reference, in this case 'term:concept' of which it is a <a href="https://tno-terminology-design.github.io/tev2-specifications/docs/terms/synonym" hovertext="Synonym (of a [term](@)): a Term that has the same (or sufficiently similar) meaning as another Term (i.e., the Term of which it is a Synonym." >synonym (576, 405)</a>.
 

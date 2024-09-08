@@ -2,8 +2,7 @@ import { glob } from "glob"
 import { Interpreter, type MRGRef } from "./Interpreter.js"
 import { Converter } from "./Converter.js"
 import { Sorter } from "./Sorter.js"
-import { SAF, MRG } from "@tno-terminology-design/utils"
-import { report, log, writeFile, type TermError, type Profile } from "@tno-terminology-design/utils"
+import { SAF, MRG, report, log, writeFile, type TermError, type Profile } from "@tno-terminology-design/utils" 
 
 import matter from "gray-matter"
 import fs = require("fs")
@@ -172,7 +171,7 @@ export class Resolver {
     const profile: Profile = {
       int: this.interpreter,
       ref: mrgref,
-      mrg: mrg.terminology,
+      mrg: mrg, // Use the actual `mrg` instance here
       err: {
         file: file.path.base,
         dir: file.path.dir,
@@ -194,8 +193,8 @@ export class Resolver {
       }
       entries.sort((a, b) =>
         sorter
-          .convert({ int: this.interpreter, ref: mrgref, entry: a, mrg: mrg.terminology })
-          .localeCompare(sorter.convert({ int: this.interpreter, ref: mrgref, entry: b, mrg: mrg.terminology }))
+          .convert({ int: this.interpreter, ref: mrgref, entry: a, mrg: mrg })
+          .localeCompare(sorter.convert({ int: this.interpreter, ref: mrgref, entry: b, mrg: mrg }))
       )
 
       // Check if the MRGRef has a converter specified

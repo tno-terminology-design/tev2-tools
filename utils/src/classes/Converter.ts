@@ -1,10 +1,10 @@
-import { MRG, Handlebars, type TermError, type Reference, Interpreter } from "../index.js"
+import { MRG, Handlebars, type TermError, type Reference, Interpreter } from "../index.js";
 
 export interface Profile {
   int: Interpreter
   ref: Reference
   entry?: MRG.Entry
-  mrg?: MRG.Terminology
+  mrg?: MRG.Type; // Update to use the full MRG type
   err?: TermError
 }
 
