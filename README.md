@@ -4,11 +4,14 @@ The Terminology Engine (v2) is a set of specifications and tools that caters for
 
 Please refer to the [project documentation](https://tno-terminology-design.github.io/tev2-specifications) for more information.
 
+For @RieksJ: The 'scripts' section in 'package.json' file states the ways in which you can, e.g., recompile the tools locally.
+
 ## Release Notes
 
 ### v1.2.1
 
 - Extended the handlebars helper `ifValue`, which now allows not only the `equals` option, but also `notEqual`, `greaterThan`, `greaterThanOrEqual`, `lessThan`, `lessThanOrEqual`, `isNull`, `isTruthy`, and `isFalsy,`.
+- Introduced the handlebars helper `sort`, which sorts arrays of strings alphabetically. It can be used, e.g., to sort glossaryNotes in an MRGentry.
 - Rename `-o` into `-e` as equivalent for `--onNotExist`, to avoid ambiguities with `-o` that is used for output stuff (HRGT, MRG-import)
 - Make calling MRGT, HRGT more robust in terms of testing that stuff exists, and enhancing the logging
 - MRGT has bugfixes in the treatment of `synonymOf` fields.
