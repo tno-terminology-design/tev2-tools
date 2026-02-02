@@ -3,34 +3,17 @@ on:
   release:
     types: [published]
 
-jobs:
-  # github:
-  #   name: Publish to GitHub Package Manager
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: "18.x"
-  #         registry-url: "https://npm.pkg.github.com"
-  #         cache: "npm"
-  #         scope: "@tno-terminology-design"
-  #     - run: |
-  #         npm ci
-  #         npm run build
-  #         npm publish --workspaces --access public
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+permissions:
+  id-token: write
+  contents: read
 
+jobs:
   npm:
     name: Publish to Node Package Manager
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
           registry-url: "https://registry.npmjs.org"
@@ -40,5 +23,3 @@ jobs:
           npm ci
           npm run build
           npm publish --workspaces --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
